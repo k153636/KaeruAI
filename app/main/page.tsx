@@ -49,8 +49,7 @@ export default function MainPage() {
   }
 
   function resetProfile() {
-    localStorage.removeItem("yt_profile");
-    router.push("/setup");
+    router.push("/profile");
   }
 
   if (!profile) return null;
