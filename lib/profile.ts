@@ -3,7 +3,7 @@ import { storage } from "./storage";
 
 const REQUIRED_KEYS: (keyof Profile)[] = [
   "platform", "motivation", "bestComment", "creativeTriger", "audienceRelation",
-  "coreTheme", "avoid", "reference", "processingStyle",
+  "targetAudience", "contentApproach", "avoid", "processingStyle",
   "creatorIdentity", "successDefinition",
 ];
 

@@ -4,9 +4,9 @@ export interface Profile {
   bestComment: string;
   creativeTriger: string;
   audienceRelation: string;
-  coreTheme: string;
+  targetAudience: string;
+  contentApproach: string;
   avoid: string;
-  reference: string;
   processingStyle: string;
   creatorIdentity: string;
   successDefinition: string;
