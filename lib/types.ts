@@ -15,6 +15,8 @@ export interface Idea {
   title: string;
   description: string;
   hook: string;
+  thumbnail: string;
+  filming: string;
 }
 
 export interface FeedbackEntry {
