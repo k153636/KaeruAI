@@ -107,7 +107,7 @@ const STEPS: Step[] = [
   {
     id: "avoid",
     question: "絶対にやりたくないことは？",
-    subtitle: "これを外すことで企画の純度が上がります",
+    subtitle: "選んだ内容はAIが企画から除外します",
     type: "multiselect",
     options: [
       "炎上・煽りを狙ったコンテンツ",
