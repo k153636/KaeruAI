@@ -29,3 +29,7 @@ body {
   opacity: 0;
   animation: staggerIn 0.18s ease-out forwards;
 }
+
+button.stagger-item:disabled {
+  opacity: 0.3 !important;
+}
