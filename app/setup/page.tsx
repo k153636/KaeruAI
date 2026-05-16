@@ -17,56 +17,118 @@ interface Step {
 
 const STEPS: Step[] = [
   {
-    id: "genre",
-    question: "どんな内容のチャンネルですか？",
-    subtitle: "ジャンルや扱うテーマを自由に書いてください",
-    type: "text",
-    placeholder: "例：AIツール紹介、哲学系解説、筋トレ日記、ガジェットレビュー...",
-  },
-  {
-    id: "strength",
-    question: "チャンネルの一番の強みは何ですか？",
-    subtitle: "他のチャンネルと違う点、自分が得意なことを教えてください",
-    type: "text",
-    placeholder: "例：専門知識をわかりやすく噛み砕く、圧倒的なリサーチ量、独自の視点...",
-  },
-  {
-    id: "moodGoal",
-    question: "視聴者にどんな気持ちになってほしいですか？",
-    subtitle: "動画を見終わった後の感情。複数選択できます",
-    type: "multiselect",
+    id: "motivation",
+    question: "なぜ動画を作るの？",
+    subtitle: "一番近いものを選んでください",
+    type: "select",
     options: [
-      "「なるほど！」と学びを得た",
-      "「やってみよう」と行動したくなった",
-      "「面白かった」と笑えた",
-      "「スッキリした」と癒された",
-      "「怖い・衝撃的」と心が揺れた",
-      "「共感した」と分かってもらえた",
-      "「すごい」と純粋に感動した",
+      "お金・影響力を得たいから",
+      "自分の考えや知識を広めたいから",
+      "純粋に楽しい・自己表現したいから",
+      "誰かの悩みを解決したいから",
+      "認められたい・有名になりたいから",
     ],
   },
   {
-    id: "avoid",
-    question: "絶対にやりたくないことは何ですか？",
-    subtitle: "コンテンツの方向性・スタイル・テーマ、何でもOK",
+    id: "bestComment",
+    question: "視聴者から一番嬉しいコメントは？",
+    subtitle: "正直に選んでください",
+    type: "select",
+    options: [
+      "「すごくわかりやすかった」",
+      "「笑えた、また来ます」",
+      "「やってみます！」",
+      "「元気もらえました」",
+      "「ずっと応援してます」",
+    ],
+  },
+  {
+    id: "creativeTriger",
+    question: "動画を作りたくなる瞬間は？",
+    subtitle: "複数選択できます",
+    type: "multiselect",
+    options: [
+      "怒りや違和感を感じた時",
+      "感動・発見があった時",
+      "誰かに教えたいことができた時",
+      "面白い体験をした時",
+    ],
+  },
+  {
+    id: "audienceRelation",
+    question: "視聴者との理想の関係は？",
+    subtitle: "自分のチャンネルのイメージに近いものを",
+    type: "select",
+    options: [
+      "先生と生徒（教える立場）",
+      "友達・仲間（対等）",
+      "演者と観客（エンタメ届ける）",
+      "同志（同じ道を歩む）",
+    ],
+  },
+  {
+    id: "coreTheme",
+    question: "チャンネルの核となる「問い」を一言で",
+    subtitle: "あなたが一生追いかけたいテーマや問いかけ",
     type: "text",
-    placeholder: "例：炎上狙い、政治系の話題、長すぎる動画、顔出し...",
+    placeholder: "例：「なぜ人は変われないのか」「最高の体験を追い求める」",
+  },
+  {
+    id: "avoid",
+    question: "絶対にやりたくないことは？",
+    subtitle: "テーマ・スタイル・表現方法、何でもOK",
+    type: "text",
+    placeholder: "例：炎上狙い、政治系の話題、顔出し、長すぎる動画...",
   },
   {
     id: "reference",
-    question: "参考にしているチャンネルや好きなコンテンツは？",
-    subtitle: "YouTubeに限らず、映画・本・SNSなど何でも",
+    question: "参考にしているコンテンツ・人物は？",
+    subtitle: "YouTube以外でも、本・映画・SNSなど何でも",
     type: "text",
-    placeholder: "例：MKBHD、中田敦彦のYouTube大学、Vox、NHKドキュメンタリー...",
+    placeholder: "例：MKBHD、中田敦彦、Vox、村上春樹、スティーブ・ジョブズ...",
   },
   {
-    id: "tagline",
-    question: "あなたのチャンネルを一言で表すと？",
-    subtitle: "キャッチコピーでも、ひとつのキーワードでも",
-    type: "text",
-    placeholder: "例：「知的好奇心を刺激するチャンネル」「ゆるくて本質的」...",
+    id: "processingStyle",
+    question: "新しいことを学んだ時、まず何をしたい？",
+    subtitle: "自然な衝動に従って選んでください",
+    type: "select",
+    options: [
+      "とにかく深く調べる",
+      "誰かに話したくなる",
+      "すぐ自分で試してみる",
+      "全体像を図にまとめたくなる",
+    ],
+  },
+  {
+    id: "creatorIdentity",
+    question: "自分は本質的に何者だと思う？",
+    subtitle: "コンテンツ抜きで、あなたの本質を選んでください",
+    type: "select",
+    options: [
+      "教える人（ティーチャー）",
+      "楽しませる人（エンターテイナー）",
+      "探求する人（エクスプローラー）",
+      "語る人（ストーリーテラー）",
+      "批評・分析する人（クリティック）",
+      "実験する人（イノベーター）",
+    ],
+  },
+  {
+    id: "successDefinition",
+    question: "チャンネルが成功したと感じる瞬間は？",
+    subtitle: "あなたにとっての「ゴール」を選んでください",
+    type: "select",
+    options: [
+      "「あの動画で人生変わりました」と言われる",
+      "収益だけで生活できる",
+      "専門家として認められる",
+      "ファンが熱狂的に応援してくれる",
+      "心から楽しみながら続けられている",
+    ],
   },
 ];
+
+const SEPARATOR = "|||";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -77,15 +139,13 @@ export default function SetupPage() {
   const value = answers[current.id] ?? "";
 
   function toggleMulti(opt: string) {
-    const current_vals = value ? value.split("|||") : [];
-    const next = current_vals.includes(opt)
-      ? current_vals.filter((v) => v !== opt)
-      : [...current_vals, opt];
-    setAnswers((a) => ({ ...a, [current.id]: next.join("|||") }));
+    const vals = value ? value.split(SEPARATOR) : [];
+    const next = vals.includes(opt) ? vals.filter((v) => v !== opt) : [...vals, opt];
+    setAnswers((a) => ({ ...a, [current.id]: next.join(SEPARATOR) }));
   }
 
   function isSelected(opt: string) {
-    return value.split("|||").includes(opt);
+    return value.split(SEPARATOR).includes(opt);
   }
 
   function canNext() {
@@ -97,25 +157,25 @@ export default function SetupPage() {
   function next() {
     if (step < STEPS.length - 1) {
       setStep((s) => s + 1);
-    } else {
-      const formatMulti = (val: string) =>
-        val.split("|||").filter(Boolean).join("、");
-
-      const profile: Profile = {
-        genre: answers.genre ?? "",
-        strength: answers.strength ?? "",
-        moodGoal: formatMulti(answers.moodGoal ?? ""),
-        avoid: answers.avoid ?? "",
-        reference: answers.reference ?? "",
-        tagline: answers.tagline ?? "",
-      };
-      localStorage.setItem("yt_profile", JSON.stringify(profile));
-      router.push("/main");
+      return;
     }
-  }
 
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && canNext()) next();
+    const fmt = (v: string) => v.split(SEPARATOR).filter(Boolean).join("、");
+
+    const profile: Profile = {
+      motivation: answers.motivation ?? "",
+      bestComment: answers.bestComment ?? "",
+      creativeTriger: fmt(answers.creativeTriger ?? ""),
+      audienceRelation: answers.audienceRelation ?? "",
+      coreTheme: answers.coreTheme ?? "",
+      avoid: answers.avoid ?? "",
+      reference: answers.reference ?? "",
+      processingStyle: answers.processingStyle ?? "",
+      creatorIdentity: answers.creatorIdentity ?? "",
+      successDefinition: answers.successDefinition ?? "",
+    };
+    localStorage.setItem("yt_profile", JSON.stringify(profile));
+    router.push("/main");
   }
 
   const progress = ((step + 1) / STEPS.length) * 100;
@@ -123,16 +183,14 @@ export default function SetupPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
-        {/* Header */}
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
             <span className="text-2xl">🎬</span>
             <span>YouTuber企画メーカー</span>
           </div>
-          <p className="text-zinc-500 text-sm">チャンネルのことを教えてください</p>
+          <p className="text-zinc-500 text-sm">あなたのことを教えてください</p>
         </div>
 
-        {/* Progress */}
         <div className="mb-8">
           <div className="flex justify-between text-xs text-zinc-500 mb-2">
             <span>STEP {step + 1} / {STEPS.length}</span>
@@ -146,7 +204,6 @@ export default function SetupPage() {
           </div>
         </div>
 
-        {/* Question card */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-white mb-1">{current.question}</h2>
           <p className="text-zinc-500 text-sm mb-6">{current.subtitle}</p>
@@ -155,48 +212,38 @@ export default function SetupPage() {
             <textarea
               value={value}
               onChange={(e) => setAnswers((a) => ({ ...a, [current.id]: e.target.value }))}
-              onKeyDown={handleKeyDown}
+              onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && canNext() && next()}
               placeholder={current.placeholder}
               rows={3}
               className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
               autoFocus
             />
-          ) : current.type === "multiselect" ? (
-            <div className="flex flex-wrap gap-2">
-              {current.options?.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => toggleMulti(opt)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
-                    isSelected(opt)
-                      ? "bg-red-500 border-red-500 text-white"
-                      : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
           ) : (
             <div className="flex flex-wrap gap-2">
-              {current.options?.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => setAnswers((a) => ({ ...a, [current.id]: opt }))}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
-                    value === opt
-                      ? "bg-red-500 border-red-500 text-white"
-                      : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
-                  }`}
-                >
-                  {opt}
-                </button>
-              ))}
+              {current.options?.map((opt) => {
+                const active = current.type === "multiselect" ? isSelected(opt) : value === opt;
+                return (
+                  <button
+                    key={opt}
+                    onClick={() =>
+                      current.type === "multiselect"
+                        ? toggleMulti(opt)
+                        : setAnswers((a) => ({ ...a, [current.id]: opt }))
+                    }
+                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
+                      active
+                        ? "bg-red-500 border-red-500 text-white"
+                        : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* Navigation */}
         <div className="flex gap-3">
           {step > 0 && (
             <button

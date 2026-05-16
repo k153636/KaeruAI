@@ -13,40 +13,42 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const prompt = `あなたはYouTuberの企画参謀です。以下のYouTuberのプロフィールと今日の気分をもとに、具体的で面白い企画を5つ提案してください。
+  const prompt = `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、このクリエイターにしか作れない企画を5つ提案してください。
 
-【チャンネルプロフィール】
-- ジャンル・テーマ：${profile.genre}
-- チャンネルの強み：${profile.strength}
-- 視聴者に感じてほしいこと：${profile.moodGoal}
+【クリエイタープロフィール】
+- 動画を作る動機：${profile.motivation}
+- 一番嬉しい視聴者の反応：${profile.bestComment}
+- 創作衝動が湧く瞬間：${profile.creativeTriger}
+- 視聴者との理想の関係：${profile.audienceRelation}
+- チャンネルの核となる問い：${profile.coreTheme}
 - 絶対にやりたくないこと：${profile.avoid}
-- 参考にしているコンテンツ：${profile.reference}
-- チャンネルを一言で言うと：${profile.tagline}
+- 参考にしているコンテンツ・人物：${profile.reference}
+- 情報処理スタイル：${profile.processingStyle}
+- クリエイターとしての本質：${profile.creatorIdentity}
+- 成功の定義：${profile.successDefinition}
 
 【今日の気分】
 ${mood}
 
-以下のJSON形式で厳密に返答してください。他のテキストは一切含めないでください：
+以下のJSON形式のみで返答してください。前後に余分なテキストは不要です：
 {
   "ideas": [
     {
-      "title": "動画タイトル（視聴者がクリックしたくなる具体的なタイトル）",
-      "description": "企画の内容説明（2〜3文で具体的に）",
-      "hook": "最初の15秒で使える掴みセリフ"
+      "title": "タイトル（視聴者がクリックしたくなる具体的なもの）",
+      "description": "企画内容（2〜3文。何をどう撮るか具体的に）",
+      "hook": "冒頭15秒の掴みセリフ"
     }
   ]
 }
 
-条件：
+制約：
 - 「絶対にやりたくないこと」は絶対に含めない
-- 今日の気分とチャンネルの強みを掛け合わせた企画にする
-- 視聴者に「${profile.moodGoal}」と感じてもらえる内容にする
-- タイトルは具体的で数字や感情ワードを活用する
-- 実際に撮影できそうな現実的な企画にする
-- チャンネルの個性（${profile.tagline}）が出る企画にする`;
+- クリエイターの本質（${profile.creatorIdentity}）が自然に滲み出る企画にする
+- 今日の気分を起点にしつつ、チャンネルの核（${profile.coreTheme}）と接続する
+- 視聴者に「${profile.bestComment}」と言ってもらえるような方向性にする
+- 実際に一人で撮影・編集できるスケール感にする`;
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
   const result = await model.generateContent(prompt);
   const text = result.response.text().trim();
 
@@ -56,6 +58,5 @@ ${mood}
   }
 
   const parsed = JSON.parse(jsonMatch[0]) as { ideas: Idea[] };
-
   return Response.json(parsed);
 }
