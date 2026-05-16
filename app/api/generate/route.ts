@@ -1,16 +1,18 @@
 import Groq from "groq-sdk";
 import type { Profile, Idea, FeedbackStore } from "@/lib/types";
+import { getPlatform } from "@/lib/platforms";
 
 function getGroq() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
-const SYSTEM_PROMPT = `あなたはYouTuberの専属企画参謀です。
+const SYSTEM_PROMPT = `あなたはコンテンツクリエイターの専属企画参謀です。
 クリエイターの本質・動機・スタイルを深く理解し、そのクリエイターにしか作れない企画を提案します。
 返答は必ず指定されたJSON形式のみで行い、前後に余分なテキストを一切含めないでください。
 すべての出力は日本語で行ってください。`;
 
 function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore): string {
+  const platform = getPlatform(profile.platform);
   const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
   const dislikedTitles = feedback.disliked.slice(0, 5).map((e) => `・${e.title}`).join("\n");
 
@@ -19,12 +21,15 @@ function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore
       ? `\n【過去のフィードバック】\n${likedTitles ? `好みの傾向（このテイストに近づけて）：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}\n`
       : "";
 
-  return `【クリエイタープロフィール】
-- 動画を作る動機：${profile.motivation}
-- 一番嬉しい視聴者の反応：${profile.bestComment}
+  return `【プラットフォーム】
+${platform.label}（${platform.contentWord}を作っているクリエイター）
+
+【クリエイタープロフィール】
+- コンテンツを作る動機：${profile.motivation}
+- 一番嬉しいフォロワーの反応：${profile.bestComment}
 - 創作衝動が湧く瞬間：${profile.creativeTriger}
-- 視聴者との理想の関係：${profile.audienceRelation}
-- チャンネルの核となる問い：${profile.coreTheme}
+- フォロワーとの理想の関係：${profile.audienceRelation}
+- チャンネル・アカウントの核となる問い：${profile.coreTheme}
 - 絶対にやりたくないこと：${profile.avoid}
 - 参考にしているコンテンツ・人物：${profile.reference}
 - 情報処理スタイル：${profile.processingStyle}
@@ -39,10 +44,10 @@ ${mood}
   "ideas": [
     {
       "title": "タイトル（数字・感情ワード・具体性を含むクリックされるもの）",
-      "description": "①何をするか ②なぜ面白いか ③視聴者にとっての価値（3文）",
-      "hook": "冒頭15秒のセリフ（そのまま読めるレベルで具体的に）",
-      "thumbnail": "サムネイル構成（背景色・メインビジュアル・テキスト・表情・構図）",
-      "filming": "撮影メモ（必要な素材・場所・道具・構成順を箇条書き）"
+      "description": "①何をするか ②なぜ面白いか ③フォロワーにとっての価値（3文）",
+      "hook": "${platform.hookPlaceholder}",
+      "thumbnail": "${platform.visualLabel}の構成案（具体的に）",
+      "filming": "${platform.productionLabel}（必要な素材・場所・道具・構成順を箇条書き）"
     }
   ]
 }
@@ -50,9 +55,10 @@ ${mood}
 制約：
 - 「絶対にやりたくないこと」は絶対に含めない
 - ${profile.creatorIdentity}としての本質が滲み出る企画にする
-- 今日の気分（${mood}）とチャンネルの核（${profile.coreTheme}）を接続する
+- 今日の気分（${mood}）とアカウントの核（${profile.coreTheme}）を接続する
 - 「${profile.bestComment}」と言ってもらえる方向性にする
-- 一人で撮影・編集できるスケール感にする
+- ${platform.label}に適したフォーマット・尺感の企画にする
+- 一人で制作できるスケール感にする
 - 5つは互いに方向性が重複しないようにする`;
 }
 
