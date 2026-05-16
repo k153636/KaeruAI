@@ -19,3 +19,13 @@ body {
 .page-fade {
   animation: fadeIn 0.22s ease-out;
 }
+
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: staggerIn 0.18s ease-out forwards;
+}

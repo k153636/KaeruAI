@@ -263,7 +263,7 @@ export default function SetupPage() {
           ) : (
             <div>
               <div className="flex flex-wrap gap-2">
-                {current.options?.map((opt) => {
+                {current.options?.map((opt, i) => {
                   const active = current.type === "multiselect" ? isSelected(opt) : value === opt;
                   const label = current.id === "platform"
                     ? (PLATFORMS.find((p) => p.id === opt)?.label ?? opt)
@@ -279,7 +279,8 @@ export default function SetupPage() {
                           : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                       }
                       disabled={atLimit}
-                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                      style={{ animationDelay: `${i * 55}ms` }}
+                      className={`stagger-item px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                         active
                           ? "bg-red-500 border-red-500 text-white"
                           : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
