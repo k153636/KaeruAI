@@ -4,101 +4,85 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
 
-const STEPS = [
+type StepType = "text" | "select";
+
+interface Step {
+  id: keyof Profile;
+  question: string;
+  subtitle: string;
+  type: StepType;
+  placeholder?: string;
+  options?: string[];
+}
+
+const STEPS: Step[] = [
   {
     id: "genre",
-    question: "チャンネルのジャンルは？",
-    subtitle: "メインで扱っているコンテンツを選んでください",
-    options: [
-      "ゲーム実況",
-      "Vlog・日常",
-      "料理・グルメ",
-      "ビジネス・自己啓発",
-      "テック・ガジェット",
-      "エンタメ・バラエティ",
-      "教育・解説",
-      "スポーツ・フィットネス",
-      "美容・ファッション",
-      "旅行・アウトドア",
-    ],
+    question: "どんな内容のチャンネルですか？",
+    subtitle: "ジャンルや扱うテーマを自由に書いてください",
+    type: "text",
+    placeholder: "例：AIツール紹介、哲学系解説、筋トレ日記、ガジェットレビュー...",
   },
   {
-    id: "style",
-    question: "好きな動画スタイルは？",
-    subtitle: "自分のチャンネルに合うスタイルを選んでください",
+    id: "strength",
+    question: "チャンネルの一番の強みは何ですか？",
+    subtitle: "他のチャンネルと違う点、自分が得意なことを教えてください",
+    type: "text",
+    placeholder: "例：専門知識をわかりやすく噛み砕く、圧倒的なリサーチ量、独自の視点...",
+  },
+  {
+    id: "moodGoal",
+    question: "視聴者にどんな気持ちになってほしいですか？",
+    subtitle: "動画を見終わった後の視聴者の感情をイメージしてください",
+    type: "select",
     options: [
-      "テンポ速め・エネルギッシュ",
-      "じっくり・丁寧に解説",
-      "笑いあり・エンタメ系",
-      "感動・ストーリー系",
-      "情報密度高め・知識系",
-      "リアル・ドキュメンタリー系",
-      "短くサクッと完結",
-      "長尺でじっくり",
+      "「なるほど！」と学びを得た",
+      "「やってみよう」と行動したくなった",
+      "「面白かった」と笑えた",
+      "「スッキリした」と癒された",
+      "「怖い・衝撃的」と心が揺れた",
+      "「共感した」と分かってもらえた",
+      "「すごい」と純粋に感動した",
     ],
   },
   {
     id: "avoid",
-    question: "避けたいテーマは？",
-    subtitle: "扱いたくないジャンルがあれば選んでください（複数可）",
-    options: [
-      "政治・社会問題",
-      "炎上・対立系",
-      "お金・投資",
-      "恋愛・出会い",
-      "ホラー・怖い話",
-      "暴力・過激な表現",
-      "特になし",
-    ],
-    multi: true,
+    question: "絶対にやりたくないことは何ですか？",
+    subtitle: "コンテンツの方向性・スタイル・テーマ、何でもOK",
+    type: "text",
+    placeholder: "例：炎上狙い、政治系の話題、長すぎる動画、顔出し...",
   },
   {
-    id: "audience",
-    question: "メインのターゲット視聴者は？",
-    subtitle: "どんな人に見てほしいですか？",
-    options: [
-      "10代（学生）",
-      "20代（社会人・学生）",
-      "30〜40代（社会人）",
-      "主婦・主夫",
-      "ビジネスパーソン",
-      "趣味人・マニア",
-      "幅広くみんなに",
-    ],
+    id: "reference",
+    question: "参考にしているチャンネルや好きなコンテンツは？",
+    subtitle: "YouTubeに限らず、映画・本・SNSなど何でも",
+    type: "text",
+    placeholder: "例：MKBHD、中田敦彦のYouTube大学、Vox、NHKドキュメンタリー...",
+  },
+  {
+    id: "tagline",
+    question: "あなたのチャンネルを一言で表すと？",
+    subtitle: "キャッチコピーでも、ひとつのキーワードでも",
+    type: "text",
+    placeholder: "例：「知的好奇心を刺激するチャンネル」「ゆるくて本質的」...",
   },
 ];
 
 export default function SetupPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
+  const [answers, setAnswers] = useState<Partial<Record<keyof Profile, string>>>({});
 
   const current = STEPS[step];
-  const isMulti = current.multi === true;
-  const selected = answers[current.id];
+  const value = answers[current.id] ?? "";
 
-  function toggle(option: string) {
-    if (isMulti) {
-      const cur = (answers[current.id] as string[] | undefined) ?? [];
-      const next = cur.includes(option)
-        ? cur.filter((v) => v !== option)
-        : [...cur, option];
-      setAnswers((a) => ({ ...a, [current.id]: next }));
-    } else {
-      setAnswers((a) => ({ ...a, [current.id]: option }));
-    }
-  }
-
-  function isSelected(option: string) {
-    if (isMulti) {
-      return ((selected as string[] | undefined) ?? []).includes(option);
-    }
-    return selected === option;
+  function setValue(val: string) {
+    setAnswers((a) => ({ ...a, [current.id]: val }));
   }
 
   function canNext() {
-    if (isMulti) return true;
-    return !!selected;
+    if (current.type === "select") return !!value;
+    return value.trim().length > 0;
   }
 
   function next() {
@@ -106,16 +90,20 @@ export default function SetupPage() {
       setStep((s) => s + 1);
     } else {
       const profile: Profile = {
-        genre: answers.genre as string,
-        style: answers.style as string,
-        avoid: Array.isArray(answers.avoid)
-          ? (answers.avoid as string[]).join("、")
-          : "特になし",
-        audience: answers.audience as string,
+        genre: answers.genre ?? "",
+        strength: answers.strength ?? "",
+        moodGoal: answers.moodGoal ?? "",
+        avoid: answers.avoid ?? "",
+        reference: answers.reference ?? "",
+        tagline: answers.tagline ?? "",
       };
       localStorage.setItem("yt_profile", JSON.stringify(profile));
       router.push("/main");
     }
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" && canNext()) next();
   }
 
   const progress = ((step + 1) / STEPS.length) * 100;
@@ -129,7 +117,7 @@ export default function SetupPage() {
             <span className="text-2xl">🎬</span>
             <span>YouTuber企画メーカー</span>
           </div>
-          <p className="text-zinc-500 text-sm">1分でセットアップ完了</p>
+          <p className="text-zinc-500 text-sm">チャンネルのことを教えてください</p>
         </div>
 
         {/* Progress */}
@@ -151,37 +139,53 @@ export default function SetupPage() {
           <h2 className="text-xl font-bold text-white mb-1">{current.question}</h2>
           <p className="text-zinc-500 text-sm mb-6">{current.subtitle}</p>
 
-          <div className="flex flex-wrap gap-2">
-            {current.options.map((opt) => (
-              <button
-                key={opt}
-                onClick={() => toggle(opt)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
-                  isSelected(opt)
-                    ? "bg-red-500 border-red-500 text-white"
-                    : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
-                }`}
-              >
-                {opt}
-              </button>
-            ))}
-          </div>
-
-          {isMulti && (
-            <p className="text-zinc-600 text-xs mt-4">
-              ※ 複数選択可。選ばなくてもOK
-            </p>
+          {current.type === "text" ? (
+            <textarea
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={current.placeholder}
+              rows={3}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+              autoFocus
+            />
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {current.options?.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => setValue(opt)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
+                    value === opt
+                      ? "bg-red-500 border-red-500 text-white"
+                      : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
-        {/* Next button */}
-        <button
-          onClick={next}
-          disabled={!canNext()}
-          className="w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white"
-        >
-          {step < STEPS.length - 1 ? "次へ →" : "セットアップ完了 🎉"}
-        </button>
+        {/* Navigation */}
+        <div className="flex gap-3">
+          {step > 0 && (
+            <button
+              onClick={() => setStep((s) => s - 1)}
+              className="px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer"
+            >
+              ← 戻る
+            </button>
+          )}
+          <button
+            onClick={next}
+            disabled={!canNext()}
+            className="flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white"
+          >
+            {step < STEPS.length - 1 ? "次へ →" : "セットアップ完了 🎉"}
+          </button>
+        </div>
       </div>
     </div>
   );

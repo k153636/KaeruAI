@@ -1,8 +1,10 @@
 export interface Profile {
   genre: string;
-  style: string;
+  strength: string;
+  moodGoal: string;
   avoid: string;
-  audience: string;
+  reference: string;
+  tagline: string;
 }
 
 export interface Idea {

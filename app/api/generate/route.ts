@@ -13,13 +13,15 @@ export async function POST(request: Request) {
     return Response.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  const prompt = `あなたはYouTuberの企画参謀です。以下のYouTuberプロフィールと今日の気分をもとに、具体的で面白い企画を5つ提案してください。
+  const prompt = `あなたはYouTuberの企画参謀です。以下のYouTuberのプロフィールと今日の気分をもとに、具体的で面白い企画を5つ提案してください。
 
-【プロフィール】
-- ジャンル：${profile.genre}
-- 動画スタイル：${profile.style}
-- 避けたいテーマ：${profile.avoid}
-- ターゲット視聴者：${profile.audience}
+【チャンネルプロフィール】
+- ジャンル・テーマ：${profile.genre}
+- チャンネルの強み：${profile.strength}
+- 視聴者に感じてほしいこと：${profile.moodGoal}
+- 絶対にやりたくないこと：${profile.avoid}
+- 参考にしているコンテンツ：${profile.reference}
+- チャンネルを一言で言うと：${profile.tagline}
 
 【今日の気分】
 ${mood}
@@ -36,10 +38,12 @@ ${mood}
 }
 
 条件：
-- 避けたいテーマは絶対に含めない
-- 今日の気分をチャンネルの色と掛け合わせた企画にする
-- タイトルは具体的で数字や感情ワードを使う
-- 実際に撮影できそうな現実的な企画にする`;
+- 「絶対にやりたくないこと」は絶対に含めない
+- 今日の気分とチャンネルの強みを掛け合わせた企画にする
+- 視聴者に「${profile.moodGoal}」と感じてもらえる内容にする
+- タイトルは具体的で数字や感情ワードを活用する
+- 実際に撮影できそうな現実的な企画にする
+- チャンネルの個性（${profile.tagline}）が出る企画にする`;
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 

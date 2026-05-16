@@ -74,7 +74,7 @@ export default function MainPage() {
 
         {/* Profile badge */}
         <div className="flex flex-wrap gap-2 mb-8">
-          {[profile.genre, profile.style, profile.audience].map((tag) => (
+          {[profile.genre, profile.tagline].filter(Boolean).map((tag) => (
             <span
               key={tag}
               className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-400"
