@@ -346,7 +346,7 @@ export default function SetupPage() {
                 }
               </div>
               {current.type === "multiselect" && (
-                <div style={{ animationDelay: "300ms" }} className="stagger-item flex gap-2 mt-3">
+                <FadeUp triggerKey={step} delay={300} className="flex gap-2 mt-3">
                   <input
                     type="text"
                     value={customInput}
@@ -362,7 +362,7 @@ export default function SetupPage() {
                   >
                     追加
                   </button>
-                </div>
+                </FadeUp>
               )}
             </div>
           )}
