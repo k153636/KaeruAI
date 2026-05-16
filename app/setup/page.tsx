@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
 
-type StepType = "text" | "select";
+type StepType = "text" | "select" | "multiselect";
 
 interface Step {
   id: keyof Profile;
@@ -33,8 +33,8 @@ const STEPS: Step[] = [
   {
     id: "moodGoal",
     question: "視聴者にどんな気持ちになってほしいですか？",
-    subtitle: "動画を見終わった後の視聴者の感情をイメージしてください",
-    type: "select",
+    subtitle: "動画を見終わった後の感情。複数選択できます",
+    type: "multiselect",
     options: [
       "「なるほど！」と学びを得た",
       "「やってみよう」と行動したくなった",
@@ -76,11 +76,20 @@ export default function SetupPage() {
   const current = STEPS[step];
   const value = answers[current.id] ?? "";
 
-  function setValue(val: string) {
-    setAnswers((a) => ({ ...a, [current.id]: val }));
+  function toggleMulti(opt: string) {
+    const current_vals = value ? value.split("|||") : [];
+    const next = current_vals.includes(opt)
+      ? current_vals.filter((v) => v !== opt)
+      : [...current_vals, opt];
+    setAnswers((a) => ({ ...a, [current.id]: next.join("|||") }));
+  }
+
+  function isSelected(opt: string) {
+    return value.split("|||").includes(opt);
   }
 
   function canNext() {
+    if (current.type === "multiselect") return value.length > 0;
     if (current.type === "select") return !!value;
     return value.trim().length > 0;
   }
@@ -89,10 +98,13 @@ export default function SetupPage() {
     if (step < STEPS.length - 1) {
       setStep((s) => s + 1);
     } else {
+      const formatMulti = (val: string) =>
+        val.split("|||").filter(Boolean).join("、");
+
       const profile: Profile = {
         genre: answers.genre ?? "",
         strength: answers.strength ?? "",
-        moodGoal: answers.moodGoal ?? "",
+        moodGoal: formatMulti(answers.moodGoal ?? ""),
         avoid: answers.avoid ?? "",
         reference: answers.reference ?? "",
         tagline: answers.tagline ?? "",
@@ -142,19 +154,35 @@ export default function SetupPage() {
           {current.type === "text" ? (
             <textarea
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => setAnswers((a) => ({ ...a, [current.id]: e.target.value }))}
               onKeyDown={handleKeyDown}
               placeholder={current.placeholder}
               rows={3}
               className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
               autoFocus
             />
+          ) : current.type === "multiselect" ? (
+            <div className="flex flex-wrap gap-2">
+              {current.options?.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => toggleMulti(opt)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
+                    isSelected(opt)
+                      ? "bg-red-500 border-red-500 text-white"
+                      : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
           ) : (
             <div className="flex flex-wrap gap-2">
               {current.options?.map((opt) => (
                 <button
                   key={opt}
-                  onClick={() => setValue(opt)}
+                  onClick={() => setAnswers((a) => ({ ...a, [current.id]: opt }))}
                   className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
                     value === opt
                       ? "bg-red-500 border-red-500 text-white"
