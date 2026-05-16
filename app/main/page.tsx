@@ -9,6 +9,7 @@ import { addHistory } from "@/lib/history";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
+import ThemeToggle from "@/components/ThemeToggle";
 
 function IconCopy({ size = 14 }: { size?: number }) {
   return (
@@ -140,6 +141,7 @@ export default function MainPage() {
               <IconUser size={14} />
               プロフィール
             </button>
+            <ThemeToggle size={15} />
           </div>
         </FadeUp>
 

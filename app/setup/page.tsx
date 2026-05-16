@@ -7,6 +7,7 @@ import { saveProfile } from "@/lib/profile";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 import FadeUp from "@/components/FadeUp";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type StepType = "text" | "select" | "multiselect";
 
@@ -257,7 +258,10 @@ export default function SetupPage() {
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center relative">
+          <div className="absolute right-0 top-0">
+            <ThemeToggle size={15} />
+          </div>
           <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
             <IconCamera size={22} />
             <span>KaeruAI</span>

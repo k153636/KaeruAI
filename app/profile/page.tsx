@@ -6,6 +6,7 @@ import type { Profile } from "@/lib/types";
 import { loadProfile, saveProfile } from "@/lib/profile";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const SEPARATOR = "|||";
 
@@ -228,13 +229,16 @@ export default function ProfilePage() {
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-zinc-900 font-bold text-xl">プロフィール編集</h1>
-          <button
-            onClick={() => router.push("/main")}
-            className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
-          >
-            <IconArrowLeft size={16} />
-            戻る
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle size={15} />
+            <button
+              onClick={() => router.push("/main")}
+              className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
+            >
+              <IconArrowLeft size={16} />
+              戻る
+            </button>
+          </div>
         </div>
 
         <div className="space-y-3">

@@ -7,6 +7,7 @@ import { getHistory, deleteHistory } from "@/lib/history";
 import { loadProfile } from "@/lib/profile";
 import { getPlatform } from "@/lib/platforms";
 import { IconCamera, IconArrowLeft } from "@/components/icons";
+import ThemeToggle from "@/components/ThemeToggle";
 
 function IconTrash({ size = 14 }: { size?: number }) {
   return (
@@ -80,13 +81,16 @@ export default function HistoryPage() {
             <IconCamera size={22} />
             <span>履歴</span>
           </div>
-          <button
-            onClick={() => router.push("/main")}
-            className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
-          >
-            <IconArrowLeft size={16} />
-            戻る
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle size={15} />
+            <button
+              onClick={() => router.push("/main")}
+              className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
+            >
+              <IconArrowLeft size={16} />
+              戻る
+            </button>
+          </div>
         </div>
 
         {entries.length === 0 ? (
