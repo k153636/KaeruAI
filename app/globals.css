@@ -26,8 +26,7 @@ body {
 }
 
 .stagger-item {
-  opacity: 0;
-  animation: staggerIn 0.18s ease-out forwards;
+  animation: staggerIn 0.18s ease-out both;
 }
 
 button.stagger-item:disabled {
