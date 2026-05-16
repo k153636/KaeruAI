@@ -1,25 +1,34 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef } from "react";
 
-export default function FadeUp({
-  delay = 0,
-  className = "",
-  children,
-  triggerKey,
-}: {
+type Props = {
+  as?: string;
   delay?: number;
   className?: string;
-  children: React.ReactNode;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
   triggerKey?: string | number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
+  [key: string]: any;
+};
+
+export default function FadeUp({
+  as: Tag = "div",
+  delay = 0,
+  className = "",
+  style,
+  children,
+  triggerKey,
+  ...rest
+}: Props) {
+  const ref = useRef<any>(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.style.opacity = "0";
-    el.style.transform = "translateY(10px)";
+    el.style.transform = "translateY(18px)";
     el.style.transition = "none";
     void el.offsetHeight;
     requestAnimationFrame(() => {
@@ -30,9 +39,10 @@ export default function FadeUp({
     });
   }, [triggerKey, delay]);
 
+  const AnyTag = Tag as any;
   return (
-    <div ref={ref} style={{ opacity: 0 }} className={className}>
+    <AnyTag ref={ref} className={className} style={{ opacity: 0, ...style }} {...rest}>
       {children}
-    </div>
+    </AnyTag>
   );
 }

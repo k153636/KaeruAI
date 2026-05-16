@@ -315,23 +315,25 @@ export default function SetupPage() {
                   const selectedCount = value ? value.split(SEPARATOR).filter(Boolean).length : 0;
                   const atLimit = !!current.maxSelect && selectedCount >= current.maxSelect && !active;
                   return (
-                    <button
+                    <FadeUp
                       key={opt}
+                      as="button"
+                      triggerKey={step}
+                      delay={100 + i * 50}
                       onClick={() =>
                         current.type === "multiselect"
                           ? toggleMulti(opt)
                           : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                       }
                       disabled={atLimit}
-                      style={{ animationDelay: `${100 + i * 50}ms` }}
-                      className={`stagger-item px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:!opacity-30 disabled:cursor-not-allowed ${
                         active
                           ? "bg-red-500 border-red-500 text-white"
                           : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
                       }`}
                     >
                       {label}
-                    </button>
+                    </FadeUp>
                   );
                 })}
                 {current.type === "multiselect" &&

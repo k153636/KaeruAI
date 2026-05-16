@@ -196,7 +196,7 @@ export default function MainPage() {
               const expanded = expandedId === idea.title;
 
               return (
-                <div key={i} style={{ animationDelay: `${i * 80}ms` }} className="stagger-item bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors">
+                <FadeUp key={i} delay={i * 80} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors">
                   <div className="p-5">
                     <div className="flex items-start gap-3">
                       <span className="text-red-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
@@ -271,7 +271,7 @@ export default function MainPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </FadeUp>
               );
             })}
 
