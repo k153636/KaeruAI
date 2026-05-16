@@ -1,16 +1,16 @@
 export interface Profile {
   platform: string;
   contentNiche: string;
-  motivation: string;
-  bestComment: string;
-  creativeTriger: string;
-  audienceRelation: string;
-  targetAudience: string;
-  contentApproach: string;
-  avoid: string;
-  processingStyle: string;
-  creatorIdentity: string;
-  successDefinition: string;
+  motivation?: string;
+  bestComment?: string;
+  creativeTriger?: string;
+  audienceRelation?: string;
+  targetAudience?: string;
+  contentApproach?: string;
+  avoid?: string;
+  processingStyle?: string;
+  creatorIdentity?: string;
+  successDefinition?: string;
 }
 
 export interface Idea {

@@ -1,11 +1,7 @@
 import type { Profile } from "./types";
 import { storage } from "./storage";
 
-const REQUIRED_KEYS: (keyof Profile)[] = [
-  "platform", "contentNiche", "motivation", "bestComment", "creativeTriger", "audienceRelation",
-  "targetAudience", "contentApproach", "avoid", "processingStyle",
-  "creatorIdentity", "successDefinition",
-];
+const REQUIRED_KEYS: (keyof Profile)[] = ["platform", "contentNiche"];
 
 export function loadProfile(): Profile | null {
   try {
