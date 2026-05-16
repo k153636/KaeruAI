@@ -4,16 +4,21 @@ import type { Profile, Idea } from "@/lib/types";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: Request) {
-  const { mood, profile } = (await request.json()) as {
-    mood: string;
-    profile: Profile;
-  };
+  try {
+    const { mood, profile } = (await request.json()) as {
+      mood: string;
+      profile: Profile;
+    };
 
-  if (!mood || !profile) {
-    return Response.json({ error: "Invalid request" }, { status: 400 });
-  }
+    if (!mood || !profile) {
+      return Response.json({ error: "リクエストが不正です" }, { status: 400 });
+    }
 
-  const prompt = `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、このクリエイターにしか作れない企画を5つ提案してください。
+    if (!process.env.GEMINI_API_KEY) {
+      return Response.json({ error: "GEMINI_API_KEY が設定されていません" }, { status: 500 });
+    }
+
+    const prompt = `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、このクリエイターにしか作れない企画を5つ提案してください。
 
 【クリエイタープロフィール】
 - 動画を作る動機：${profile.motivation}
@@ -48,15 +53,21 @@ ${mood}
 - 視聴者に「${profile.bestComment}」と言ってもらえるような方向性にする
 - 実際に一人で撮影・編集できるスケール感にする`;
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().trim();
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim();
 
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    return Response.json({ error: "AIの返答を解析できませんでした" }, { status: 500 });
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error("Gemini raw response:", text);
+      return Response.json({ error: "AIの返答を解析できませんでした。もう一度お試しください。" }, { status: 500 });
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]) as { ideas: Idea[] };
+    return Response.json(parsed);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("Generate error:", message);
+    return Response.json({ error: `エラー: ${message}` }, { status: 500 });
   }
-
-  const parsed = JSON.parse(jsonMatch[0]) as { ideas: Idea[] };
-  return Response.json(parsed);
 }
