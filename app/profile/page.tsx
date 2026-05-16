@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
+import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
 
 const SEPARATOR = "|||";
 
@@ -160,9 +161,10 @@ export default function ProfilePage() {
           <h1 className="text-white font-bold text-xl">プロフィール編集</h1>
           <button
             onClick={() => router.push("/main")}
-            className="text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer"
           >
-            ← 戻る
+            <IconArrowLeft size={16} />
+            戻る
           </button>
         </div>
 
@@ -188,8 +190,9 @@ export default function ProfilePage() {
                   {!isEditing && (
                     <button
                       onClick={() => startEdit(field)}
-                      className="text-xs text-zinc-500 hover:text-red-400 transition-colors cursor-pointer shrink-0 mt-1"
+                      className="flex items-center gap-1 text-xs text-zinc-500 hover:text-red-400 transition-colors cursor-pointer shrink-0 mt-1"
                     >
+                      <IconEdit size={13} />
                       変更
                     </button>
                   )}
@@ -236,8 +239,9 @@ export default function ProfilePage() {
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={save}
-                        className="px-4 py-2 bg-red-500 hover:bg-red-400 text-white text-sm font-medium rounded-xl transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-400 text-white text-sm font-medium rounded-xl transition-colors cursor-pointer"
                       >
+                        <IconCheck size={14} />
                         保存
                       </button>
                       <button

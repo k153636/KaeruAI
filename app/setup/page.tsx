@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
+import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 
 type StepType = "text" | "select" | "multiselect";
 
@@ -185,7 +186,7 @@ export default function SetupPage() {
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
-            <span className="text-2xl">🎬</span>
+            <IconCamera size={22} />
             <span>YouTuber企画メーカー</span>
           </div>
           <p className="text-zinc-500 text-sm">あなたのことを教えてください</p>
@@ -248,17 +249,22 @@ export default function SetupPage() {
           {step > 0 && (
             <button
               onClick={() => setStep((s) => s - 1)}
-              className="px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer"
             >
-              ← 戻る
+              <IconArrowLeft size={16} />
+              戻る
             </button>
           )}
           <button
             onClick={next}
             disabled={!canNext()}
-            className="flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white"
+            className="flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
           >
-            {step < STEPS.length - 1 ? "次へ →" : "セットアップ完了 🎉"}
+            {step < STEPS.length - 1 ? (
+              <><span>次へ</span><IconArrowRight size={18} /></>
+            ) : (
+              <><IconCheck size={18} /><span>セットアップ完了</span></>
+            )}
           </button>
         </div>
       </div>

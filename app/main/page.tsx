@@ -4,13 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import type { Idea } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
-import {
-  getFeedback,
-  getFeedbackState,
-  addLiked,
-  addDisliked,
-  removeFeedback,
-} from "@/lib/feedback";
+import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
+import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 
 export default function MainPage() {
   const router = useRouter();
@@ -87,14 +82,15 @@ export default function MainPage() {
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
-            <span className="text-2xl">🎬</span>
+            <IconCamera size={22} />
             <span>企画メーカー</span>
           </div>
           <button
             onClick={() => router.push("/profile")}
-            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
           >
-            プロフィール変更
+            <IconUser size={14} />
+            プロフィール
           </button>
         </div>
 
@@ -123,15 +119,18 @@ export default function MainPage() {
         <button
           onClick={generate}
           disabled={!mood.trim() || loading}
-          className="w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white mb-8"
+          className="w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white mb-8 flex items-center justify-center gap-2"
         >
           {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <>
+              <IconLoader size={18} className="animate-spin" />
               {retrying ? "リトライ中..." : "企画を考え中..."}
-            </span>
+            </>
           ) : (
-            "企画を5つ生成 ✨"
+            <>
+              <IconSparkle size={18} />
+              企画を5つ生成
+            </>
           )}
         </button>
 
@@ -145,7 +144,7 @@ export default function MainPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-zinc-400 text-sm font-medium">生成された企画（{mood}）</h2>
-              <span className="text-zinc-600 text-xs">👍/👎 で次回の精度が上がります</span>
+              <span className="text-zinc-600 text-xs">評価すると次回の精度が上がります</span>
             </div>
 
             {ideas.map((idea, i) => {
@@ -164,23 +163,25 @@ export default function MainPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleFeedback(idea, "liked")}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs border transition-all cursor-pointer ${
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border transition-all cursor-pointer ${
                             fb === "liked"
                               ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                              : "border-zinc-700 text-zinc-500 hover:border-zinc-500"
+                              : "border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
                           }`}
                         >
-                          👍 いい感じ
+                          <IconThumbUp size={13} />
+                          いい感じ
                         </button>
                         <button
                           onClick={() => handleFeedback(idea, "disliked")}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs border transition-all cursor-pointer ${
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border transition-all cursor-pointer ${
                             fb === "disliked"
                               ? "bg-red-500/20 border-red-500 text-red-400"
-                              : "border-zinc-700 text-zinc-500 hover:border-zinc-500"
+                              : "border-zinc-700 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300"
                           }`}
                         >
-                          👎 違う
+                          <IconThumbDown size={13} />
+                          違う
                         </button>
                       </div>
                     </div>
