@@ -370,7 +370,7 @@ export default function SetupPage() {
           )}
         </FadeUp>
 
-        <FadeUp triggerKey={step} delay={200} className="flex gap-3">
+        <FadeUp triggerKey={step} delay={80} className="flex gap-3">
           {step > 0 && (
             <button
               onClick={() => goStep(step - 1)}
