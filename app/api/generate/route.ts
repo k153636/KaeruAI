@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import type { Profile, Idea } from "@/lib/types";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(request: Request) {
   try {
@@ -14,8 +14,8 @@ export async function POST(request: Request) {
       return Response.json({ error: "リクエストが不正です" }, { status: 400 });
     }
 
-    if (!process.env.GEMINI_API_KEY) {
-      return Response.json({ error: "GEMINI_API_KEY が設定されていません" }, { status: 500 });
+    if (!process.env.GROQ_API_KEY) {
+      return Response.json({ error: "GROQ_API_KEY が設定されていません" }, { status: 500 });
     }
 
     const prompt = `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、このクリエイターにしか作れない企画を5つ提案してください。
@@ -53,13 +53,17 @@ ${mood}
 - 視聴者に「${profile.bestComment}」と言ってもらえるような方向性にする
 - 実際に一人で撮影・編集できるスケール感にする`;
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.8,
+    });
+
+    const text = completion.choices[0]?.message?.content?.trim() ?? "";
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Gemini raw response:", text);
+      console.error("Groq raw response:", text);
       return Response.json({ error: "AIの返答を解析できませんでした。もう一度お試しください。" }, { status: 500 });
     }
 
