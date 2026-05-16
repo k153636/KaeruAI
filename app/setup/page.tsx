@@ -281,7 +281,7 @@ export default function SetupPage() {
           </div>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
+        <div key={step} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
           <h2 style={{ animationDelay: "0ms" }} className="stagger-item text-xl font-bold text-white mb-1">{current.question}</h2>
           <div style={{ animationDelay: "55ms" }} className="stagger-item flex items-center justify-between mb-6">
             <p className="text-zinc-500 text-sm">{current.subtitle}</p>
@@ -369,7 +369,7 @@ export default function SetupPage() {
           )}
         </div>
 
-        <div className="flex gap-3">
+        <div key={`nav-${step}`} className="flex gap-3">
           {step > 0 && (
             <button
               onClick={() => goStep(step - 1)}
