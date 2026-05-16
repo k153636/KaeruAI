@@ -1,7 +1,9 @@
 import Groq from "groq-sdk";
 import type { Profile, Idea, FeedbackStore } from "@/lib/types";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGroq() {
+  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+}
 
 const SYSTEM_PROMPT = `あなたはYouTuberの専属企画参謀です。
 クリエイターの本質・動機・スタイルを深く理解し、そのクリエイターにしか作れない企画を提案します。
@@ -55,7 +57,7 @@ ${mood}
 }
 
 async function callGroq(systemPrompt: string, userPrompt: string): Promise<string> {
-  const completion = await groq.chat.completions.create({
+  const completion = await getGroq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
       { role: "system", content: systemPrompt },
