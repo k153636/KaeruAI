@@ -180,16 +180,20 @@ const STEPS: Step[] = [
   },
 ];
 
+const REQUIRED_STEPS = 2;
 const SEPARATOR = "|||";
+
+type Phase = "required" | "interstitial" | "optional";
 
 export default function SetupPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [phase, setPhase] = useState<Phase>("required");
   const [answers, setAnswers] = useState<Partial<Record<keyof Profile, string>>>({});
   const [customInput, setCustomInput] = useState("");
 
   const current = STEPS[step];
-  const value = answers[current.id] ?? "";
+  const value = answers[current?.id] ?? "";
 
   function toggleMulti(opt: string) {
     const vals = value ? value.split(SEPARATOR) : [];
@@ -227,51 +231,150 @@ export default function SetupPage() {
     return value.trim().length > 0;
   }
 
-  function next() {
-    if (step < STEPS.length - 1) {
-      goStep(step + 1);
-      return;
-    }
-
+  function buildProfile(): Profile {
     const fmt = (v: string) => v.split(SEPARATOR).filter(Boolean).join("、");
-
-    const profile: Profile = {
+    return {
       platform: answers.platform ?? "youtube",
       contentNiche: fmt(answers.contentNiche ?? ""),
-      motivation: fmt(answers.motivation ?? ""),
-      bestComment: answers.bestComment ?? "",
-      creativeTriger: fmt(answers.creativeTriger ?? ""),
-      audienceRelation: answers.audienceRelation ?? "",
-      targetAudience: answers.targetAudience ?? "",
-      contentApproach: answers.contentApproach ?? "",
-      avoid: fmt(answers.avoid ?? ""),
-      processingStyle: answers.processingStyle ?? "",
-      creatorIdentity: fmt(answers.creatorIdentity ?? ""),
-      successDefinition: answers.successDefinition ?? "",
+      motivation: answers.motivation ? fmt(answers.motivation) : undefined,
+      bestComment: answers.bestComment || undefined,
+      creativeTriger: answers.creativeTriger ? fmt(answers.creativeTriger) : undefined,
+      audienceRelation: answers.audienceRelation || undefined,
+      targetAudience: answers.targetAudience || undefined,
+      contentApproach: answers.contentApproach || undefined,
+      avoid: answers.avoid ? fmt(answers.avoid) : undefined,
+      processingStyle: answers.processingStyle || undefined,
+      creatorIdentity: answers.creatorIdentity ? fmt(answers.creatorIdentity) : undefined,
+      successDefinition: answers.successDefinition || undefined,
     };
-    saveProfile(profile);
+  }
+
+  function finishSetup() {
+    saveProfile(buildProfile());
     router.push("/main");
   }
 
-  const progress = ((step + 1) / STEPS.length) * 100;
+  function next() {
+    const isLastStep = step === STEPS.length - 1;
+
+    if (isLastStep) {
+      finishSetup();
+      return;
+    }
+
+    const nextStep = step + 1;
+
+    // 必須2問完了 → 中間画面へ
+    if (nextStep === REQUIRED_STEPS && phase === "required") {
+      saveProfile(buildProfile());
+      setPhase("interstitial");
+      return;
+    }
+
+    goStep(nextStep);
+  }
+
+  function continueOptional() {
+    setPhase("optional");
+    goStep(REQUIRED_STEPS);
+  }
+
+  function exitToMain() {
+    saveProfile(buildProfile());
+    router.push("/main");
+  }
+
+  const isOptionalPhase = phase === "optional";
+  const progress = phase === "required"
+    ? ((step + 1) / REQUIRED_STEPS) * 100
+    : ((step + 1) / STEPS.length) * 100;
+
+  // 中間画面
+  if (phase === "interstitial") {
+    return (
+      <div className="min-h-dvh bg-zinc-50 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
+        <div className="w-full max-w-lg">
+          <FadeUp delay={0} className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-6">
+              <IconCamera size={22} />
+              <span>KaeruAI</span>
+            </div>
+            <div className="text-4xl mb-4">✦</div>
+            <h2 className="text-zinc-900 font-bold text-2xl mb-3">
+              まず使ってみましょう！
+            </h2>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              あと10問答えると、あなたにしか作れない企画が生まれます。<br />
+              続ける？それともあとで？
+            </p>
+          </FadeUp>
+
+          <FadeUp delay={120} className="bg-white border border-zinc-200 rounded-2xl p-5 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-zinc-500">回答すると精度が上がる項目</span>
+              <span className="text-xs text-zinc-400">残り10問</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {["クリエイター像", "届けたい人", "コンテンツの武器", "作る理由", "NGこと", "距離感", "他5問"].map((tag) => (
+                <span key={tag} className="px-2.5 py-1 bg-zinc-100 rounded-full text-xs text-zinc-500">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </FadeUp>
+
+          <FadeUp delay={200} className="flex flex-col gap-3">
+            <button
+              onClick={continueOptional}
+              className="w-full py-4 rounded-xl font-bold text-base bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <span>続けて答える</span>
+              <IconArrowRight size={18} />
+            </button>
+            <button
+              onClick={exitToMain}
+              className="w-full py-3 rounded-xl text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
+            >
+              あとで答える（企画生成へ）
+            </button>
+          </FadeUp>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-dvh bg-zinc-50 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center relative">
-          <div className="absolute right-0 top-0">
+          <div className="absolute right-0 top-0 flex items-center gap-2">
+            {isOptionalPhase && (
+              <button
+                onClick={exitToMain}
+                className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer p-1 text-lg leading-none"
+                aria-label="終了して企画生成へ"
+              >
+                ✕
+              </button>
+            )}
             <ThemeToggle size={15} />
           </div>
           <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
             <IconCamera size={22} />
             <span>KaeruAI</span>
           </div>
-          <p className="text-zinc-500 text-sm">あなたのことを教えてください</p>
+          <p className="text-zinc-500 text-sm">
+            {isOptionalPhase ? "答えるほど精度が上がります" : "あなたのことを教えてください"}
+          </p>
         </div>
 
         <div className="mb-8">
           <div className="flex justify-between text-xs text-zinc-500 mb-2">
-            <span>STEP {step + 1} / {STEPS.length}</span>
+            <span>
+              {isOptionalPhase
+                ? `STEP ${step + 1} / ${STEPS.length}（任意）`
+                : `STEP ${step + 1} / ${REQUIRED_STEPS}`}
+            </span>
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="h-1 bg-zinc-200 rounded-full overflow-hidden">
@@ -300,8 +403,7 @@ export default function SetupPage() {
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && canNext() && next()}
               placeholder={current.placeholder}
               rows={3}
-              style={{ animationDelay: "100ms" }}
-              className="stagger-item w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+              className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base resize-none"
               autoFocus
             />
           ) : (
@@ -326,7 +428,7 @@ export default function SetupPage() {
                           : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                       }
                       disabled={atLimit}
-                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:!opacity-30 disabled:cursor-not-allowed ${
+                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                         active
                           ? "bg-red-500 border-red-500 text-white"
                           : "bg-white border-zinc-300 text-zinc-700 hover:border-zinc-400"
@@ -357,7 +459,7 @@ export default function SetupPage() {
                     onChange={(e) => setCustomInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addCustom()}
                     placeholder="その他を入力して追加..."
-                    className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                    className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
                   />
                   <button
                     onClick={addCustom}
@@ -378,7 +480,13 @@ export default function SetupPage() {
               as="button"
               triggerKey={step}
               delay={80}
-              onClick={() => goStep(step - 1)}
+              onClick={() => {
+                if (step === REQUIRED_STEPS && isOptionalPhase) {
+                  setPhase("interstitial");
+                } else {
+                  goStep(step - 1);
+                }
+              }}
               className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
             >
               <IconArrowLeft size={16} />
