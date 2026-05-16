@@ -3,23 +3,16 @@ import type { Profile, Idea, FeedbackStore } from "@/lib/types";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-function buildPrompt(
-  mood: string,
-  profile: Profile,
-  feedback: FeedbackStore
-): string {
+function buildPrompt(mood: string, profile: Profile, feedback: FeedbackStore): string {
   const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
   const dislikedTitles = feedback.disliked.slice(0, 5).map((e) => `・${e.title}`).join("\n");
 
   const feedbackSection =
     likedTitles || dislikedTitles
-      ? `
-【過去のフィードバック】
-${likedTitles ? `気に入った企画の傾向（このテイストに近づけて）：\n${likedTitles}` : ""}
-${dislikedTitles ? `気に入らなかった企画（このテイストは避けて）：\n${dislikedTitles}` : ""}`
+      ? `\n【過去のフィードバック】\n${likedTitles ? `好みの傾向（このテイストに近づけて）：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}`
       : "";
 
-  return `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、このクリエイターにしか作れない企画を5つ提案してください。
+  return `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、実際のYouTubeチャンネルでそのまま使える高品質な企画を5つ提案してください。
 
 【クリエイタープロフィール】
 - 動画を作る動機：${profile.motivation}
@@ -37,13 +30,15 @@ ${feedbackSection}
 【今日の気分】
 ${mood}
 
-以下のJSON形式のみで返答してください。前後に余分なテキストは不要です：
+以下のJSON形式のみで返答してください。前後に余分なテキストは絶対に含めないでください：
 {
   "ideas": [
     {
-      "title": "タイトル（視聴者がクリックしたくなる具体的なもの）",
-      "description": "企画内容（2〜3文。何をどう撮るか具体的に）",
-      "hook": "冒頭15秒の掴みセリフ"
+      "title": "タイトル（視聴者がクリックしたくなる。数字・感情ワード・具体性を含む）",
+      "description": "企画内容（3文。①何をするか ②なぜ面白いか ③視聴者にとっての価値）",
+      "hook": "冒頭15秒のセリフ（そのまま読めるレベルで具体的に）",
+      "thumbnail": "サムネイルの構成案（背景色・文字・表情・構図を具体的に）",
+      "filming": "撮影メモ（必要な素材・場所・道具・構成の順番を箇条書きで）"
     }
   ]
 }
@@ -52,9 +47,10 @@ ${mood}
 - 「絶対にやりたくないこと」は絶対に含めない
 - クリエイターの本質（${profile.creatorIdentity}）が自然に滲み出る企画にする
 - 今日の気分を起点にしつつ、チャンネルの核（${profile.coreTheme}）と接続する
-- 視聴者に「${profile.bestComment}」と言ってもらえるような方向性にする
-- 実際に一人で撮影・編集できるスケール感にする
-- 5つの企画は互いに方向性が重複しないようにする`;
+- 視聴者に「${profile.bestComment}」と言ってもらえる方向性にする
+- 一人で撮影・編集できるスケール感にする
+- 5つは互いに方向性が重複しないようにする
+- titleとhookとthumbnailとfilmingはすべて日本語で出力する`;
 }
 
 async function callGroq(prompt: string): Promise<string> {
@@ -88,7 +84,6 @@ export async function POST(request: Request) {
     try {
       text = await callGroq(prompt);
     } catch {
-      // 1回だけ自動リトライ
       await new Promise((r) => setTimeout(r, 2000));
       text = await callGroq(prompt);
     }
@@ -96,10 +91,7 @@ export async function POST(request: Request) {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("Groq raw response:", text);
-      return Response.json(
-        { error: "AIの返答を解析できませんでした。もう一度お試しください。" },
-        { status: 500 }
-      );
+      return Response.json({ error: "AIの返答を解析できませんでした。もう一度お試しください。" }, { status: 500 });
     }
 
     const parsed = JSON.parse(jsonMatch[0]) as { ideas: Idea[] };
