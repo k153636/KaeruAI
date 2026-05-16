@@ -368,30 +368,34 @@ export default function SetupPage() {
           )}
         </FadeUp>
 
-        <FadeUp triggerKey={step} delay={80} className="flex gap-3">
+        <div className="flex gap-3">
           {step > 0 && (
-            <button
+            <FadeUp
+              as="button"
+              triggerKey={step}
+              delay={80}
               onClick={() => goStep(step - 1)}
-              style={{ animationDelay: "200ms" }}
-              className="stagger-item flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
             >
               <IconArrowLeft size={16} />
               戻る
-            </button>
+            </FadeUp>
           )}
-          <button
+          <FadeUp
+            as="button"
+            triggerKey={step}
+            delay={130}
             onClick={next}
             disabled={!canNext()}
-            style={{ animationDelay: "200ms" }}
-            className="stagger-item flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
+            className="flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:!opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
           >
             {step < STEPS.length - 1 ? (
               <><span>次へ</span><IconArrowRight size={18} /></>
             ) : (
               <><IconCheck size={18} /><span>セットアップ完了</span></>
             )}
-          </button>
-        </FadeUp>
+          </FadeUp>
+        </div>
       </div>
     </div>
   );
