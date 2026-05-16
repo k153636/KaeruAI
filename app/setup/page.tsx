@@ -282,8 +282,8 @@ export default function SetupPage() {
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
-          <h2 className="text-xl font-bold text-white mb-1">{current.question}</h2>
-          <div className="flex items-center justify-between mb-6">
+          <h2 style={{ animationDelay: "0ms" }} className="stagger-item text-xl font-bold text-white mb-1">{current.question}</h2>
+          <div style={{ animationDelay: "55ms" }} className="stagger-item flex items-center justify-between mb-6">
             <p className="text-zinc-500 text-sm">{current.subtitle}</p>
             {current.maxSelect && (
               <span className="text-xs text-zinc-600">
@@ -299,7 +299,8 @@ export default function SetupPage() {
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && canNext() && next()}
               placeholder={current.placeholder}
               rows={3}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+              style={{ animationDelay: "110ms" }}
+              className="stagger-item w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
               autoFocus
             />
           ) : (
@@ -321,7 +322,7 @@ export default function SetupPage() {
                           : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                       }
                       disabled={atLimit}
-                      style={{ animationDelay: `${i * 55}ms` }}
+                      style={{ animationDelay: `${(i + 2) * 55}ms` }}
                       className={`stagger-item px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                         active
                           ? "bg-red-500 border-red-500 text-white"
@@ -346,7 +347,7 @@ export default function SetupPage() {
                 }
               </div>
               {current.type === "multiselect" && (
-                <div className="flex gap-2 mt-3">
+                <div style={{ animationDelay: `${((current.options?.length ?? 0) + 2) * 55}ms` }} className="stagger-item flex gap-2 mt-3">
                   <input
                     type="text"
                     value={customInput}
@@ -372,7 +373,8 @@ export default function SetupPage() {
           {step > 0 && (
             <button
               onClick={() => goStep(step - 1)}
-              className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer"
+              style={{ animationDelay: `${((current.options?.length ?? 0) + 3) * 55}ms` }}
+              className="stagger-item flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-colors cursor-pointer"
             >
               <IconArrowLeft size={16} />
               戻る
@@ -381,7 +383,8 @@ export default function SetupPage() {
           <button
             onClick={next}
             disabled={!canNext()}
-            className="flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
+            style={{ animationDelay: `${((current.options?.length ?? 0) + 3) * 55}ms` }}
+            className="stagger-item flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
           >
             {step < STEPS.length - 1 ? (
               <><span>次へ</span><IconArrowRight size={18} /></>

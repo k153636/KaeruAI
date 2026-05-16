@@ -120,7 +120,7 @@ export default function MainPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] px-4 py-10">
       <div className="max-w-xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div style={{ animationDelay: "0ms" }} className="stagger-item flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
             <IconCamera size={22} />
             <span>企画メーカー</span>
@@ -142,7 +142,7 @@ export default function MainPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div style={{ animationDelay: "60ms" }} className="stagger-item flex flex-wrap gap-2 mb-8">
           {[profile.contentNiche, profile.creatorIdentity].filter(Boolean).map((tag) => (
             <span key={tag} className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-400">
               {tag}
@@ -150,7 +150,7 @@ export default function MainPage() {
           ))}
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
+        <div style={{ animationDelay: "120ms" }} className="stagger-item bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
           <h1 className="text-white font-bold text-xl mb-1">今日の気分は？</h1>
           <p className="text-zinc-500 text-sm mb-4">一言入力するだけで企画を5つ生成します</p>
           <input
@@ -167,7 +167,8 @@ export default function MainPage() {
         <button
           onClick={generate}
           disabled={!mood.trim() || loading}
-          className="w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white mb-8 flex items-center justify-center gap-2"
+          style={{ animationDelay: "180ms" }}
+          className="stagger-item w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white mb-8 flex items-center justify-center gap-2"
         >
           {loading ? (
             <><IconLoader size={18} className="animate-spin" />{retrying ? "リトライ中..." : "企画を考え中..."}</>
