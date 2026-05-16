@@ -15,6 +15,7 @@ const FIELDS: {
   type: "text" | "select" | "multiselect";
   options?: string[];
   optionLabels?: Record<string, string>;
+  maxSelect?: number;
 }[] = [
   {
     id: "platform",
@@ -26,7 +27,8 @@ const FIELDS: {
   {
     id: "motivation",
     label: "なぜコンテンツを作るの？",
-    type: "select",
+    type: "multiselect",
+    maxSelect: 2,
     options: [
       "お金・影響力を得たいから",
       "自分の考えや知識を広めたいから",
@@ -98,7 +100,8 @@ const FIELDS: {
   {
     id: "creatorIdentity",
     label: "自分は本質的に何者？",
-    type: "select",
+    type: "multiselect",
+    maxSelect: 2,
     options: [
       "教える人（ティーチャー）",
       "楽しませる人（エンターテイナー）",
@@ -149,16 +152,21 @@ export default function ProfilePage() {
     setCustomInput("");
   }
 
-  function toggleMulti(opt: string) {
+  function toggleMulti(opt: string, maxSelect?: number) {
     const vals = draft ? draft.split(SEPARATOR) : [];
-    const next = vals.includes(opt) ? vals.filter((v) => v !== opt) : [...vals, opt];
-    setDraft(next.join(SEPARATOR));
+    if (vals.includes(opt)) {
+      setDraft(vals.filter((v) => v !== opt).join(SEPARATOR));
+    } else {
+      if (maxSelect && vals.length >= maxSelect) return;
+      setDraft([...vals, opt].join(SEPARATOR));
+    }
   }
 
-  function addCustom() {
+  function addCustom(maxSelect?: number) {
     const trimmed = customInput.trim();
     if (!trimmed) return;
     const vals = draft ? draft.split(SEPARATOR) : [];
+    if (maxSelect && vals.length >= maxSelect) return;
     if (!vals.includes(trimmed)) setDraft([...vals, trimmed].join(SEPARATOR));
     setCustomInput("");
   }
@@ -232,63 +240,73 @@ export default function ProfilePage() {
                       />
                     ) : (
                       <div>
-                        <div className="flex flex-wrap gap-2">
-                          {editingField.options?.map((opt) => {
-                            const active =
-                              editingField.type === "multiselect"
-                                ? draft.split(SEPARATOR).includes(opt)
-                                : draft === opt;
-                            const label = editingField.optionLabels?.[opt] ?? opt;
-                            return (
-                              <button
-                                key={opt}
-                                onClick={() =>
-                                  editingField.type === "multiselect"
-                                    ? toggleMulti(opt)
-                                    : setDraft(draft === opt ? "" : opt)
-                                }
-                                className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
-                                  active
-                                    ? "bg-red-500 border-red-500 text-white"
-                                    : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
-                                }`}
-                              >
-                                {label}
-                              </button>
-                            );
-                          })}
-                          {editingField.type === "multiselect" &&
-                            draft.split(SEPARATOR).filter((v) => v && !editingField.options?.includes(v)).map((custom) => (
-                              <button
-                                key={custom}
-                                onClick={() => toggleMulti(custom)}
-                                className="px-3 py-1.5 rounded-full text-sm border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
-                              >
-                                {custom}
-                                <span className="text-red-200 text-xs ml-0.5">×</span>
-                              </button>
-                            ))
-                          }
-                        </div>
-                        {editingField.type === "multiselect" && (
-                          <div className="flex gap-2 mt-3">
-                            <input
-                              type="text"
-                              value={customInput}
-                              onChange={(e) => setCustomInput(e.target.value)}
-                              onKeyDown={(e) => e.key === "Enter" && addCustom()}
-                              placeholder="その他を入力して追加..."
-                              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm"
-                            />
-                            <button
-                              onClick={addCustom}
-                              disabled={!customInput.trim()}
-                              className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
-                            >
-                              追加
-                            </button>
+                        <div>
+                          {editingField.maxSelect && (
+                            <p className="text-xs text-zinc-600 mb-2">
+                              {draft.split(SEPARATOR).filter(Boolean).length} / {editingField.maxSelect}
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-2">
+                            {editingField.options?.map((opt) => {
+                              const active =
+                                editingField.type === "multiselect"
+                                  ? draft.split(SEPARATOR).includes(opt)
+                                  : draft === opt;
+                              const label = editingField.optionLabels?.[opt] ?? opt;
+                              const selectedCount = draft.split(SEPARATOR).filter(Boolean).length;
+                              const atLimit = !!editingField.maxSelect && selectedCount >= editingField.maxSelect && !active;
+                              return (
+                                <button
+                                  key={opt}
+                                  onClick={() =>
+                                    editingField.type === "multiselect"
+                                      ? toggleMulti(opt, editingField.maxSelect)
+                                      : setDraft(draft === opt ? "" : opt)
+                                  }
+                                  disabled={atLimit}
+                                  className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                                    active
+                                      ? "bg-red-500 border-red-500 text-white"
+                                      : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                                  }`}
+                                >
+                                  {label}
+                                </button>
+                              );
+                            })}
+                            {editingField.type === "multiselect" &&
+                              draft.split(SEPARATOR).filter((v) => v && !editingField.options?.includes(v)).map((custom) => (
+                                <button
+                                  key={custom}
+                                  onClick={() => toggleMulti(custom, editingField.maxSelect)}
+                                  className="px-3 py-1.5 rounded-full text-sm border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                                >
+                                  {custom}
+                                  <span className="text-red-200 text-xs ml-0.5">×</span>
+                                </button>
+                              ))
+                            }
                           </div>
-                        )}
+                          {editingField.type === "multiselect" && (
+                            <div className="flex gap-2 mt-3">
+                              <input
+                                type="text"
+                                value={customInput}
+                                onChange={(e) => setCustomInput(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && addCustom(editingField.maxSelect)}
+                                placeholder="その他を入力して追加..."
+                                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                              />
+                              <button
+                                onClick={() => addCustom(editingField.maxSelect)}
+                                disabled={!customInput.trim()}
+                                className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                              >
+                                追加
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 

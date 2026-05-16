@@ -16,6 +16,7 @@ interface Step {
   type: StepType;
   placeholder?: string;
   options?: string[];
+  maxSelect?: number;
 }
 
 const STEPS: Step[] = [
@@ -29,8 +30,9 @@ const STEPS: Step[] = [
   {
     id: "motivation",
     question: "なぜコンテンツを作るの？",
-    subtitle: "一番近いものを選んでください",
-    type: "select",
+    subtitle: "最大2つ選べます",
+    type: "multiselect",
+    maxSelect: 2,
     options: [
       "お金・影響力を得たいから",
       "自分の考えや知識を広めたいから",
@@ -112,8 +114,9 @@ const STEPS: Step[] = [
   {
     id: "creatorIdentity",
     question: "自分は本質的に何者だと思う？",
-    subtitle: "コンテンツ抜きで、あなたの本質を選んでください",
-    type: "select",
+    subtitle: "最大2つ選べます",
+    type: "multiselect",
+    maxSelect: 2,
     options: [
       "教える人（ティーチャー）",
       "楽しませる人（エンターテイナー）",
@@ -151,14 +154,19 @@ export default function SetupPage() {
 
   function toggleMulti(opt: string) {
     const vals = value ? value.split(SEPARATOR) : [];
-    const next = vals.includes(opt) ? vals.filter((v) => v !== opt) : [...vals, opt];
-    setAnswers((a) => ({ ...a, [current.id]: next.join(SEPARATOR) }));
+    if (vals.includes(opt)) {
+      setAnswers((a) => ({ ...a, [current.id]: vals.filter((v) => v !== opt).join(SEPARATOR) }));
+    } else {
+      if (current.maxSelect && vals.length >= current.maxSelect) return;
+      setAnswers((a) => ({ ...a, [current.id]: [...vals, opt].join(SEPARATOR) }));
+    }
   }
 
   function addCustom() {
     const trimmed = customInput.trim();
     if (!trimmed) return;
     const vals = value ? value.split(SEPARATOR) : [];
+    if (current.maxSelect && vals.length >= current.maxSelect) return;
     if (!vals.includes(trimmed)) {
       setAnswers((a) => ({ ...a, [current.id]: [...vals, trimmed].join(SEPARATOR) }));
     }
@@ -190,7 +198,7 @@ export default function SetupPage() {
 
     const profile: Profile = {
       platform: answers.platform ?? "youtube",
-      motivation: answers.motivation ?? "",
+      motivation: fmt(answers.motivation ?? ""),
       bestComment: answers.bestComment ?? "",
       creativeTriger: fmt(answers.creativeTriger ?? ""),
       audienceRelation: answers.audienceRelation ?? "",
@@ -198,7 +206,7 @@ export default function SetupPage() {
       avoid: answers.avoid ?? "",
       reference: answers.reference ?? "",
       processingStyle: answers.processingStyle ?? "",
-      creatorIdentity: answers.creatorIdentity ?? "",
+      creatorIdentity: fmt(answers.creatorIdentity ?? ""),
       successDefinition: answers.successDefinition ?? "",
     };
     saveProfile(profile);
@@ -233,7 +241,14 @@ export default function SetupPage() {
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-white mb-1">{current.question}</h2>
-          <p className="text-zinc-500 text-sm mb-6">{current.subtitle}</p>
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-zinc-500 text-sm">{current.subtitle}</p>
+            {current.maxSelect && (
+              <span className="text-xs text-zinc-600">
+                {value ? value.split(SEPARATOR).filter(Boolean).length : 0} / {current.maxSelect}
+              </span>
+            )}
+          </div>
 
           {current.type === "text" ? (
             <textarea
@@ -253,6 +268,8 @@ export default function SetupPage() {
                   const label = current.id === "platform"
                     ? (PLATFORMS.find((p) => p.id === opt)?.label ?? opt)
                     : opt;
+                  const selectedCount = value ? value.split(SEPARATOR).filter(Boolean).length : 0;
+                  const atLimit = !!current.maxSelect && selectedCount >= current.maxSelect && !active;
                   return (
                     <button
                       key={opt}
@@ -261,7 +278,8 @@ export default function SetupPage() {
                           ? toggleMulti(opt)
                           : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                       }
-                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
+                      disabled={atLimit}
+                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                         active
                           ? "bg-red-500 border-red-500 text-white"
                           : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
