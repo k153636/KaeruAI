@@ -6,6 +6,7 @@ import type { Profile } from "@/lib/types";
 import { saveProfile } from "@/lib/profile";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
+import FadeUp from "@/components/FadeUp";
 
 type StepType = "text" | "select" | "multiselect";
 
@@ -281,7 +282,7 @@ export default function SetupPage() {
           </div>
         </div>
 
-        <div key={step} style={{ animationDelay: "0ms" }} className="stagger-item bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
+        <FadeUp triggerKey={step} delay={0} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-white mb-1">{current.question}</h2>
           <div className="flex items-center justify-between mb-6">
             <p className="text-zinc-500 text-sm">{current.subtitle}</p>
@@ -367,9 +368,9 @@ export default function SetupPage() {
               )}
             </div>
           )}
-        </div>
+        </FadeUp>
 
-        <div key={`nav-${step}`} className="flex gap-3">
+        <FadeUp triggerKey={step} delay={200} className="flex gap-3">
           {step > 0 && (
             <button
               onClick={() => goStep(step - 1)}
@@ -392,7 +393,7 @@ export default function SetupPage() {
               <><IconCheck size={18} /><span>セットアップ完了</span></>
             )}
           </button>
-        </div>
+        </FadeUp>
       </div>
     </div>
   );
