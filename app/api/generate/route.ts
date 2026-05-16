@@ -24,6 +24,9 @@ function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore
   return `【プラットフォーム】
 ${platform.label}（${platform.contentWord}を作っているクリエイター）
 
+【発信ジャンル】
+${profile.contentNiche}
+
 【クリエイタープロフィール】
 - コンテンツを作る動機：${profile.motivation}
 - 一番嬉しいフォロワーの反応：${profile.bestComment}

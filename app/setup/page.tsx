@@ -28,6 +28,26 @@ const STEPS: Step[] = [
     options: PLATFORMS.map((p) => p.id),
   },
   {
+    id: "contentNiche",
+    question: "どんなジャンル・テーマで発信したい？",
+    subtitle: "複数でもOK。具体的なほど精度が上がります",
+    type: "multiselect",
+    options: [
+      "AI・テクノロジー",
+      "ビジネス・副業",
+      "ガジェット・レビュー",
+      "ゲーム",
+      "料理・グルメ",
+      "旅行・Vlog",
+      "ファッション・美容",
+      "フィットネス・健康",
+      "学習・自己啓発",
+      "エンタメ・コメディ",
+      "音楽・アート",
+      "投資・お金",
+    ],
+  },
+  {
     id: "motivation",
     question: "なぜコンテンツを作るの？",
     subtitle: "最大2つ選べます",
@@ -219,6 +239,7 @@ export default function SetupPage() {
 
     const profile: Profile = {
       platform: answers.platform ?? "youtube",
+      contentNiche: fmt(answers.contentNiche ?? ""),
       motivation: fmt(answers.motivation ?? ""),
       bestComment: answers.bestComment ?? "",
       creativeTriger: fmt(answers.creativeTriger ?? ""),

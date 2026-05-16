@@ -2,7 +2,7 @@ import type { Profile } from "./types";
 import { storage } from "./storage";
 
 const REQUIRED_KEYS: (keyof Profile)[] = [
-  "platform", "motivation", "bestComment", "creativeTriger", "audienceRelation",
+  "platform", "contentNiche", "motivation", "bestComment", "creativeTriger", "audienceRelation",
   "targetAudience", "contentApproach", "avoid", "processingStyle",
   "creatorIdentity", "successDefinition",
 ];

@@ -1,5 +1,6 @@
 export interface Profile {
   platform: string;
+  contentNiche: string;
   motivation: string;
   bestComment: string;
   creativeTriger: string;

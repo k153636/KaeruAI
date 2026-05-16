@@ -143,7 +143,7 @@ export default function MainPage() {
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
-          {[profile.creatorIdentity, profile.contentApproach].filter(Boolean).map((tag) => (
+          {[profile.contentNiche, profile.creatorIdentity].filter(Boolean).map((tag) => (
             <span key={tag} className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full text-xs text-zinc-400">
               {tag}
             </span>
