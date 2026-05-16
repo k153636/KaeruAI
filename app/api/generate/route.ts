@@ -3,18 +3,21 @@ import type { Profile, Idea, FeedbackStore } from "@/lib/types";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-function buildPrompt(mood: string, profile: Profile, feedback: FeedbackStore): string {
+const SYSTEM_PROMPT = `あなたはYouTuberの専属企画参謀です。
+クリエイターの本質・動機・スタイルを深く理解し、そのクリエイターにしか作れない企画を提案します。
+返答は必ず指定されたJSON形式のみで行い、前後に余分なテキストを一切含めないでください。
+すべての出力は日本語で行ってください。`;
+
+function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore): string {
   const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
   const dislikedTitles = feedback.disliked.slice(0, 5).map((e) => `・${e.title}`).join("\n");
 
   const feedbackSection =
     likedTitles || dislikedTitles
-      ? `\n【過去のフィードバック】\n${likedTitles ? `好みの傾向（このテイストに近づけて）：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}`
+      ? `\n【過去のフィードバック】\n${likedTitles ? `好みの傾向（このテイストに近づけて）：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}\n`
       : "";
 
-  return `あなたはYouTuberの専属企画参謀です。以下のクリエイタープロフィールと今日の気分をもとに、実際のYouTubeチャンネルでそのまま使える高品質な企画を5つ提案してください。
-
-【クリエイタープロフィール】
+  return `【クリエイタープロフィール】
 - 動画を作る動機：${profile.motivation}
 - 一番嬉しい視聴者の反応：${profile.bestComment}
 - 創作衝動が湧く瞬間：${profile.creativeTriger}
@@ -26,38 +29,40 @@ function buildPrompt(mood: string, profile: Profile, feedback: FeedbackStore): s
 - クリエイターとしての本質：${profile.creatorIdentity}
 - 成功の定義：${profile.successDefinition}
 ${feedbackSection}
-
 【今日の気分】
 ${mood}
 
-以下のJSON形式のみで返答してください。前後に余分なテキストは絶対に含めないでください：
+以下のJSON形式のみで5つの企画を返してください：
 {
   "ideas": [
     {
-      "title": "タイトル（視聴者がクリックしたくなる。数字・感情ワード・具体性を含む）",
-      "description": "企画内容（3文。①何をするか ②なぜ面白いか ③視聴者にとっての価値）",
+      "title": "タイトル（数字・感情ワード・具体性を含むクリックされるもの）",
+      "description": "①何をするか ②なぜ面白いか ③視聴者にとっての価値（3文）",
       "hook": "冒頭15秒のセリフ（そのまま読めるレベルで具体的に）",
-      "thumbnail": "サムネイルの構成案（背景色・文字・表情・構図を具体的に）",
-      "filming": "撮影メモ（必要な素材・場所・道具・構成の順番を箇条書きで）"
+      "thumbnail": "サムネイル構成（背景色・メインビジュアル・テキスト・表情・構図）",
+      "filming": "撮影メモ（必要な素材・場所・道具・構成順を箇条書き）"
     }
   ]
 }
 
 制約：
 - 「絶対にやりたくないこと」は絶対に含めない
-- クリエイターの本質（${profile.creatorIdentity}）が自然に滲み出る企画にする
-- 今日の気分を起点にしつつ、チャンネルの核（${profile.coreTheme}）と接続する
-- 視聴者に「${profile.bestComment}」と言ってもらえる方向性にする
+- ${profile.creatorIdentity}としての本質が滲み出る企画にする
+- 今日の気分（${mood}）とチャンネルの核（${profile.coreTheme}）を接続する
+- 「${profile.bestComment}」と言ってもらえる方向性にする
 - 一人で撮影・編集できるスケール感にする
-- 5つは互いに方向性が重複しないようにする
-- titleとhookとthumbnailとfilmingはすべて日本語で出力する`;
+- 5つは互いに方向性が重複しないようにする`;
 }
 
-async function callGroq(prompt: string): Promise<string> {
+async function callGroq(systemPrompt: string, userPrompt: string): Promise<string> {
   const completion = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.8,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: 0.85,
+    max_tokens: 4096,
   });
   return completion.choices[0]?.message?.content?.trim() ?? "";
 }
@@ -78,20 +83,23 @@ export async function POST(request: Request) {
       return Response.json({ error: "GROQ_API_KEY が設定されていません" }, { status: 500 });
     }
 
-    const prompt = buildPrompt(mood, profile, feedback ?? { liked: [], disliked: [] });
+    const userPrompt = buildUserPrompt(mood, profile, feedback ?? { liked: [], disliked: [] });
 
     let text = "";
     try {
-      text = await callGroq(prompt);
+      text = await callGroq(SYSTEM_PROMPT, userPrompt);
     } catch {
       await new Promise((r) => setTimeout(r, 2000));
-      text = await callGroq(prompt);
+      text = await callGroq(SYSTEM_PROMPT, userPrompt);
     }
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("Groq raw response:", text);
-      return Response.json({ error: "AIの返答を解析できませんでした。もう一度お試しください。" }, { status: 500 });
+      return Response.json(
+        { error: "AIの返答を解析できませんでした。もう一度お試しください。" },
+        { status: 500 }
+      );
     }
 
     const parsed = JSON.parse(jsonMatch[0]) as { ideas: Idea[] };
