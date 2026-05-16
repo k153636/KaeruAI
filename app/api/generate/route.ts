@@ -21,23 +21,25 @@ function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore
       ? `\n【過去のフィードバック】\n${likedTitles ? `好みの傾向（このテイストに近づけて）：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}\n`
       : "";
 
+  const optionalFields = [
+    profile.motivation       && `- コンテンツを作る動機：${profile.motivation}`,
+    profile.bestComment      && `- 一番嬉しいフォロワーの反応：${profile.bestComment}`,
+    profile.creativeTriger   && `- 創作衝動が湧く瞬間：${profile.creativeTriger}`,
+    profile.audienceRelation && `- フォロワーとの距離感：${profile.audienceRelation}`,
+    profile.targetAudience   && `- 届けたいターゲット：${profile.targetAudience}`,
+    profile.contentApproach  && `- コンテンツの武器・アプローチ：${profile.contentApproach}`,
+    profile.avoid            && `- 絶対にやりたくないこと：${profile.avoid}`,
+    profile.processingStyle  && `- 情報処理スタイル：${profile.processingStyle}`,
+    profile.creatorIdentity  && `- クリエイターとしての本質：${profile.creatorIdentity}`,
+    profile.successDefinition && `- 成功の定義：${profile.successDefinition}`,
+  ].filter(Boolean).join("\n");
+
   return `【プラットフォーム】
 ${platform.label}（${platform.contentWord}を作っているクリエイター）
 
 【ここへ来た目的】
 ${profile.contentNiche}
-
-【クリエイタープロフィール】
-- コンテンツを作る動機：${profile.motivation}
-- 一番嬉しいフォロワーの反応：${profile.bestComment}
-- 創作衝動が湧く瞬間：${profile.creativeTriger}
-- フォロワーとの距離感：${profile.audienceRelation}
-- 届けたいターゲット：${profile.targetAudience}
-- コンテンツの武器・アプローチ：${profile.contentApproach}
-- 絶対にやりたくないこと：${profile.avoid}
-- 情報処理スタイル：${profile.processingStyle}
-- クリエイターとしての本質：${profile.creatorIdentity}
-- 成功の定義：${profile.successDefinition}
+${optionalFields ? `\n【クリエイタープロフィール】\n${optionalFields}` : ""}
 ${feedbackSection}
 【今日の気分】
 ${mood}
@@ -56,11 +58,11 @@ ${mood}
 }
 
 制約：
-- 「絶対にやりたくないこと」は絶対に含めない
-- ${profile.creatorIdentity}としての本質が滲み出る企画にする
-- 今日の気分（${mood}）と届けたいターゲット（${profile.targetAudience}）を接続する
-- コンテンツの武器（${profile.contentApproach}）を活かした企画にする
-- 「${profile.bestComment}」と言ってもらえる方向性にする
+${profile.avoid            ? `- 「${profile.avoid}」は絶対に含めない` : "- 過激・炎上狙い・不快感を与える内容は避ける"}
+${profile.creatorIdentity  ? `- ${profile.creatorIdentity}としての本質が滲み出る企画にする` : ""}
+${profile.targetAudience   ? `- 今日の気分（${mood}）と届けたいターゲット（${profile.targetAudience}）を接続する` : `- 今日の気分（${mood}）に合った企画にする`}
+${profile.contentApproach  ? `- コンテンツの武器（${profile.contentApproach}）を活かした企画にする` : ""}
+${profile.bestComment      ? `- 「${profile.bestComment}」と言ってもらえる方向性にする` : ""}
 - ${platform.label}に適したフォーマット・尺感の企画にする
 - 一人で制作できるスケール感にする
 - 5つは互いに方向性が重複しないようにする`;
