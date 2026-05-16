@@ -16,3 +16,13 @@ export interface Idea {
   description: string;
   hook: string;
 }
+
+export interface FeedbackEntry {
+  title: string;
+  mood: string;
+}
+
+export interface FeedbackStore {
+  liked: FeedbackEntry[];
+  disliked: FeedbackEntry[];
+}
