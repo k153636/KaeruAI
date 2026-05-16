@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
 import { loadProfile, saveProfile } from "@/lib/profile";
+import { PLATFORMS } from "@/lib/platforms";
 import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
 
 const SEPARATOR = "|||";
@@ -13,10 +14,18 @@ const FIELDS: {
   label: string;
   type: "text" | "select" | "multiselect";
   options?: string[];
+  optionLabels?: Record<string, string>;
 }[] = [
   {
+    id: "platform",
+    label: "メインプラットフォーム",
+    type: "select",
+    options: PLATFORMS.map((p) => p.id),
+    optionLabels: Object.fromEntries(PLATFORMS.map((p) => [p.id, p.label])),
+  },
+  {
     id: "motivation",
-    label: "なぜ動画を作るの？",
+    label: "なぜコンテンツを作るの？",
     type: "select",
     options: [
       "お金・影響力を得たいから",
@@ -116,6 +125,7 @@ const FIELDS: {
 function displayValue(field: (typeof FIELDS)[0], raw: string): string {
   if (!raw) return "未設定";
   if (field.type === "multiselect") return raw.split(SEPARATOR).filter(Boolean).join("、");
+  if (field.optionLabels) return field.optionLabels[raw] ?? raw;
   return raw;
 }
 
@@ -216,13 +226,14 @@ export default function ProfilePage() {
                             editingField.type === "multiselect"
                               ? draft.split(SEPARATOR).includes(opt)
                               : draft === opt;
+                          const label = editingField.optionLabels?.[opt] ?? opt;
                           return (
                             <button
                               key={opt}
                               onClick={() =>
                                 editingField.type === "multiselect"
                                   ? toggleMulti(opt)
-                                  : setDraft(opt)
+                                  : setDraft(draft === opt ? "" : opt)
                               }
                               className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
                                 active
@@ -230,7 +241,7 @@ export default function ProfilePage() {
                                   : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
                               }`}
                             >
-                              {opt}
+                              {label}
                             </button>
                           );
                         })}
