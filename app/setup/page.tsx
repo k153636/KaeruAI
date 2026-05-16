@@ -255,7 +255,7 @@ export default function SetupPage() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
@@ -270,7 +270,7 @@ export default function SetupPage() {
             <span>STEP {step + 1} / {STEPS.length}</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="h-1 bg-zinc-800 rounded-full overflow-hidden">
+          <div className="h-1 bg-zinc-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-red-500 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
@@ -278,12 +278,12 @@ export default function SetupPage() {
           </div>
         </div>
 
-        <FadeUp triggerKey={step} delay={0} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6">
-          <h2 className="text-xl font-bold text-white mb-1">{current.question}</h2>
+        <FadeUp triggerKey={step} delay={0} className="bg-white border border-zinc-200 rounded-2xl p-6 mb-6">
+          <h2 className="text-xl font-bold text-zinc-900 mb-1">{current.question}</h2>
           <div className="flex items-center justify-between mb-6">
             <p className="text-zinc-500 text-sm">{current.subtitle}</p>
             {current.maxSelect && (
-              <span className="text-xs text-zinc-600">
+              <span className="text-xs text-zinc-400">
                 {value ? value.split(SEPARATOR).filter(Boolean).length : 0} / {current.maxSelect}
               </span>
             )}
@@ -297,7 +297,7 @@ export default function SetupPage() {
               placeholder={current.placeholder}
               rows={3}
               style={{ animationDelay: "100ms" }}
-              className="stagger-item w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+              className="stagger-item w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
               autoFocus
             />
           ) : (
@@ -325,7 +325,7 @@ export default function SetupPage() {
                       className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:!opacity-30 disabled:cursor-not-allowed ${
                         active
                           ? "bg-red-500 border-red-500 text-white"
-                          : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                          : "bg-white border-zinc-300 text-zinc-700 hover:border-zinc-400"
                       }`}
                     >
                       {label}
@@ -353,12 +353,12 @@ export default function SetupPage() {
                     onChange={(e) => setCustomInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addCustom()}
                     placeholder="その他を入力して追加..."
-                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                    className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
                   />
                   <button
                     onClick={addCustom}
                     disabled={!customInput.trim()}
-                    className="px-4 py-2 rounded-xl text-sm font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                   >
                     追加
                   </button>
@@ -373,7 +373,7 @@ export default function SetupPage() {
             <button
               onClick={() => goStep(step - 1)}
               style={{ animationDelay: "200ms" }}
-              className="stagger-item flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-colors cursor-pointer"
+              className="stagger-item flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
             >
               <IconArrowLeft size={16} />
               戻る

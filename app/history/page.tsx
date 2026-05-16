@@ -73,7 +73,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] px-4 py-10">
+    <div className="min-h-screen bg-zinc-50 px-4 py-10">
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
@@ -82,7 +82,7 @@ export default function HistoryPage() {
           </div>
           <button
             onClick={() => router.push("/main")}
-            className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
           >
             <IconArrowLeft size={16} />
             戻る
@@ -91,7 +91,7 @@ export default function HistoryPage() {
 
         {entries.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-zinc-600 text-sm">まだ生成した企画がありません</p>
+            <p className="text-zinc-400 text-sm">まだ生成した企画がありません</p>
             <button
               onClick={() => router.push("/main")}
               className="mt-4 text-red-500 text-sm hover:text-red-400 transition-colors cursor-pointer"
@@ -104,49 +104,49 @@ export default function HistoryPage() {
             {entries.map((entry) => {
               const isOpen = expandedId === entry.id;
               return (
-                <div key={entry.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                <div key={entry.id} className="bg-white border border-zinc-200 rounded-2xl overflow-hidden">
                   <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-800/50 transition-colors"
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-50 transition-colors"
                     onClick={() => setExpandedId(isOpen ? null : entry.id)}
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-medium truncate">「{entry.mood}」</p>
-                      <p className="text-zinc-600 text-xs mt-0.5">{formatDate(entry.createdAt)} · {entry.ideas.length}件の企画</p>
+                      <p className="text-zinc-900 text-sm font-medium truncate">「{entry.mood}」</p>
+                      <p className="text-zinc-400 text-xs mt-0.5">{formatDate(entry.createdAt)} · {entry.ideas.length}件の企画</p>
                     </div>
                     <div className="flex items-center gap-2 ml-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}
-                        className="text-zinc-600 hover:text-red-400 transition-colors cursor-pointer p-1"
+                        className="text-zinc-400 hover:text-red-500 transition-colors cursor-pointer p-1"
                       >
                         <IconTrash size={14} />
                       </button>
-                      <span className="text-zinc-600 text-xs">{isOpen ? "▲" : "▼"}</span>
+                      <span className="text-zinc-400 text-xs">{isOpen ? "▲" : "▼"}</span>
                     </div>
                   </div>
 
                   {isOpen && (
-                    <div className="border-t border-zinc-800">
+                    <div className="border-t border-zinc-200">
                       {entry.ideas.map((idea, i) => {
                         const ideaKey = `${entry.id}-${idea.title}`;
                         const isIdeaOpen = expandedIdeaKey === ideaKey;
                         const copied = copiedKey === ideaKey;
                         return (
-                          <div key={i} className="border-b border-zinc-800 last:border-b-0 px-4 py-3">
+                          <div key={i} className="border-b border-zinc-100 last:border-b-0 px-4 py-3">
                             <div className="flex items-start gap-2">
                               <span className="text-red-500 font-bold text-sm shrink-0 mt-0.5">{i + 1}</span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-white text-sm font-medium leading-snug mb-1">{idea.title}</p>
+                                <p className="text-zinc-900 text-sm font-medium leading-snug mb-1">{idea.title}</p>
                                 <p className="text-zinc-500 text-xs leading-relaxed mb-2">{idea.description}</p>
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={() => setExpandedIdeaKey(isIdeaOpen ? null : ideaKey)}
-                                    className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
+                                    className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer"
                                   >
                                     {isIdeaOpen ? "▲ 閉じる" : "▼ 詳細"}
                                   </button>
                                   <button
                                     onClick={() => copyIdea(idea, entry.id)}
-                                    className={`flex items-center gap-1 text-xs ml-auto transition-colors cursor-pointer ${copied ? "text-zinc-300" : "text-zinc-600 hover:text-zinc-400"}`}
+                                    className={`flex items-center gap-1 text-xs ml-auto transition-colors cursor-pointer ${copied ? "text-zinc-700" : "text-zinc-400 hover:text-zinc-600"}`}
                                   >
                                     <IconCopy size={12} />
                                     {copied ? "コピー済み" : "コピー"}
@@ -154,17 +154,17 @@ export default function HistoryPage() {
                                 </div>
                                 {isIdeaOpen && (
                                   <div className="space-y-2 mt-2">
-                                    <div className="bg-zinc-800 rounded-lg px-3 py-2">
+                                    <div className="bg-zinc-100 rounded-lg px-3 py-2">
                                       <p className="text-xs text-zinc-500 font-medium mb-1">{platform.hookLabel}</p>
-                                      <p className="text-xs text-zinc-300">{idea.hook}</p>
+                                      <p className="text-xs text-zinc-700">{idea.hook}</p>
                                     </div>
-                                    <div className="bg-zinc-800 rounded-lg px-3 py-2">
+                                    <div className="bg-zinc-100 rounded-lg px-3 py-2">
                                       <p className="text-xs text-zinc-500 font-medium mb-1">{platform.visualLabel}</p>
-                                      <p className="text-xs text-zinc-300">{idea.thumbnail}</p>
+                                      <p className="text-xs text-zinc-700">{idea.thumbnail}</p>
                                     </div>
-                                    <div className="bg-zinc-800 rounded-lg px-3 py-2">
+                                    <div className="bg-zinc-100 rounded-lg px-3 py-2">
                                       <p className="text-xs text-zinc-500 font-medium mb-1">{platform.productionLabel}</p>
-                                      <p className="text-xs text-zinc-300 whitespace-pre-line">{idea.filming}</p>
+                                      <p className="text-xs text-zinc-700 whitespace-pre-line">{idea.filming}</p>
                                     </div>
                                   </div>
                                 )}

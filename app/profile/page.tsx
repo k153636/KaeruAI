@@ -224,13 +224,13 @@ export default function ProfilePage() {
   const editingField = FIELDS.find((f) => f.id === editingId);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] px-4 py-10">
+    <div className="min-h-screen bg-zinc-50 px-4 py-10">
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-white font-bold text-xl">プロフィール編集</h1>
+          <h1 className="text-zinc-900 font-bold text-xl">プロフィール編集</h1>
           <button
             onClick={() => router.push("/main")}
-            className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
           >
             <IconArrowLeft size={16} />
             戻る
@@ -245,13 +245,13 @@ export default function ProfilePage() {
             return (
               <div
                 key={field.id}
-                className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4"
+                className="bg-white border border-zinc-200 rounded-2xl p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-zinc-500 mb-1">{field.label}</p>
+                    <p className="text-xs text-zinc-400 mb-1">{field.label}</p>
                     {!isEditing && (
-                      <p className="text-sm text-white leading-relaxed">
+                      <p className="text-sm text-zinc-900 leading-relaxed">
                         {displayValue(field, raw)}
                       </p>
                     )}
@@ -259,7 +259,7 @@ export default function ProfilePage() {
                   {!isEditing && (
                     <button
                       onClick={() => startEdit(field)}
-                      className="flex items-center gap-1 text-xs text-zinc-500 hover:text-red-400 transition-colors cursor-pointer shrink-0 mt-1"
+                      className="flex items-center gap-1 text-xs text-zinc-400 hover:text-red-500 transition-colors cursor-pointer shrink-0 mt-1"
                     >
                       <IconEdit size={13} />
                       変更
@@ -275,13 +275,13 @@ export default function ProfilePage() {
                         onChange={(e) => setDraft(e.target.value)}
                         rows={3}
                         autoFocus
-                        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+                        className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
                       />
                     ) : (
                       <div>
                         <div>
                           {editingField.maxSelect && (
-                            <p className="text-xs text-zinc-600 mb-2">
+                            <p className="text-xs text-zinc-400 mb-2">
                               {draft.split(SEPARATOR).filter(Boolean).length} / {editingField.maxSelect}
                             </p>
                           )}
@@ -306,7 +306,7 @@ export default function ProfilePage() {
                                   className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                                     active
                                       ? "bg-red-500 border-red-500 text-white"
-                                      : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                                      : "bg-white border-zinc-300 text-zinc-700 hover:border-zinc-400"
                                   }`}
                                 >
                                   {label}
@@ -334,12 +334,12 @@ export default function ProfilePage() {
                                 onChange={(e) => setCustomInput(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && addCustom(editingField.maxSelect)}
                                 placeholder="その他を入力して追加..."
-                                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                                className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
                               />
                               <button
                                 onClick={() => addCustom(editingField.maxSelect)}
                                 disabled={!customInput.trim()}
-                                className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                               >
                                 追加
                               </button>
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="px-4 py-2 text-zinc-400 text-sm border border-zinc-700 hover:border-zinc-500 rounded-xl transition-colors cursor-pointer"
+                        className="px-4 py-2 text-zinc-500 text-sm border border-zinc-200 hover:border-zinc-400 rounded-xl transition-colors cursor-pointer"
                       >
                         キャンセル
                       </button>
