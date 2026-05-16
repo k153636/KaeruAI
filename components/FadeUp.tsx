@@ -1,7 +1,7 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 type Props = {
   as?: string;
@@ -24,13 +24,17 @@ export default function FadeUp({
 }: Props) {
   const ref = useRef<any>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.style.opacity = "0";
     el.style.transform = "translateY(18px)";
     el.style.transition = "none";
-    void el.offsetHeight;
+  }, [triggerKey]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
     let raf1: number;
     let raf2: number;
     raf1 = requestAnimationFrame(() => {
@@ -46,7 +50,7 @@ export default function FadeUp({
 
   const AnyTag = Tag as any;
   return (
-    <AnyTag ref={ref} className={className} style={{ opacity: 0, ...style }} {...rest}>
+    <AnyTag ref={ref} className={className} style={{ ...style, opacity: 0, transform: "translateY(18px)" }} {...rest}>
       {children}
     </AnyTag>
   );

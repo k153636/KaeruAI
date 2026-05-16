@@ -282,7 +282,7 @@ export default function SetupPage() {
           </div>
         </div>
 
-        <FadeUp triggerKey={step} delay={0} className="bg-white border border-zinc-200 rounded-2xl p-6 mb-6">
+        <FadeUp key={step} delay={0} className="bg-white border border-zinc-200 rounded-2xl p-6 mb-6">
           <h2 className="text-xl font-bold text-zinc-900 mb-1">{current.question}</h2>
           <div className="flex items-center justify-between mb-6">
             <p className="text-zinc-500 text-sm">{current.subtitle}</p>
@@ -385,19 +385,18 @@ export default function SetupPage() {
               戻る
             </FadeUp>
           )}
-          <FadeUp
-            as="button"
-            triggerKey={step}
-            delay={130}
-            onClick={next}
-            disabled={!canNext()}
-            className="flex-1 py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:!opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
-          >
-            {step < STEPS.length - 1 ? (
-              <><span>次へ</span><IconArrowRight size={18} /></>
-            ) : (
-              <><IconCheck size={18} /><span>セットアップ完了</span></>
-            )}
+          <FadeUp key={step} delay={130} className="flex-1">
+            <button
+              onClick={next}
+              disabled={!canNext()}
+              className="w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
+            >
+              {step < STEPS.length - 1 ? (
+                <><span>次へ</span><IconArrowRight size={18} /></>
+              ) : (
+                <><IconCheck size={18} /><span>セットアップ完了</span></>
+              )}
+            </button>
           </FadeUp>
         </div>
       </div>
