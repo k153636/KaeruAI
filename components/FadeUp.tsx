@@ -31,12 +31,17 @@ export default function FadeUp({
     el.style.transform = "translateY(18px)";
     el.style.transition = "none";
     void el.offsetHeight;
-    requestAnimationFrame(() => {
-      if (!el) return;
-      el.style.transition = `opacity 0.2s ease-out ${delay}ms, transform 0.2s ease-out ${delay}ms`;
-      el.style.opacity = "1";
-      el.style.transform = "translateY(0)";
+    let raf1: number;
+    let raf2: number;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        if (!el) return;
+        el.style.transition = `opacity 0.2s ease-out ${delay}ms, transform 0.2s ease-out ${delay}ms`;
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0)";
+      });
     });
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
   }, [triggerKey, delay]);
 
   const AnyTag = Tag as any;
