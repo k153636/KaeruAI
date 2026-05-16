@@ -8,12 +8,15 @@ export interface StorageAdapter {
   setProfile(value: string): void;
   getFeedback(): string | null;
   setFeedback(value: string): void;
+  getHistory(): string | null;
+  setHistory(value: string): void;
   clear(): void;
 }
 
 class LocalStorageAdapter implements StorageAdapter {
   private readonly PROFILE_KEY = "yt_profile";
   private readonly FEEDBACK_KEY = "yt_feedback";
+  private readonly HISTORY_KEY = "yt_history";
 
   getProfile() {
     return typeof window !== "undefined" ? localStorage.getItem(this.PROFILE_KEY) : null;
@@ -27,9 +30,16 @@ class LocalStorageAdapter implements StorageAdapter {
   setFeedback(value: string) {
     localStorage.setItem(this.FEEDBACK_KEY, value);
   }
+  getHistory() {
+    return typeof window !== "undefined" ? localStorage.getItem(this.HISTORY_KEY) : null;
+  }
+  setHistory(value: string) {
+    localStorage.setItem(this.HISTORY_KEY, value);
+  }
   clear() {
     localStorage.removeItem(this.PROFILE_KEY);
     localStorage.removeItem(this.FEEDBACK_KEY);
+    localStorage.removeItem(this.HISTORY_KEY);
   }
 }
 

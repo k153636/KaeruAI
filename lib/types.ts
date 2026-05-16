@@ -1,4 +1,5 @@
 export interface Profile {
+  platform: string;
   motivation: string;
   bestComment: string;
   creativeTriger: string;
@@ -27,4 +28,11 @@ export interface FeedbackEntry {
 export interface FeedbackStore {
   liked: FeedbackEntry[];
   disliked: FeedbackEntry[];
+}
+
+export interface HistoryEntry {
+  id: string;
+  mood: string;
+  ideas: Idea[];
+  createdAt: number;
 }

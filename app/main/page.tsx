@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Idea } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
 import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
+import { addHistory } from "@/lib/history";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 
@@ -84,6 +85,7 @@ export default function MainPage() {
       const data = await res.json();
       setIdeas(data.ideas);
       refreshFeedbackMap(data.ideas.map((i: Idea) => i.title));
+      addHistory(mood.trim(), data.ideas);
     } catch (e) {
       setError(e instanceof Error ? e.message : "エラーが発生しました");
     } finally {
@@ -123,13 +125,21 @@ export default function MainPage() {
             <IconCamera size={22} />
             <span>企画メーカー</span>
           </div>
-          <button
-            onClick={() => router.push("/profile")}
-            className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
-          >
-            <IconUser size={14} />
-            プロフィール
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/history")}
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+            >
+              履歴
+            </button>
+            <button
+              onClick={() => router.push("/profile")}
+              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
+            >
+              <IconUser size={14} />
+              プロフィール
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
