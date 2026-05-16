@@ -134,6 +134,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editingId, setEditingId] = useState<keyof Profile | null>(null);
   const [draft, setDraft] = useState("");
+  const [customInput, setCustomInput] = useState("");
 
   useEffect(() => {
     const p = loadProfile();
@@ -145,6 +146,7 @@ export default function ProfilePage() {
     if (!profile) return;
     setEditingId(field.id);
     setDraft(profile[field.id] ?? "");
+    setCustomInput("");
   }
 
   function toggleMulti(opt: string) {
@@ -153,12 +155,21 @@ export default function ProfilePage() {
     setDraft(next.join(SEPARATOR));
   }
 
+  function addCustom() {
+    const trimmed = customInput.trim();
+    if (!trimmed) return;
+    const vals = draft ? draft.split(SEPARATOR) : [];
+    if (!vals.includes(trimmed)) setDraft([...vals, trimmed].join(SEPARATOR));
+    setCustomInput("");
+  }
+
   function save() {
     if (!profile || !editingId) return;
     const updated = { ...profile, [editingId]: draft };
     setProfile(updated);
     saveProfile(updated);
     setEditingId(null);
+    setCustomInput("");
   }
 
   if (!profile) return null;
@@ -220,31 +231,64 @@ export default function ProfilePage() {
                         className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
                       />
                     ) : (
-                      <div className="flex flex-wrap gap-2">
-                        {editingField.options?.map((opt) => {
-                          const active =
-                            editingField.type === "multiselect"
-                              ? draft.split(SEPARATOR).includes(opt)
-                              : draft === opt;
-                          const label = editingField.optionLabels?.[opt] ?? opt;
-                          return (
+                      <div>
+                        <div className="flex flex-wrap gap-2">
+                          {editingField.options?.map((opt) => {
+                            const active =
+                              editingField.type === "multiselect"
+                                ? draft.split(SEPARATOR).includes(opt)
+                                : draft === opt;
+                            const label = editingField.optionLabels?.[opt] ?? opt;
+                            return (
+                              <button
+                                key={opt}
+                                onClick={() =>
+                                  editingField.type === "multiselect"
+                                    ? toggleMulti(opt)
+                                    : setDraft(draft === opt ? "" : opt)
+                                }
+                                className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
+                                  active
+                                    ? "bg-red-500 border-red-500 text-white"
+                                    : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                                }`}
+                              >
+                                {label}
+                              </button>
+                            );
+                          })}
+                          {editingField.type === "multiselect" &&
+                            draft.split(SEPARATOR).filter((v) => v && !editingField.options?.includes(v)).map((custom) => (
+                              <button
+                                key={custom}
+                                onClick={() => toggleMulti(custom)}
+                                className="px-3 py-1.5 rounded-full text-sm border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                {custom}
+                                <span className="text-red-200 text-xs ml-0.5">×</span>
+                              </button>
+                            ))
+                          }
+                        </div>
+                        {editingField.type === "multiselect" && (
+                          <div className="flex gap-2 mt-3">
+                            <input
+                              type="text"
+                              value={customInput}
+                              onChange={(e) => setCustomInput(e.target.value)}
+                              onKeyDown={(e) => e.key === "Enter" && addCustom()}
+                              placeholder="その他を入力して追加..."
+                              className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                            />
                             <button
-                              key={opt}
-                              onClick={() =>
-                                editingField.type === "multiselect"
-                                  ? toggleMulti(opt)
-                                  : setDraft(draft === opt ? "" : opt)
-                              }
-                              className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer ${
-                                active
-                                  ? "bg-red-500 border-red-500 text-white"
-                                  : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
-                              }`}
+                              onClick={addCustom}
+                              disabled={!customInput.trim()}
+                              className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                             >
-                              {label}
+                              追加
                             </button>
-                          );
-                        })}
+                          </div>
+                        )}
                       </div>
                     )}
 

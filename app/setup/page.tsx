@@ -144,6 +144,7 @@ export default function SetupPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Partial<Record<keyof Profile, string>>>({});
+  const [customInput, setCustomInput] = useState("");
 
   const current = STEPS[step];
   const value = answers[current.id] ?? "";
@@ -154,8 +155,23 @@ export default function SetupPage() {
     setAnswers((a) => ({ ...a, [current.id]: next.join(SEPARATOR) }));
   }
 
+  function addCustom() {
+    const trimmed = customInput.trim();
+    if (!trimmed) return;
+    const vals = value ? value.split(SEPARATOR) : [];
+    if (!vals.includes(trimmed)) {
+      setAnswers((a) => ({ ...a, [current.id]: [...vals, trimmed].join(SEPARATOR) }));
+    }
+    setCustomInput("");
+  }
+
   function isSelected(opt: string) {
     return value.split(SEPARATOR).includes(opt);
+  }
+
+  function goStep(n: number) {
+    setCustomInput("");
+    setStep(n);
   }
 
   function canNext() {
@@ -166,7 +182,7 @@ export default function SetupPage() {
 
   function next() {
     if (step < STEPS.length - 1) {
-      setStep((s) => s + 1);
+      goStep(step + 1);
       return;
     }
 
@@ -230,30 +246,63 @@ export default function SetupPage() {
               autoFocus
             />
           ) : (
-            <div className="flex flex-wrap gap-2">
-              {current.options?.map((opt) => {
-                const active = current.type === "multiselect" ? isSelected(opt) : value === opt;
-                const label = current.id === "platform"
-                  ? (PLATFORMS.find((p) => p.id === opt)?.label ?? opt)
-                  : opt;
-                return (
+            <div>
+              <div className="flex flex-wrap gap-2">
+                {current.options?.map((opt) => {
+                  const active = current.type === "multiselect" ? isSelected(opt) : value === opt;
+                  const label = current.id === "platform"
+                    ? (PLATFORMS.find((p) => p.id === opt)?.label ?? opt)
+                    : opt;
+                  return (
+                    <button
+                      key={opt}
+                      onClick={() =>
+                        current.type === "multiselect"
+                          ? toggleMulti(opt)
+                          : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
+                      }
+                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
+                        active
+                          ? "bg-red-500 border-red-500 text-white"
+                          : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+                {current.type === "multiselect" &&
+                  value.split(SEPARATOR).filter((v) => v && !current.options?.includes(v)).map((custom) => (
+                    <button
+                      key={custom}
+                      onClick={() => toggleMulti(custom)}
+                      className="px-4 py-2 rounded-full text-sm font-medium border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                    >
+                      {custom}
+                      <span className="text-red-200 text-xs ml-0.5">×</span>
+                    </button>
+                  ))
+                }
+              </div>
+              {current.type === "multiselect" && (
+                <div className="flex gap-2 mt-3">
+                  <input
+                    type="text"
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addCustom()}
+                    placeholder="その他を入力して追加..."
+                    className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                  />
                   <button
-                    key={opt}
-                    onClick={() =>
-                      current.type === "multiselect"
-                        ? toggleMulti(opt)
-                        : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
-                    }
-                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
-                      active
-                        ? "bg-red-500 border-red-500 text-white"
-                        : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
-                    }`}
+                    onClick={addCustom}
+                    disabled={!customInput.trim()}
+                    className="px-4 py-2 rounded-xl text-sm font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                   >
-                    {label}
+                    追加
                   </button>
-                );
-              })}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -261,7 +310,7 @@ export default function SetupPage() {
         <div className="flex gap-3">
           {step > 0 && (
             <button
-              onClick={() => setStep((s) => s - 1)}
+              onClick={() => goStep(step - 1)}
               className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-400 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer"
             >
               <IconArrowLeft size={16} />
