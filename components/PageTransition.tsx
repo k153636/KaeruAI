@@ -1,5 +1,8 @@
 "use client";
 
+import { usePathname } from "next/navigation";
+
 export default function PageTransition({ children }: { children: React.ReactNode }) {
-  return <div className="page-fade">{children}</div>;
+  const pathname = usePathname();
+  return <div key={pathname} className="page-fade">{children}</div>;
 }
