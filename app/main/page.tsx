@@ -6,6 +6,7 @@ import type { Idea } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
 import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
+import { getPlatform } from "@/lib/platforms";
 
 function IconCopy({ size = 14 }: { size?: number }) {
   return (
@@ -104,13 +105,15 @@ export default function MainPage() {
   }
 
   function copyIdea(idea: Idea) {
-    const text = `【タイトル】\n${idea.title}\n\n【企画内容】\n${idea.description}\n\n【フック（冒頭15秒）】\n${idea.hook}\n\n【サムネイル案】\n${idea.thumbnail}\n\n【撮影メモ】\n${idea.filming}`;
+    const text = `【タイトル】\n${idea.title}\n\n【企画内容】\n${idea.description}\n\n【${platform.hookLabel}】\n${idea.hook}\n\n【${platform.visualLabel}】\n${idea.thumbnail}\n\n【${platform.productionLabel}】\n${idea.filming}`;
     navigator.clipboard.writeText(text);
     setCopiedId(idea.title);
     setTimeout(() => setCopiedId(null), 2000);
   }
 
   if (!profile) return null;
+
+  const platform = getPlatform(profile.platform);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] px-4 py-10">
@@ -189,7 +192,7 @@ export default function MainPage() {
                         <p className="text-zinc-400 text-sm mb-3 leading-relaxed">{idea.description}</p>
 
                         <div className="bg-zinc-800 rounded-lg px-3 py-2 mb-3">
-                          <span className="text-xs text-zinc-500 font-medium">フック：</span>
+                          <span className="text-xs text-zinc-500 font-medium">{platform.hookLabel}：</span>
                           <span className="text-xs text-zinc-300 ml-1">{idea.hook}</span>
                         </div>
 
@@ -197,7 +200,7 @@ export default function MainPage() {
                           onClick={() => setExpandedId(expanded ? null : idea.title)}
                           className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer mb-3 flex items-center gap-1"
                         >
-                          {expanded ? "▲ 閉じる" : "▼ サムネイル案・撮影メモを見る"}
+                          {expanded ? "▲ 閉じる" : `▼ ${platform.visualLabel}・${platform.productionLabel}を見る`}
                         </button>
 
                         {expanded && (
@@ -205,14 +208,14 @@ export default function MainPage() {
                             <div className="bg-zinc-800 rounded-lg px-3 py-2">
                               <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-1">
                                 <IconImage size={12} />
-                                サムネイル案
+                                {platform.visualLabel}
                               </div>
                               <p className="text-xs text-zinc-300 leading-relaxed">{idea.thumbnail}</p>
                             </div>
                             <div className="bg-zinc-800 rounded-lg px-3 py-2">
                               <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-1">
                                 <IconFilm size={12} />
-                                撮影メモ
+                                {platform.productionLabel}
                               </div>
                               <p className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">{idea.filming}</p>
                             </div>
