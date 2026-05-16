@@ -1,22 +1,15 @@
 import type { Profile } from "./types";
+import { storage } from "./storage";
 
 const REQUIRED_KEYS: (keyof Profile)[] = [
-  "motivation",
-  "bestComment",
-  "creativeTriger",
-  "audienceRelation",
-  "coreTheme",
-  "avoid",
-  "reference",
-  "processingStyle",
-  "creatorIdentity",
-  "successDefinition",
+  "motivation", "bestComment", "creativeTriger", "audienceRelation",
+  "coreTheme", "avoid", "reference", "processingStyle",
+  "creatorIdentity", "successDefinition",
 ];
 
 export function loadProfile(): Profile | null {
-  if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem("yt_profile");
+    const raw = storage.getProfile();
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     const isValid = REQUIRED_KEYS.every((k) => typeof parsed[k] === "string");
@@ -24,4 +17,8 @@ export function loadProfile(): Profile | null {
   } catch {
     return null;
   }
+}
+
+export function saveProfile(profile: Profile): void {
+  storage.setProfile(JSON.stringify(profile));
 }

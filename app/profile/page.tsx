@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
+import { loadProfile, saveProfile } from "@/lib/profile";
 import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
 
 const SEPARATOR = "|||";
@@ -125,9 +126,9 @@ export default function ProfilePage() {
   const [draft, setDraft] = useState("");
 
   useEffect(() => {
-    const raw = localStorage.getItem("yt_profile");
-    if (!raw) { router.replace("/setup"); return; }
-    setProfile(JSON.parse(raw));
+    const p = loadProfile();
+    if (!p) { router.replace("/setup"); return; }
+    setProfile(p);
   }, [router]);
 
   function startEdit(field: (typeof FIELDS)[0]) {
@@ -146,7 +147,7 @@ export default function ProfilePage() {
     if (!profile || !editingId) return;
     const updated = { ...profile, [editingId]: draft };
     setProfile(updated);
-    localStorage.setItem("yt_profile", JSON.stringify(updated));
+    saveProfile(updated);
     setEditingId(null);
   }
 

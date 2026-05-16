@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
+import { saveProfile } from "@/lib/profile";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 
 type StepType = "text" | "select" | "multiselect";
@@ -175,7 +176,7 @@ export default function SetupPage() {
       creatorIdentity: answers.creatorIdentity ?? "",
       successDefinition: answers.successDefinition ?? "",
     };
-    localStorage.setItem("yt_profile", JSON.stringify(profile));
+    saveProfile(profile);
     router.push("/main");
   }
 
