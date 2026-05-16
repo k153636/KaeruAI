@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
 import { saveProfile } from "@/lib/profile";
+import { PLATFORMS } from "@/lib/platforms";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 
 type StepType = "text" | "select" | "multiselect";
@@ -19,8 +20,15 @@ interface Step {
 
 const STEPS: Step[] = [
   {
+    id: "platform",
+    question: "メインで活動しているプラットフォームは？",
+    subtitle: "最も力を入れているものを選んでください",
+    type: "select",
+    options: PLATFORMS.map((p) => p.id),
+  },
+  {
     id: "motivation",
-    question: "なぜ動画を作るの？",
+    question: "なぜコンテンツを作るの？",
     subtitle: "一番近いものを選んでください",
     type: "select",
     options: [
@@ -165,6 +173,7 @@ export default function SetupPage() {
     const fmt = (v: string) => v.split(SEPARATOR).filter(Boolean).join("、");
 
     const profile: Profile = {
+      platform: answers.platform ?? "youtube",
       motivation: answers.motivation ?? "",
       bestComment: answers.bestComment ?? "",
       creativeTriger: fmt(answers.creativeTriger ?? ""),
@@ -188,7 +197,7 @@ export default function SetupPage() {
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
             <IconCamera size={22} />
-            <span>YouTuber企画メーカー</span>
+            <span>KaeruAI</span>
           </div>
           <p className="text-zinc-500 text-sm">あなたのことを教えてください</p>
         </div>
@@ -224,13 +233,16 @@ export default function SetupPage() {
             <div className="flex flex-wrap gap-2">
               {current.options?.map((opt) => {
                 const active = current.type === "multiselect" ? isSelected(opt) : value === opt;
+                const label = current.id === "platform"
+                  ? (PLATFORMS.find((p) => p.id === opt)?.label ?? opt)
+                  : opt;
                 return (
                   <button
                     key={opt}
                     onClick={() =>
                       current.type === "multiselect"
                         ? toggleMulti(opt)
-                        : setAnswers((a) => ({ ...a, [current.id]: opt }))
+                        : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                     }
                     className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer ${
                       active
@@ -238,7 +250,7 @@ export default function SetupPage() {
                         : "bg-transparent border-zinc-700 text-zinc-300 hover:border-zinc-500"
                     }`}
                   >
-                    {opt}
+                    {label}
                   </button>
                 );
               })}
