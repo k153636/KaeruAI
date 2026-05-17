@@ -129,6 +129,10 @@ export default function MainPage() {
   return (
     <div className="min-h-dvh bg-zinc-50 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-xl mx-auto">
+        <FadeUp delay={0} className="bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 mb-6 flex items-center gap-2">
+          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">⚠ 現在アルファ版として運用中のため、1日10回の生成制限があります</span>
+        </FadeUp>
+
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
             <IconCamera size={22} />
