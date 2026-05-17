@@ -225,7 +225,11 @@ function SetupContent() {
       }
       setFromMain(true);
       setPhase("optional");
-      setStep(REQUIRED_STEPS);
+      // 未回答の最初のステップにジャンプ
+      const firstUnanswered = STEPS.findIndex(
+        (s, i) => i >= REQUIRED_STEPS && !existing?.[s.id]
+      );
+      setStep(firstUnanswered !== -1 ? firstUnanswered : REQUIRED_STEPS);
     }
   }, [searchParams]);
   const [customInput, setCustomInput] = useState("");
