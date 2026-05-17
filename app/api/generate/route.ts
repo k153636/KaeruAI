@@ -93,7 +93,7 @@ ${profile.avoid ? `\n【絶対に含めないこと】\n${profile.avoid}` : ""}
 
 async function callGroq(systemPrompt: string, userPrompt: string): Promise<string> {
   const completion = await getGroq().chat.completions.create({
-    model: "meta-llama/llama-4-maverick-17b-128e-instruct",
+    model: "meta-llama/llama-4-scout-17b-16e-instruct",
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
