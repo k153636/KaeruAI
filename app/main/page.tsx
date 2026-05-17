@@ -2,15 +2,20 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { Profile } from "@/lib/types";
-import { loadProfile, saveProfile } from "@/lib/profile";
+import type { Profile, Idea } from "@/lib/types";
+import { loadProfile } from "@/lib/profile";
 import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
 import { addHistory } from "@/lib/history";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
 import ThemeToggle from "@/components/ThemeToggle";
-import type { Idea } from "@/lib/types";
+
+const OPTIONAL_FIELDS: (keyof Profile)[] = [
+  "creatorIdentity", "targetAudience", "contentApproach", "motivation",
+  "avoid", "audienceRelation", "bestComment", "creativeTriger",
+  "processingStyle", "successDefinition",
+];
 
 function IconCopy({ size = 14 }: { size?: number }) {
   return (
@@ -36,221 +41,6 @@ function IconImage({ size = 13 }: { size?: number }) {
       <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
       <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" strokeWidth="1.5"/>
       <path d="M21 15l-5-5L5 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  );
-}
-
-// 精度向上サジェスト定義（表示優先順）
-const SEPARATOR = "|||";
-
-interface SuggestionField {
-  id: keyof Profile;
-  question: string;
-  subtitle: string;
-  type: "select" | "multiselect";
-  options: string[];
-  maxSelect?: number;
-}
-
-const SUGGESTION_FIELDS: SuggestionField[] = [
-  {
-    id: "creatorIdentity",
-    question: "自分は本質的に何者だと思う？",
-    subtitle: "最大2つ選べます",
-    type: "multiselect",
-    maxSelect: 2,
-    options: ["教える人（ティーチャー）", "楽しませる人（エンターテイナー）", "探求する人（エクスプローラー）", "語る人（ストーリーテラー）", "批評・分析する人（クリティック）", "実験する人（イノベーター）"],
-  },
-  {
-    id: "targetAudience",
-    question: "一番刺さってほしい人は？",
-    subtitle: "企画の「誰のため」を明確にします",
-    type: "select",
-    options: ["過去の自分と同じ悩みを抱えた人", "同じ熱量で楽しめる仲間", "これから始めようとしている初心者", "もっと上を目指している向上心のある人", "今の自分自身（自己表現・記録）"],
-  },
-  {
-    id: "contentApproach",
-    question: "コンテンツの一番の武器は？",
-    subtitle: "企画の方向性の軸になります",
-    type: "select",
-    options: ["リアルな体験・失敗も含めたドキュメント", "わかりやすく噛み砕いた解説・教育", "一緒に楽しめるエンタメ・巻き込み力", "深く共感できる感情・ストーリー", "意外性・驚き・新しい視点"],
-  },
-  {
-    id: "motivation",
-    question: "なぜコンテンツを作るの？",
-    subtitle: "最大2つ選べます",
-    type: "multiselect",
-    maxSelect: 2,
-    options: ["お金・影響力を得たいから", "自分の考えや知識を広めたいから", "純粋に楽しい・自己表現したいから", "誰かの悩みを解決したいから", "認められたい・有名になりたいから"],
-  },
-  {
-    id: "avoid",
-    question: "絶対にやりたくないことは？",
-    subtitle: "AIが企画から除外します",
-    type: "multiselect",
-    options: ["炎上・煽りを狙ったコンテンツ", "政治・宗教・思想系の話題", "顔出し", "20分を超える長尺", "企業案件・広告感の強い内容", "ネガティブ・暗い雰囲気", "過激・センセーショナルな表現", "特定の誰かを批判・攻撃する内容"],
-  },
-  {
-    id: "audienceRelation",
-    question: "フォロワーとの理想の距離感は？",
-    subtitle: "チャンネルの空気感を決めます",
-    type: "select",
-    options: ["先生と生徒（信頼して学びに来る）", "友達・仲間（対等に楽しむ）", "演者と観客（非日常を届ける）", "同志（同じ目標に向かって歩む）"],
-  },
-  {
-    id: "bestComment",
-    question: "視聴者から一番嬉しいコメントは？",
-    subtitle: "正直に選んでください",
-    type: "select",
-    options: ["「すごくわかりやすかった」", "「笑えた、また来ます」", "「やってみます！」", "「元気もらえました」", "「ずっと応援してます」"],
-  },
-  {
-    id: "creativeTriger",
-    question: "動画を作りたくなる瞬間は？",
-    subtitle: "複数選択できます",
-    type: "multiselect",
-    options: ["怒りや違和感を感じた時", "感動・発見があった時", "誰かに教えたいことができた時", "面白い体験をした時"],
-  },
-  {
-    id: "processingStyle",
-    question: "面白いものを見つけた時、最初にしたいことは？",
-    subtitle: "あなたの情報処理スタイル",
-    type: "select",
-    options: ["とことん深く調べたくなる", "すぐ誰かに話したくなる", "とにかく自分でやってみたくなる", "全体を整理して図にまとめたくなる"],
-  },
-  {
-    id: "successDefinition",
-    question: "チャンネルが成功したと感じる瞬間は？",
-    subtitle: "あなたにとっての「ゴール」",
-    type: "select",
-    options: ["「あの動画で人生変わりました」と言われる", "収益だけで生活できる", "専門家として認められる", "ファンが熱狂的に応援してくれる", "心から楽しみながら続けられている"],
-  },
-];
-
-function SuggestionSection({ profile, onUpdate }: { profile: Profile; onUpdate: (p: Profile) => void }) {
-  const [openId, setOpenId] = useState<keyof Profile | null>(null);
-  const [draft, setDraft] = useState("");
-  const [saved, setSaved] = useState<keyof Profile | null>(null);
-
-  const unanswered = SUGGESTION_FIELDS.filter((f) => !profile[f.id]);
-  const answered = SUGGESTION_FIELDS.length - unanswered.length;
-
-  if (unanswered.length === 0) return null;
-
-  function open(field: SuggestionField) {
-    if (openId === field.id) { setOpenId(null); setDraft(""); return; }
-    setOpenId(field.id);
-    setDraft(profile[field.id] ?? "");
-  }
-
-  function toggleMulti(opt: string, field: SuggestionField) {
-    const vals = draft ? draft.split(SEPARATOR) : [];
-    if (vals.includes(opt)) {
-      setDraft(vals.filter((v) => v !== opt).join(SEPARATOR));
-    } else {
-      if (field.maxSelect && vals.length >= field.maxSelect) return;
-      setDraft([...vals, opt].join(SEPARATOR));
-    }
-  }
-
-  function saveDraft(field: SuggestionField) {
-    if (!draft) return;
-    const fmt = (v: string) => v.split(SEPARATOR).filter(Boolean).join("、");
-    const value = field.type === "multiselect" ? fmt(draft) : draft;
-    const updated = { ...profile, [field.id]: value };
-    saveProfile(updated);
-    onUpdate(updated);
-    setSaved(field.id);
-    setOpenId(null);
-    setDraft("");
-    setTimeout(() => setSaved(null), 1500);
-  }
-
-  return (
-    <FadeUp delay={240} className="mt-6">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-zinc-900 text-sm font-bold">✦ 精度を上げる</span>
-        </div>
-        <span className="text-xs text-zinc-400">{answered} / {SUGGESTION_FIELDS.length} 回答済み</span>
-      </div>
-
-      <div className="bg-white border border-zinc-200 rounded-2xl overflow-hidden">
-        {unanswered.map((field, i) => {
-          const isOpen = openId === field.id;
-          const justSaved = saved === field.id;
-          return (
-            <div key={field.id} className={`${i > 0 ? "border-t border-zinc-100" : ""}`}>
-              <button
-                onClick={() => open(field)}
-                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 transition-colors cursor-pointer text-left"
-              >
-                <div>
-                  <p className="text-zinc-900 text-sm font-medium">{field.question}</p>
-                  {justSaved && <p className="text-emerald-500 text-xs mt-0.5">保存しました ✓</p>}
-                </div>
-                <span className="text-zinc-400 text-xs ml-3 shrink-0">{isOpen ? "▲" : "▼"}</span>
-              </button>
-
-              {isOpen && (
-                <div className="px-4 pb-4">
-                  <p className="text-zinc-400 text-xs mb-3">{field.subtitle}</p>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {field.options.map((opt) => {
-                      const active = field.type === "multiselect"
-                        ? draft.split(SEPARATOR).includes(opt)
-                        : draft === opt;
-                      const selectedCount = draft.split(SEPARATOR).filter(Boolean).length;
-                      const atLimit = !!field.maxSelect && selectedCount >= field.maxSelect && !active;
-                      return (
-                        <button
-                          key={opt}
-                          onClick={() => field.type === "multiselect"
-                            ? toggleMulti(opt, field)
-                            : setDraft(draft === opt ? "" : opt)
-                          }
-                          disabled={atLimit}
-                          className={`px-3 py-1.5 rounded-full text-sm border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-                            active
-                              ? "bg-red-500 border-red-500 text-white"
-                              : "bg-white border-zinc-300 text-zinc-700 hover:border-zinc-400"
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => saveDraft(field)}
-                      disabled={!draft}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-400 text-white text-sm font-medium rounded-xl transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-                    >
-                      <IconCheck size={14} />
-                      保存
-                    </button>
-                    <button
-                      onClick={() => { setOpenId(null); setDraft(""); }}
-                      className="px-4 py-2 text-zinc-500 text-sm border border-zinc-200 hover:border-zinc-400 rounded-xl transition-colors cursor-pointer"
-                    >
-                      キャンセル
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </FadeUp>
-  );
-}
-
-function IconCheck({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
@@ -334,6 +124,7 @@ export default function MainPage() {
   if (!profile) return null;
 
   const platform = getPlatform(profile.platform);
+  const unansweredCount = OPTIONAL_FIELDS.filter((f) => !profile[f]).length;
 
   return (
     <div className="min-h-dvh bg-zinc-50 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
@@ -383,7 +174,7 @@ export default function MainPage() {
           />
         </FadeUp>
 
-        <FadeUp delay={180} className="mb-8">
+        <FadeUp delay={180} className="mb-6">
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
@@ -396,6 +187,18 @@ export default function MainPage() {
             )}
           </button>
         </FadeUp>
+
+        {unansweredCount > 0 && (
+          <FadeUp delay={220} className="mb-8">
+            <button
+              onClick={() => router.push("/setup?continue=true")}
+              className="w-full py-3 rounded-xl text-sm font-medium border border-zinc-200 hover:border-red-400 hover:text-red-500 text-zinc-500 transition-colors cursor-pointer flex items-center justify-center gap-2"
+            >
+              ✦ 精度を上げる
+              <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
+            </button>
+          </FadeUp>
+        )}
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 text-red-600 text-sm">{error}</div>
@@ -501,11 +304,6 @@ export default function MainPage() {
             </button>
           </div>
         )}
-
-        <SuggestionSection
-          profile={profile}
-          onUpdate={(updated) => setProfile(updated)}
-        />
       </div>
     </div>
   );
