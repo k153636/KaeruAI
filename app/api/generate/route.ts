@@ -97,14 +97,17 @@ export async function POST(request: Request) {
     }
 
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
-    const key = `kaeruai:generate:${ip}`;
-    const count = await redis.incr(key);
-    if (count === 1) await redis.expire(key, 86400);
-    if (count > 10) {
-      return Response.json(
-        { error: "本日の生成上限（10回）に達しました。明日またお試しください。" },
-        { status: 429 }
-      );
+    const whitelisted = (process.env.WHITELISTED_IPS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+    if (!whitelisted.includes(ip)) {
+      const key = `kaeruai:generate:${ip}`;
+      const count = await redis.incr(key);
+      if (count === 1) await redis.expire(key, 86400);
+      if (count > 10) {
+        return Response.json(
+          { error: "本日の生成上限（10回）に達しました。明日またお試しください。" },
+          { status: 429 }
+        );
+      }
     }
 
     if (!process.env.GROQ_API_KEY) {
