@@ -164,11 +164,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "リクエストが不正です" }, { status: 400 });
     }
 
-    const rawForwarded = request.headers.get("x-forwarded-for") ?? "none";
-    const ip = rawForwarded.split(",")[0]?.trim() ?? "anonymous";
-    console.log("[generate] x-forwarded-for:", rawForwarded);
-    console.log("[generate] ip:", ip);
-    console.log("[generate] WHITELISTED_IPS:", process.env.WHITELISTED_IPS ?? "(unset)");
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
     const whitelisted = (process.env.WHITELISTED_IPS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     const isDev = process.env.NODE_ENV === "development";
     const isOwner = isDev || whitelisted.includes(ip);
