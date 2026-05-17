@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KaeruAI — コンテンツ企画メーカー
 
-## Getting Started
+今日の気分を一言入力するだけで、あなた専用の企画を5つ生成するAIツールです。
 
-First, run the development server:
+## 主な機能
+
+- **企画生成** — 気分・プロフィール・過去のフィードバックを元に、Groq（llama-3.3-70b-versatile）が企画を5件提案
+- **マルチプラットフォーム対応** — YouTube / TikTok・Reels / Instagram / Podcast / ブログ・note / X (Twitter) / 配信
+- **プログレッシブセットアップ** — 2問だけ答えればすぐ使える。あとから追加回答するほどAI精度が上がる
+- **フィードバック学習** — 「いい感じ」「違う」を押すと次回生成に反映
+- **履歴管理** — 過去の生成結果をいつでも確認
+- **ダークモード対応**
+
+## 企画カードの内容
+
+各企画にはプラットフォームに合わせて以下が含まれます：
+
+| 項目 | YouTube | TikTok/Reels | Podcast |
+|------|---------|--------------|---------|
+| フック | 冒頭15秒のセリフ | 冒頭3秒のフック | オープニングトーク |
+| ビジュアル | サムネイル案 | サムネイル案 | エピソードアート案 |
+| 制作メモ | 撮影メモ | 撮影メモ | 収録メモ |
+
+## 技術スタック
+
+| 項目 | 内容 |
+|------|------|
+| フレームワーク | Next.js 16 (App Router) |
+| AI | Groq API — llama-3.3-70b-versatile |
+| スタイリング | Tailwind CSS v4 |
+| 言語 | TypeScript |
+| デプロイ | Vercel |
+| データ永続化 | localStorage（サーバー不要） |
+
+## セットアップ
+
+### 1. リポジトリをクローン
+
+```bash
+git clone https://github.com/your-username/kaeruai.git
+cd kaeruai
+npm install
+```
+
+### 2. 環境変数を設定
+
+`.env.local` を作成：
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+Groq APIキーは [console.groq.com](https://console.groq.com) で取得できます（無料枠あり）。
+
+### 3. 開発サーバーを起動
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) をブラウザで開いてください。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Vercelへのデプロイ
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/kaeruai)
 
-## Learn More
+デプロイ後、Vercelの環境変数に `GROQ_API_KEY` を追加してください。
 
-To learn more about Next.js, take a look at the following resources:
+## プロジェクト構成
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  page.tsx          # ルート（プロフィールの有無でリダイレクト）
+  setup/page.tsx    # セットアップフロー（2問必須 → 10問任意）
+  main/page.tsx     # メイン画面（企画生成）
+  profile/page.tsx  # プロフィール編集
+  history/page.tsx  # 生成履歴
+  api/generate/     # Groq APIルート
+lib/
+  types.ts          # 型定義
+  profile.ts        # プロフィールの読み書き
+  platforms.ts      # プラットフォーム定義
+  feedback.ts       # フィードバックの読み書き
+  history.ts        # 履歴の読み書き
+  storage.ts        # localStorage抽象化
+components/
+  FadeUp.tsx        # アニメーションコンポーネント
+  ThemeToggle.tsx   # ダークモード切り替え
+  icons.tsx         # アイコン
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ライセンス
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
