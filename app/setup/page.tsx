@@ -506,22 +506,16 @@ function SetupContent() {
                 )}
               </div>
               {(current.type === "multiselect" || current.type === "select") && (
-                <FadeUp triggerKey={step} delay={300} className="flex gap-2 mt-3">
+                <FadeUp triggerKey={step} delay={300} className="mt-3">
                   <input
                     type="text"
                     value={customInput}
                     onChange={(e) => setCustomInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addCustom()}
-                    placeholder="その他を入力して追加..."
-                    className="flex-1 bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
+                    onKeyDown={(e) => { if (e.key === "Enter") { addCustom(); (e.target as HTMLInputElement).blur(); } }}
+                    onBlur={addCustom}
+                    placeholder="その他を入力...（入力後、画面を触れば確定）"
+                    className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
                   />
-                  <button
-                    onClick={addCustom}
-                    disabled={!customInput.trim()}
-                    className="px-4 py-2 rounded-2xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
-                  >
-                    追加
-                  </button>
                 </FadeUp>
               )}
             </div>
