@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile, Idea } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
@@ -56,6 +56,34 @@ export default function MainPage() {
   const [feedbackMap, setFeedbackMap] = useState<Record<string, "liked" | "disliked" | null>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [swipeDelta, setSwipeDelta] = useState<{ id: string; deltaX: number } | null>(null);
+  const [animatingFeedback, setAnimatingFeedback] = useState<{ id: string; deltaX: number } | null>(null);
+  const swipeStart = useRef<{ id: string; x: number; y: number; horizontal: boolean | null } | null>(null);
+
+  function onTouchStart(e: React.TouchEvent, id: string) {
+    swipeStart.current = { id, x: e.touches[0].clientX, y: e.touches[0].clientY, horizontal: null };
+  }
+
+  function onTouchMove(e: React.TouchEvent, id: string) {
+    const s = swipeStart.current;
+    if (!s || s.id !== id) return;
+    const dx = e.touches[0].clientX - s.x;
+    const dy = e.touches[0].clientY - s.y;
+    if (s.horizontal === null) {
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) s.horizontal = Math.abs(dx) > Math.abs(dy);
+      return;
+    }
+    if (!s.horizontal) return;
+    setSwipeDelta({ id, deltaX: dx });
+  }
+
+  function onTouchEnd(idea: Idea) {
+    const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
+    if (delta > 80) handleFeedback(idea, "liked");
+    else if (delta < -80) handleFeedback(idea, "disliked");
+    swipeStart.current = null;
+    setSwipeDelta(null);
+  }
 
   useEffect(() => {
     const p = loadProfile();
@@ -103,7 +131,7 @@ export default function MainPage() {
     }
   }
 
-  function handleFeedback(idea: Idea, type: "liked" | "disliked") {
+  function applyFeedback(idea: Idea, type: "liked" | "disliked") {
     const current = feedbackMap[idea.title];
     removeFeedback(idea.title);
     if (current === type) {
@@ -113,6 +141,19 @@ export default function MainPage() {
       else addDisliked({ title: idea.title, mood });
       setFeedbackMap((m) => ({ ...m, [idea.title]: type }));
     }
+  }
+
+  function handleFeedback(idea: Idea, type: "liked" | "disliked") {
+    applyFeedback(idea, type);
+  }
+
+  function handleFeedbackWithAnimation(idea: Idea, type: "liked" | "disliked") {
+    const deltaX = type === "liked" ? 260 : -260;
+    setAnimatingFeedback({ id: idea.title, deltaX });
+    setTimeout(() => {
+      setAnimatingFeedback(null);
+      applyFeedback(idea, type);
+    }, 350);
   }
 
   function copyIdea(idea: Idea) {
@@ -128,12 +169,10 @@ export default function MainPage() {
   const unansweredCount = OPTIONAL_FIELDS.filter((f) => !profile[f]).length;
 
   return (
-    <div className="min-h-dvh bg-zinc-50 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-xl mx-auto">
-        <div className="bg-amber-50 dark:bg-zinc-800 border border-amber-200 dark:border-zinc-700 rounded-2xl px-4 py-2.5 mb-6 flex items-center gap-2">
-          <span className="text-xs font-medium text-amber-700 dark:text-zinc-400">⚠ 現在アルファ版として運用中のため、1日10回の生成制限があります</span>
-        </div>
 
+        {/* Header */}
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
             <IconCamera size={22} />
@@ -142,13 +181,13 @@ export default function MainPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/history")}
-              className="text-xs text-zinc-500 hover:text-zinc-700 transition-colors cursor-pointer"
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
             >
               履歴
             </button>
             <button
               onClick={() => router.push("/profile")}
-              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
             >
               <IconUser size={14} />
               プロフィール
@@ -157,29 +196,32 @@ export default function MainPage() {
           </div>
         </FadeUp>
 
+        {/* Profile tags */}
         <FadeUp delay={60} className="flex flex-wrap gap-2 mb-8">
           {[profile.contentNiche, profile.creatorIdentity].filter(Boolean).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-white border border-zinc-200 rounded-full text-xs text-zinc-500">
+            <span key={tag} className="px-3 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs text-zinc-500 dark:text-zinc-400">
               {tag}
             </span>
           ))}
         </FadeUp>
 
-        <FadeUp delay={120} className="bg-white border border-zinc-200 rounded-3xl p-6 mb-6">
-          <h1 className="text-zinc-900 font-bold text-xl mb-1">今日の気分は？</h1>
-          <p className="text-zinc-500 text-sm mb-4">一言入力するだけで企画を5つ生成します</p>
+        {/* Mood input */}
+        <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl p-6 mb-4">
+          <h1 className="text-zinc-900 dark:text-white font-bold text-xl mb-1">今日の気分は？</h1>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">気分でも「〇〇系の企画が欲しい」でも OK</p>
           <input
             type="text"
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-            placeholder="例：なんか元気、やる気ない..."
-            className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
+            placeholder="例：やる気ない　／　AI関連の企画が欲しい..."
+            className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors text-base"
             disabled={loading}
           />
         </FadeUp>
 
-        <FadeUp delay={180} className="mb-6">
+        {/* Generate button */}
+        <FadeUp delay={160} className="mb-4">
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
@@ -193,11 +235,12 @@ export default function MainPage() {
           </button>
         </FadeUp>
 
+        {/* Accuracy boost button */}
         {unansweredCount > 0 && (
-          <FadeUp delay={220} className="mb-8">
+          <FadeUp delay={200} className="mb-8">
             <button
               onClick={() => router.push("/setup?continue=true")}
-              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-200 hover:border-red-400 hover:text-red-500 text-zinc-500 transition-colors cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-200 dark:border-zinc-700 hover:border-red-400 hover:text-red-500 text-zinc-400 dark:text-zinc-500 transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
@@ -205,15 +248,23 @@ export default function MainPage() {
           </FadeUp>
         )}
 
+        {/* Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 text-red-600 text-sm">{error}</div>
+          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl p-4 mb-6 text-red-600 dark:text-red-400 text-sm">{error}</div>
         )}
 
+        {/* Ideas */}
         {ideas.length > 0 && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-zinc-500 text-sm font-medium">生成された企画（{mood}）</h2>
-              <span className="text-zinc-400 text-xs">評価で精度が上がります</span>
+            {/* Section header with swipe hint */}
+            <div className="mb-1">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">生成された企画（{mood}）</h2>
+              </div>
+              <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-600 px-1">
+                <span>← スワイプで「違う」</span>
+                <span>「いい感じ」→</span>
+              </div>
             </div>
 
             {ideas.map((idea, i) => {
@@ -221,78 +272,134 @@ export default function MainPage() {
               const copied = copiedId === idea.title;
               const expanded = expandedId === idea.title;
 
+              const isDragging = swipeDelta?.id === idea.title;
+              const isAnimating = animatingFeedback?.id === idea.title;
+              const deltaX = isAnimating ? animatingFeedback!.deltaX : (isDragging ? swipeDelta!.deltaX : 0);
+              const likeOpacity = Math.min(1, Math.max(0, deltaX / 80));
+              const dislikeOpacity = Math.min(1, Math.max(0, -deltaX / 80));
+
               return (
-                <FadeUp key={i} delay={i * 80} className="bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:border-zinc-300 transition-colors">
-                  <div className="p-5">
-                    <div className="flex items-start gap-3">
-                      <span className="text-red-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-zinc-900 font-bold text-base mb-2 leading-tight">{idea.title}</h3>
-                        <p className="text-zinc-500 text-sm mb-3 leading-relaxed">{idea.description}</p>
+                <FadeUp key={i} delay={i * 80}>
+                  <div
+                    onTouchStart={(e) => onTouchStart(e, idea.title)}
+                    onTouchMove={(e) => onTouchMove(e, idea.title)}
+                    onTouchEnd={() => onTouchEnd(idea)}
+                    style={{
+                      transform: `translateX(${deltaX}px) rotate(${deltaX * 0.03}deg)`,
+                      transition: isDragging ? "none" : "transform 0.35s ease",
+                      transformOrigin: "bottom center",
+                    }}
+                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden relative cursor-default touch-pan-y"
+                  >
+                    {/* Swipe overlays */}
+                    {likeOpacity > 0 && (
+                      <div
+                        className="absolute inset-0 rounded-3xl z-10 pointer-events-none flex items-center justify-start pl-5"
+                        style={{ backgroundColor: `rgba(16,185,129,${likeOpacity * 0.35})` }}
+                      >
+                        <span className="text-emerald-700 font-bold text-sm border-2 border-emerald-500 rounded-lg px-2 py-0.5 -rotate-12">
+                          いい感じ
+                        </span>
+                      </div>
+                    )}
+                    {dislikeOpacity > 0 && (
+                      <div
+                        className="absolute inset-0 rounded-3xl z-10 pointer-events-none flex items-center justify-end pr-5"
+                        style={{ backgroundColor: `rgba(239,68,68,${dislikeOpacity * 0.35})` }}
+                      >
+                        <span className="text-red-700 font-bold text-sm border-2 border-red-500 rounded-lg px-2 py-0.5 rotate-12">
+                          違う
+                        </span>
+                      </div>
+                    )}
 
-                        <div className="bg-zinc-100 rounded-xl px-3 py-2 mb-3">
-                          <span className="text-xs text-zinc-500 font-medium">{platform.hookLabel}：</span>
-                          <span className="text-xs text-zinc-700 ml-1">{idea.hook}</span>
-                        </div>
+                    <div className="p-5">
+                      <div className="flex items-start gap-3">
+                        <span className="text-red-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
+                        <div className="flex-1 min-w-0">
 
-                        <button
-                          onClick={() => setExpandedId(expanded ? null : idea.title)}
-                          className="text-xs text-zinc-500 hover:text-zinc-700 transition-colors cursor-pointer mb-3 flex items-center gap-1"
-                        >
-                          {expanded ? "▲ 閉じる" : `▼ ${platform.visualLabel}・${platform.productionLabel}を見る`}
-                        </button>
+                          {/* Title */}
+                          <h3 className="text-zinc-900 dark:text-white font-bold text-base mb-2 leading-tight">
+                            {idea.title}
+                          </h3>
 
-                        {expanded && (
-                          <div className="space-y-2 mb-3">
-                            <div className="bg-zinc-100 rounded-xl px-3 py-2">
-                              <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-1">
-                                <IconImage size={12} />
-                                {platform.visualLabel}
+                          {/* Description */}
+                          <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-3 leading-relaxed">
+                            {idea.description}
+                          </p>
+
+                          {/* Expand details */}
+                          <button
+                            onClick={() => setExpandedId(expanded ? null : idea.title)}
+                            className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer mb-3 flex items-center gap-1"
+                          >
+                            {expanded ? "▲ 閉じる" : "▼ フック・構成案・制作手順を見る"}
+                          </button>
+
+                          {expanded && (
+                            <div className="space-y-2 mb-3">
+                              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                                  {platform.hookLabel}：
+                                </span>
+                                <span className="text-xs text-zinc-700 dark:text-zinc-300 ml-1">{idea.hook}</span>
                               </div>
-                              <p className="text-xs text-zinc-700 leading-relaxed">{idea.thumbnail}</p>
-                            </div>
-                            <div className="bg-zinc-100 rounded-xl px-3 py-2">
-                              <div className="flex items-center gap-1.5 text-xs text-zinc-500 font-medium mb-1">
-                                <IconFilm size={12} />
-                                {platform.productionLabel}
+                              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
+                                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1">
+                                  <IconImage size={12} />
+                                  {platform.visualLabel}
+                                </div>
+                                <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">{idea.thumbnail}</p>
                               </div>
-                              <p className="text-xs text-zinc-700 leading-relaxed whitespace-pre-line">{idea.filming}</p>
+                              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
+                                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1">
+                                  <IconFilm size={12} />
+                                  {platform.productionLabel}
+                                </div>
+                                <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">{idea.filming}</p>
+                              </div>
                             </div>
+                          )}
+
+                          {/* Action buttons */}
+                          <div className="flex items-center gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                            <button
+                              onClick={() => handleFeedbackWithAnimation(idea, "liked")}
+                              disabled={isAnimating}
+                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer disabled:pointer-events-none ${
+                                fb === "liked"
+                                  ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-400 text-emerald-600"
+                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 hover:text-emerald-500"
+                              }`}
+                            >
+                              <IconThumbUp size={14} />
+                              <span>いい感じ</span>
+                            </button>
+                            <button
+                              onClick={() => handleFeedbackWithAnimation(idea, "disliked")}
+                              disabled={isAnimating}
+                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer disabled:pointer-events-none ${
+                                fb === "disliked"
+                                  ? "bg-red-50 dark:bg-red-950 border-red-400 text-red-600"
+                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-red-300 hover:text-red-500"
+                              }`}
+                            >
+                              <IconThumbDown size={14} />
+                              <span>違う</span>
+                            </button>
+                            <button
+                              onClick={() => copyIdea(idea)}
+                              title={copied ? "コピー済み" : "コピー"}
+                              className={`flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer ${
+                                copied
+                                  ? "border-zinc-400 dark:border-zinc-500 text-zinc-700 dark:text-zinc-300"
+                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 hover:border-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                              }`}
+                            >
+                              <IconCopy size={15} />
+                            </button>
                           </div>
-                        )}
 
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleFeedback(idea, "liked")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer ${
-                              fb === "liked"
-                                ? "bg-emerald-50 border-emerald-500 text-emerald-600"
-                                : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
-                            }`}
-                          >
-                            <IconThumbUp size={13} />いい感じ
-                          </button>
-                          <button
-                            onClick={() => handleFeedback(idea, "disliked")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer ${
-                              fb === "disliked"
-                                ? "bg-red-50 border-red-500 text-red-600"
-                                : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
-                            }`}
-                          >
-                            <IconThumbDown size={13} />違う
-                          </button>
-                          <button
-                            onClick={() => copyIdea(idea)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs border transition-all cursor-pointer ml-auto ${
-                              copied
-                                ? "border-zinc-400 text-zinc-700"
-                                : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
-                            }`}
-                          >
-                            <IconCopy size={13} />
-                            {copied ? "コピー済み" : "コピー"}
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -303,7 +410,7 @@ export default function MainPage() {
 
             <button
               onClick={() => { setMood(""); setIdeas([]); setExpandedId(null); }}
-              className="w-full py-3 rounded-2xl text-sm text-zinc-500 hover:text-zinc-700 border border-zinc-200 hover:border-zinc-400 transition-all cursor-pointer mt-2"
+              className="w-full py-3 rounded-2xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer mt-2"
             >
               もう一度生成する
             </button>
