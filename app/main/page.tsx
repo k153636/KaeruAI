@@ -11,6 +11,8 @@ import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
 import ThemeToggle from "@/components/ThemeToggle";
 
+const THRESHOLD = 120;
+
 const OPTIONAL_FIELDS: (keyof Profile)[] = [
   "creatorIdentity", "targetAudience", "contentApproach", "motivation",
   "avoid", "audienceRelation", "bestComment", "creativeTriger",
@@ -57,15 +59,46 @@ export default function MainPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [swipeDelta, setSwipeDelta] = useState<{ id: string; deltaX: number } | null>(null);
-  const [animatingFeedback, setAnimatingFeedback] = useState<{ id: string; deltaX: number } | null>(null);
-  const swipeStart = useRef<{ id: string; x: number; y: number; horizontal: boolean | null } | null>(null);
+  const [exitingId, setExitingId] = useState<string | null>(null);
+  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
+  const [likeAnimId, setLikeAnimId] = useState<string | null>(null);
 
+  // Unified drag state for both pointer (mouse) and touch
+  const dragStart = useRef<{ id: string; x: number; y: number; horizontal: boolean | null } | null>(null);
+
+  // ── Pointer events (mouse drag on desktop) ──────────────────────────
+  function onPointerDown(e: React.PointerEvent, id: string) {
+    if (e.pointerType === "touch") return; // touch handled separately
+    dragStart.current = { id, x: e.clientX, y: e.clientY, horizontal: true };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onPointerMove(e: React.PointerEvent, id: string) {
+    if (e.pointerType === "touch") return;
+    const s = dragStart.current;
+    if (!s || s.id !== id) return;
+    const dx = e.clientX - s.x;
+    setSwipeDelta({ id, deltaX: dx });
+  }
+
+  function onPointerUp(e: React.PointerEvent, idea: Idea) {
+    if (e.pointerType === "touch") return;
+    const s = dragStart.current;
+    if (!s || s.id !== idea.title) return;
+    const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
+    dragStart.current = null;
+    setSwipeDelta(null);
+    if (delta > THRESHOLD) triggerLike(idea);
+    else if (delta < -THRESHOLD) triggerDislike(idea);
+  }
+
+  // ── Touch events (mobile swipe) ──────────────────────────────────────
   function onTouchStart(e: React.TouchEvent, id: string) {
-    swipeStart.current = { id, x: e.touches[0].clientX, y: e.touches[0].clientY, horizontal: null };
+    dragStart.current = { id, x: e.touches[0].clientX, y: e.touches[0].clientY, horizontal: null };
   }
 
   function onTouchMove(e: React.TouchEvent, id: string) {
-    const s = swipeStart.current;
+    const s = dragStart.current;
     if (!s || s.id !== id) return;
     const dx = e.touches[0].clientX - s.x;
     const dy = e.touches[0].clientY - s.y;
@@ -79,10 +112,40 @@ export default function MainPage() {
 
   function onTouchEnd(idea: Idea) {
     const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
-    if (delta > 80) handleFeedback(idea, "liked");
-    else if (delta < -80) handleFeedback(idea, "disliked");
-    swipeStart.current = null;
+    dragStart.current = null;
     setSwipeDelta(null);
+    if (delta > THRESHOLD) triggerLike(idea);
+    else if (delta < -THRESHOLD) triggerDislike(idea);
+  }
+
+  // ── Feedback actions ─────────────────────────────────────────────────
+  function applyFeedback(idea: Idea, type: "liked" | "disliked") {
+    const current = feedbackMap[idea.title];
+    removeFeedback(idea.title);
+    if (current !== type) {
+      if (type === "liked") addLiked({ title: idea.title, mood });
+      else addDisliked({ title: idea.title, mood });
+      setFeedbackMap((m) => ({ ...m, [idea.title]: type }));
+    } else {
+      setFeedbackMap((m) => ({ ...m, [idea.title]: null }));
+    }
+  }
+
+  // いい感じ: bounce right and stay
+  function triggerLike(idea: Idea) {
+    setLikeAnimId(idea.title);
+    applyFeedback(idea, "liked");
+    setTimeout(() => setLikeAnimId(null), 400);
+  }
+
+  // 違う: slide left and disappear
+  function triggerDislike(idea: Idea) {
+    setExitingId(idea.title);
+    applyFeedback(idea, "disliked");
+    setTimeout(() => {
+      setRemovedIds((prev) => new Set([...prev, idea.title]));
+      setExitingId(null);
+    }, 380);
   }
 
   useEffect(() => {
@@ -104,6 +167,7 @@ export default function MainPage() {
     setError("");
     setIdeas([]);
     setExpandedId(null);
+    setRemovedIds(new Set());
 
     try {
       const res = await fetch("/api/generate", {
@@ -131,31 +195,6 @@ export default function MainPage() {
     }
   }
 
-  function applyFeedback(idea: Idea, type: "liked" | "disliked") {
-    const current = feedbackMap[idea.title];
-    removeFeedback(idea.title);
-    if (current === type) {
-      setFeedbackMap((m) => ({ ...m, [idea.title]: null }));
-    } else {
-      if (type === "liked") addLiked({ title: idea.title, mood });
-      else addDisliked({ title: idea.title, mood });
-      setFeedbackMap((m) => ({ ...m, [idea.title]: type }));
-    }
-  }
-
-  function handleFeedback(idea: Idea, type: "liked" | "disliked") {
-    applyFeedback(idea, type);
-  }
-
-  function handleFeedbackWithAnimation(idea: Idea, type: "liked" | "disliked") {
-    const deltaX = type === "liked" ? 260 : -260;
-    setAnimatingFeedback({ id: idea.title, deltaX });
-    setTimeout(() => {
-      setAnimatingFeedback(null);
-      applyFeedback(idea, type);
-    }, 350);
-  }
-
   function copyIdea(idea: Idea) {
     const text = `【タイトル】\n${idea.title}\n\n【企画内容】\n${idea.description}\n\n【${platform.hookLabel}】\n${idea.hook}\n\n【${platform.visualLabel}】\n${idea.thumbnail}\n\n【${platform.productionLabel}】\n${idea.filming}`;
     navigator.clipboard.writeText(text);
@@ -167,6 +206,7 @@ export default function MainPage() {
 
   const platform = getPlatform(profile.platform);
   const unansweredCount = OPTIONAL_FIELDS.filter((f) => !profile[f]).length;
+  const displayedIdeas = ideas.filter((idea) => !removedIds.has(idea.title));
 
   return (
     <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
@@ -179,18 +219,11 @@ export default function MainPage() {
             <span>KaeruAI</span>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/history")}
-              className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-            >
+            <button onClick={() => router.push("/history")} className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer">
               履歴
             </button>
-            <button
-              onClick={() => router.push("/profile")}
-              className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-            >
-              <IconUser size={14} />
-              プロフィール
+            <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer">
+              <IconUser size={14} />プロフィール
             </button>
             <ThemeToggle size={15} />
           </div>
@@ -235,7 +268,7 @@ export default function MainPage() {
           </button>
         </FadeUp>
 
-        {/* Accuracy boost button */}
+        {/* Accuracy boost */}
         {unansweredCount > 0 && (
           <FadeUp delay={200} className="mb-8">
             <button
@@ -254,81 +287,95 @@ export default function MainPage() {
         )}
 
         {/* Ideas */}
-        {ideas.length > 0 && (
+        {displayedIdeas.length > 0 && (
           <div className="space-y-4">
-            {/* Section header with swipe hint */}
             <div className="mb-1">
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">生成された企画（{mood}）</h2>
-              </div>
+              <h2 className="text-zinc-500 dark:text-zinc-400 text-sm font-medium mb-2">生成された企画（{mood}）</h2>
               <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-600 px-1">
-                <span>← スワイプで「違う」</span>
-                <span>「いい感じ」→</span>
+                <span>← 違う</span>
+                <span className="text-zinc-300 dark:text-zinc-700">ドラッグ or スワイプで評価</span>
+                <span>いい感じ →</span>
               </div>
             </div>
 
-            {ideas.map((idea, i) => {
+            {displayedIdeas.map((idea, i) => {
               const fb = feedbackMap[idea.title];
               const copied = copiedId === idea.title;
               const expanded = expandedId === idea.title;
 
               const isDragging = swipeDelta?.id === idea.title;
-              const isAnimating = animatingFeedback?.id === idea.title;
-              const deltaX = isAnimating ? animatingFeedback!.deltaX : (isDragging ? swipeDelta!.deltaX : 0);
-              const likeOpacity = Math.min(1, Math.max(0, deltaX / 80));
-              const dislikeOpacity = Math.min(1, Math.max(0, -deltaX / 80));
+              const isExiting = exitingId === idea.title;
+              const isLikeAnim = likeAnimId === idea.title;
+
+              const deltaX = isExiting ? -360
+                : isLikeAnim ? 0
+                : isDragging ? swipeDelta!.deltaX
+                : 0;
+
+              const likeOpacity = Math.min(1, Math.max(0, deltaX / THRESHOLD));
+              const dislikeOpacity = Math.min(1, Math.max(0, -deltaX / THRESHOLD));
+
+              const transition = isDragging ? "none"
+                : isExiting ? "transform 0.38s cubic-bezier(0.4,0,1,1), opacity 0.38s ease"
+                : "transform 0.35s ease";
 
               return (
-                <FadeUp key={i} delay={i * 80}>
+                <FadeUp key={idea.title} delay={i * 80}>
                   <div
+                    onPointerDown={(e) => onPointerDown(e, idea.title)}
+                    onPointerMove={(e) => onPointerMove(e, idea.title)}
+                    onPointerUp={(e) => onPointerUp(e, idea)}
                     onTouchStart={(e) => onTouchStart(e, idea.title)}
                     onTouchMove={(e) => onTouchMove(e, idea.title)}
                     onTouchEnd={() => onTouchEnd(idea)}
                     style={{
-                      transform: `translateX(${deltaX}px) rotate(${deltaX * 0.03}deg)`,
-                      transition: isDragging ? "none" : "transform 0.35s ease",
+                      transform: `translateX(${deltaX}px) rotate(${deltaX * 0.025}deg)`,
+                      opacity: isExiting ? 0 : 1,
+                      transition,
                       transformOrigin: "bottom center",
+                      boxShadow: isDragging ? "0 16px 40px rgba(0,0,0,0.12)" : undefined,
                     }}
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden relative cursor-default touch-pan-y"
+                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
-                    {/* Swipe overlays */}
-                    {likeOpacity > 0 && (
-                      <div
-                        className="absolute inset-0 rounded-3xl z-10 pointer-events-none flex items-center justify-start pl-5"
-                        style={{ backgroundColor: `rgba(16,185,129,${likeOpacity * 0.35})` }}
-                      >
-                        <span className="text-emerald-700 font-bold text-sm border-2 border-emerald-500 rounded-lg px-2 py-0.5 -rotate-12">
-                          いい感じ
-                        </span>
-                      </div>
-                    )}
-                    {dislikeOpacity > 0 && (
-                      <div
-                        className="absolute inset-0 rounded-3xl z-10 pointer-events-none flex items-center justify-end pr-5"
-                        style={{ backgroundColor: `rgba(239,68,68,${dislikeOpacity * 0.35})` }}
-                      >
-                        <span className="text-red-700 font-bold text-sm border-2 border-red-500 rounded-lg px-2 py-0.5 rotate-12">
-                          違う
-                        </span>
-                      </div>
-                    )}
+                    {/* Like overlay */}
+                    <div
+                      className="absolute inset-0 z-10 pointer-events-none flex items-center justify-start pl-6"
+                      style={{
+                        opacity: likeOpacity,
+                        background: `linear-gradient(to right, rgba(16,185,129,0.4), transparent)`,
+                      }}
+                    >
+                      <span className="text-emerald-600 font-black text-xl border-[3px] border-emerald-500 rounded-xl px-3 py-1 -rotate-12 tracking-wide">
+                        いい感じ
+                      </span>
+                    </div>
+
+                    {/* Dislike overlay */}
+                    <div
+                      className="absolute inset-0 z-10 pointer-events-none flex items-center justify-end pr-6"
+                      style={{
+                        opacity: dislikeOpacity,
+                        background: `linear-gradient(to left, rgba(239,68,68,0.4), transparent)`,
+                      }}
+                    >
+                      <span className="text-red-600 font-black text-xl border-[3px] border-red-500 rounded-xl px-3 py-1 rotate-12 tracking-wide">
+                        違う
+                      </span>
+                    </div>
 
                     <div className="p-5">
                       <div className="flex items-start gap-3">
                         <span className="text-red-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
                         <div className="flex-1 min-w-0">
 
-                          {/* Title */}
                           <h3 className="text-zinc-900 dark:text-white font-bold text-base mb-2 leading-tight">
                             {idea.title}
                           </h3>
 
-                          {/* Description */}
                           <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-3 leading-relaxed">
                             {idea.description}
                           </p>
 
-                          {/* Expand details */}
                           <button
                             onClick={() => setExpandedId(expanded ? null : idea.title)}
                             className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer mb-3 flex items-center gap-1"
@@ -339,22 +386,18 @@ export default function MainPage() {
                           {expanded && (
                             <div className="space-y-2 mb-3">
                               <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
-                                  {platform.hookLabel}：
-                                </span>
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{platform.hookLabel}：</span>
                                 <span className="text-xs text-zinc-700 dark:text-zinc-300 ml-1">{idea.hook}</span>
                               </div>
                               <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
                                 <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1">
-                                  <IconImage size={12} />
-                                  {platform.visualLabel}
+                                  <IconImage size={12} />{platform.visualLabel}
                                 </div>
                                 <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">{idea.thumbnail}</p>
                               </div>
                               <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
                                 <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1">
-                                  <IconFilm size={12} />
-                                  {platform.productionLabel}
+                                  <IconFilm size={12} />{platform.productionLabel}
                                 </div>
                                 <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">{idea.filming}</p>
                               </div>
@@ -364,28 +407,20 @@ export default function MainPage() {
                           {/* Action buttons */}
                           <div className="flex items-center gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                             <button
-                              onClick={() => handleFeedbackWithAnimation(idea, "liked")}
-                              disabled={isAnimating}
-                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer disabled:pointer-events-none ${
+                              onClick={() => triggerLike(idea)}
+                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
                                 fb === "liked"
                                   ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-400 text-emerald-600"
                                   : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 hover:text-emerald-500"
                               }`}
                             >
-                              <IconThumbUp size={14} />
-                              <span>いい感じ</span>
+                              <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
                             <button
-                              onClick={() => handleFeedbackWithAnimation(idea, "disliked")}
-                              disabled={isAnimating}
-                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer disabled:pointer-events-none ${
-                                fb === "disliked"
-                                  ? "bg-red-50 dark:bg-red-950 border-red-400 text-red-600"
-                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-red-300 hover:text-red-500"
-                              }`}
+                              onClick={() => triggerDislike(idea)}
+                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-red-300 hover:text-red-500"
                             >
-                              <IconThumbDown size={14} />
-                              <span>違う</span>
+                              <IconThumbDown size={14} /><span>違う</span>
                             </button>
                             <button
                               onClick={() => copyIdea(idea)}
@@ -409,7 +444,7 @@ export default function MainPage() {
             })}
 
             <button
-              onClick={() => { setMood(""); setIdeas([]); setExpandedId(null); }}
+              onClick={() => { setMood(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
               className="w-full py-3 rounded-2xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer mt-2"
             >
               もう一度生成する
