@@ -202,12 +202,16 @@ export default function ProfilePage() {
     }
   }
 
-  function addCustom(maxSelect?: number) {
+  function addCustom(type: "select" | "multiselect", maxSelect?: number) {
     const trimmed = customInput.trim();
     if (!trimmed) return;
-    const vals = draft ? draft.split(SEPARATOR) : [];
-    if (maxSelect && vals.length >= maxSelect) return;
-    if (!vals.includes(trimmed)) setDraft([...vals, trimmed].join(SEPARATOR));
+    if (type === "select") {
+      setDraft(trimmed);
+    } else {
+      const vals = draft ? draft.split(SEPARATOR) : [];
+      if (maxSelect && vals.length >= maxSelect) return;
+      if (!vals.includes(trimmed)) setDraft([...vals, trimmed].join(SEPARATOR));
+    }
     setCustomInput("");
   }
 
@@ -329,19 +333,28 @@ export default function ProfilePage() {
                                 </button>
                               ))
                             }
+                            {editingField.type === "select" && draft && !editingField.options?.includes(draft) && (
+                              <button
+                                onClick={() => setDraft("")}
+                                className="px-3 py-1.5 rounded-full text-sm border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                {draft}
+                                <span className="text-red-200 text-xs ml-0.5">×</span>
+                              </button>
+                            )}
                           </div>
-                          {editingField.type === "multiselect" && (
+                          {(editingField.type === "multiselect" || editingField.type === "select") && (
                             <div className="flex gap-2 mt-3">
                               <input
                                 type="text"
                                 value={customInput}
                                 onChange={(e) => setCustomInput(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && addCustom(editingField.maxSelect)}
+                                onKeyDown={(e) => e.key === "Enter" && addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect)}
                                 placeholder="その他を入力して追加..."
                                 className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
                               />
                               <button
-                                onClick={() => addCustom(editingField.maxSelect)}
+                                onClick={() => addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect)}
                                 disabled={!customInput.trim()}
                                 className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                               >
