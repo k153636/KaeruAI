@@ -172,7 +172,7 @@ export default function MainPage() {
             value={mood}
             onChange={(e) => setMood(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-            placeholder="例：なんか元気、やる気ない、ワクワクしてる..."
+            placeholder="例：なんか元気、やる気ない..."
             className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
             disabled={loading}
           />
