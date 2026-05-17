@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getTheme, toggleTheme } from "@/lib/theme";
+import { getTheme, cycleTheme, type Theme } from "@/lib/theme";
 
 function IconSun({ size = 16 }: { size?: number }) {
   return (
@@ -20,25 +20,37 @@ function IconMoon({ size = 16 }: { size?: number }) {
   );
 }
 
+function IconSystem({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M8 21h8M12 17v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
 export default function ThemeToggle({ size = 14 }: { size?: number }) {
-  const [dark, setDark] = useState(false);
+  const [theme, setTheme] = useState<Theme>("system");
 
   useEffect(() => {
-    setDark(getTheme() === "dark");
+    setTheme(getTheme());
   }, []);
 
   function handleToggle() {
-    const next = toggleTheme();
-    setDark(next === "dark");
+    const next = cycleTheme();
+    setTheme(next);
   }
+
+  const label = theme === "light" ? "ライト" : theme === "dark" ? "ダーク" : "システム";
 
   return (
     <button
       onClick={handleToggle}
-      aria-label="テーマ切り替え"
-      className="text-zinc-400 hover:text-zinc-600 dark-hover transition-colors cursor-pointer"
+      aria-label={`テーマ：${label}`}
+      title={label}
+      className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer"
     >
-      {dark ? <IconSun size={size} /> : <IconMoon size={size} />}
+      {theme === "light" ? <IconSun size={size} /> : theme === "dark" ? <IconMoon size={size} /> : <IconSystem size={size} />}
     </button>
   );
 }

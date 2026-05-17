@@ -129,8 +129,8 @@ export default function MainPage() {
   return (
     <div className="min-h-dvh bg-zinc-50 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-xl mx-auto">
-        <FadeUp delay={0} className="bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-2.5 mb-6 flex items-center gap-2">
-          <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">⚠ 現在アルファ版として運用中のため、1日10回の生成制限があります</span>
+        <FadeUp delay={0} className="bg-amber-50 dark:bg-zinc-800 border border-amber-200 dark:border-zinc-700 rounded-2xl px-4 py-2.5 mb-6 flex items-center gap-2">
+          <span className="text-xs font-medium text-amber-700 dark:text-zinc-400">⚠ 現在アルファ版として運用中のため、1日10回の生成制限があります</span>
         </FadeUp>
 
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
@@ -182,7 +182,7 @@ export default function MainPage() {
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
-            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-600 text-white flex items-center justify-center gap-2"
           >
             {loading ? (
               <><IconLoader size={18} className="animate-spin" />{retrying ? "リトライ中..." : "企画を考え中..."}</>

@@ -1,20 +1,39 @@
-export function getTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  return (localStorage.getItem("theme") as "light" | "dark") ?? "light";
+export type Theme = "light" | "dark" | "system";
+
+export function getTheme(): Theme {
+  if (typeof window === "undefined") return "system";
+  return (localStorage.getItem("theme") as Theme) ?? "system";
 }
 
-export function setTheme(theme: "light" | "dark") {
+export function setTheme(theme: Theme) {
   localStorage.setItem("theme", theme);
-  document.documentElement.classList.toggle("dark", theme === "dark");
+  applyTheme(theme);
 }
 
-export function toggleTheme(): "light" | "dark" {
-  const next = getTheme() === "light" ? "dark" : "light";
+export function applyTheme(theme: Theme) {
+  if (theme === "system") {
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", prefersDark);
+  } else {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }
+}
+
+export function cycleTheme(): Theme {
+  const current = getTheme();
+  const next: Theme = current === "light" ? "dark" : current === "dark" ? "system" : "light";
   setTheme(next);
   return next;
 }
 
 export function initTheme() {
   const theme = getTheme();
-  document.documentElement.classList.toggle("dark", theme === "dark");
+  applyTheme(theme);
+  if (theme === "system") {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+      if (getTheme() === "system") {
+        document.documentElement.classList.toggle("dark", e.matches);
+      }
+    });
+  }
 }
