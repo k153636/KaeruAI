@@ -182,7 +182,7 @@ export default function MainPage() {
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
-            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:cursor-not-allowed disabled:bg-zinc-300 disabled:text-zinc-500 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:cursor-not-allowed disabled:bg-red-100 disabled:text-red-300 bg-red-500 hover:bg-red-600 text-white flex items-center justify-center gap-2"
           >
             {loading ? (
               <><IconLoader size={18} className="animate-spin" />{retrying ? "リトライ中..." : "企画を考え中..."}</>
