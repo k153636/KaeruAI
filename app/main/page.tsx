@@ -91,9 +91,10 @@ export default function MainPage() {
       }
 
       const data = await res.json();
-      setIdeas(data.ideas);
-      refreshFeedbackMap(data.ideas.map((i: Idea) => i.title));
-      addHistory(mood.trim(), data.ideas);
+      const ideas: Idea[] = Array.isArray(data.ideas) ? data.ideas : [];
+      setIdeas(ideas);
+      refreshFeedbackMap(ideas.map((i) => i.title));
+      addHistory(mood.trim(), ideas);
     } catch (e) {
       setError(e instanceof Error ? e.message : "エラーが発生しました");
     } finally {
