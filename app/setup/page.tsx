@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { Profile } from "@/lib/types";
-import { saveProfile } from "@/lib/profile";
+import { loadProfile, saveProfile } from "@/lib/profile";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 import FadeUp from "@/components/FadeUp";
@@ -187,9 +187,37 @@ type Phase = "required" | "interstitial" | "optional";
 
 export default function SetupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState<Phase>("required");
   const [answers, setAnswers] = useState<Partial<Record<keyof Profile, string>>>({});
+
+  useEffect(() => {
+    if (searchParams.get("continue") === "true") {
+      const existing = loadProfile();
+      if (existing) {
+        // 既存の回答を復元
+        const sep = "|||";
+        const toRaw = (v: string | undefined) => v ? v.split("、").join(sep) : "";
+        setAnswers({
+          platform: existing.platform,
+          contentNiche: toRaw(existing.contentNiche),
+          motivation: toRaw(existing.motivation),
+          bestComment: existing.bestComment ?? "",
+          creativeTriger: toRaw(existing.creativeTriger),
+          audienceRelation: existing.audienceRelation ?? "",
+          targetAudience: existing.targetAudience ?? "",
+          contentApproach: existing.contentApproach ?? "",
+          avoid: toRaw(existing.avoid),
+          processingStyle: existing.processingStyle ?? "",
+          creatorIdentity: toRaw(existing.creatorIdentity),
+          successDefinition: existing.successDefinition ?? "",
+        });
+      }
+      setPhase("optional");
+      setStep(REQUIRED_STEPS);
+    }
+  }, [searchParams]);
   const [customInput, setCustomInput] = useState("");
 
   const current = STEPS[step];
