@@ -215,7 +215,7 @@ const STEPS: Step[] = [
   {
     id: "dreamGoal",
     question: "1年後、チャンネルがどんな状態なら最高？",
-    subtitle: "逆算して今の企画の方向性を決めます",
+    subtitle: "今の企画の方向性を決めます",
     type: "select",
     options: [
       "月10万円以上の収益がある",

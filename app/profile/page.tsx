@@ -197,7 +197,7 @@ const FIELDS: {
   },
   {
     id: "dreamGoal",
-    label: "1年後の理想の状態（逆算）",
+    label: "1年後の理想の状態",
     type: "select",
     options: [
       "月10万円以上の収益がある",
