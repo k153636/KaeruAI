@@ -1,12 +1,12 @@
-import Groq from "groq-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Redis } from "@upstash/redis";
 import type { Profile, Idea, FeedbackStore } from "@/lib/types";
 import { getPlatform } from "@/lib/platforms";
 
 const redis = Redis.fromEnv();
 
-function getGroq() {
-  return new Groq({ apiKey: process.env.GROQ_API_KEY });
+function getGenAI() {
+  return new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
 }
 
 const SYSTEM_PROMPT = `あなたはコンテンツクリエイターの専属企画参謀です。
@@ -96,17 +96,17 @@ ${profile.dreamGoal        ? `- 1年後の目標「${profile.dreamGoal}」に近
 - 5つは互いに方向性が重複しないようにする`;
 }
 
-async function callGroq(systemPrompt: string, userPrompt: string): Promise<string> {
-  const completion = await getGroq().chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt },
-    ],
-    temperature: 0.85,
-    max_tokens: 4096,
+async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
+  const model = getGenAI().getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: systemPrompt,
+    generationConfig: {
+      temperature: 0.85,
+      maxOutputTokens: 4096,
+    },
   });
-  return completion.choices[0]?.message?.content?.trim() ?? "";
+  const result = await model.generateContent(userPrompt);
+  return result.response.text().trim();
 }
 
 export async function POST(request: Request) {
@@ -135,18 +135,18 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!process.env.GROQ_API_KEY) {
-      return Response.json({ error: "GROQ_API_KEY が設定されていません" }, { status: 500 });
+    if (!process.env.GOOGLE_AI_API_KEY) {
+      return Response.json({ error: "GOOGLE_AI_API_KEY が設定されていません" }, { status: 500 });
     }
 
     const userPrompt = buildUserPrompt(mood, profile, feedback ?? { liked: [], disliked: [] });
 
     let text = "";
     try {
-      text = await callGroq(SYSTEM_PROMPT, userPrompt);
+      text = await callGemini(SYSTEM_PROMPT, userPrompt);
     } catch {
       await new Promise((r) => setTimeout(r, 2000));
-      text = await callGroq(SYSTEM_PROMPT, userPrompt);
+      text = await callGemini(SYSTEM_PROMPT, userPrompt);
     }
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
