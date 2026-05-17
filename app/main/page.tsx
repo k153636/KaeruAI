@@ -14,7 +14,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 const OPTIONAL_FIELDS: (keyof Profile)[] = [
   "creatorIdentity", "targetAudience", "contentApproach", "motivation",
   "avoid", "audienceRelation", "bestComment", "creativeTriger",
-  "processingStyle", "successDefinition",
+  "processingStyle", "successDefinition", "hobby", "expertise", "dreamGoal",
 ];
 
 function IconCopy({ size = 14 }: { size?: number }) {

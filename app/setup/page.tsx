@@ -178,6 +178,54 @@ const STEPS: Step[] = [
       "心から楽しみながら続けられている",
     ],
   },
+  {
+    id: "hobby",
+    question: "趣味や日常で熱中していることは？",
+    subtitle: "コンテンツのネタ源になります。複数選べます",
+    type: "multiselect",
+    options: [
+      "音楽・楽器",
+      "料理・グルメ",
+      "スポーツ・フィットネス",
+      "ゲーム",
+      "読書・映画・アニメ",
+      "旅行・アウトドア",
+      "アート・デザイン",
+      "テクノロジー・プログラミング",
+      "ファッション・美容",
+      "ビジネス・投資",
+    ],
+  },
+  {
+    id: "expertise",
+    question: "人より詳しいこと・得意なスキルは？",
+    subtitle: "コンテンツの差別化ポイントになります。複数選べます",
+    type: "multiselect",
+    options: [
+      "特定の専門知識・資格がある",
+      "実体験・失敗談が豊富",
+      "わかりやすく説明するのが得意",
+      "トレンドを早くキャッチする",
+      "独自の視点・分析力がある",
+      "コミュニティ作りが得意",
+      "編集・映像制作スキルがある",
+      "文章を書くのが得意",
+    ],
+  },
+  {
+    id: "dreamGoal",
+    question: "1年後、チャンネルがどんな状態なら最高？",
+    subtitle: "逆算して今の企画の方向性を決めます",
+    type: "select",
+    options: [
+      "月10万円以上の収益がある",
+      "フォロワー・登録者が1万人を超えている",
+      "憧れのクリエイターとコラボしている",
+      "自分のスキルで誰かの人生が変わった",
+      "本業を超える影響力を持っている",
+      "純粋に楽しみながら続けられている",
+    ],
+  },
 ];
 
 const REQUIRED_STEPS = 2;
@@ -221,6 +269,9 @@ function SetupContent() {
           processingStyle: existing.processingStyle ?? "",
           creatorIdentity: toRaw(existing.creatorIdentity),
           successDefinition: existing.successDefinition ?? "",
+          hobby: toRaw(existing.hobby),
+          expertise: toRaw(existing.expertise),
+          dreamGoal: existing.dreamGoal ?? "",
         });
       }
       setFromMain(true);
@@ -292,6 +343,9 @@ function SetupContent() {
       processingStyle: answers.processingStyle || undefined,
       creatorIdentity: answers.creatorIdentity ? fmt(answers.creatorIdentity) : undefined,
       successDefinition: answers.successDefinition || undefined,
+      hobby: answers.hobby ? fmt(answers.hobby) : undefined,
+      expertise: answers.expertise ? fmt(answers.expertise) : undefined,
+      dreamGoal: answers.dreamGoal || undefined,
     };
   }
 

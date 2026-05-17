@@ -11,6 +11,9 @@ export interface Profile {
   processingStyle?: string;
   creatorIdentity?: string;
   successDefinition?: string;
+  hobby?: string;
+  expertise?: string;
+  dreamGoal?: string;
 }
 
 export interface Idea {
