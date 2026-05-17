@@ -309,6 +309,9 @@ function SetupContent() {
       return;
     }
 
+    // 任意フェーズは1問ごとに保存
+    if (phase === "optional") saveProfile(buildProfile());
+
     goStep(nextStep);
   }
 
