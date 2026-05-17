@@ -132,7 +132,7 @@ export default function MainPage() {
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
             <IconCamera size={22} />
-            <span>企画メーカー</span>
+            <span>KaeruAI</span>
           </div>
           <div className="flex items-center gap-3">
             <button

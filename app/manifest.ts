@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "YouTuber企画メーカー",
-    short_name: "企画メーカー",
-    description: "今日の気分から企画を5つ生成するYouTuber向けツール",
+    name: "KaeruAI",
+    short_name: "KaeruAI",
+    description: "気分を一言入れるだけで、あなた専用の企画を5つ即生成",
     start_url: "/",
     display: "standalone",
     background_color: "#0a0a0a",

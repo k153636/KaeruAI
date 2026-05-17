@@ -4,17 +4,17 @@ import PageTransition from "@/components/PageTransition";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://kaeruai.vercel.app"),
-  title: "YouTuber企画メーカー",
-  description: "今日の気分から企画を5つ生成するYouTuber向けツール",
+  title: "KaeruAI",
+  description: "気分を一言入れるだけで、あなた専用の企画を5つ即生成",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "企画メーカー",
+    title: "KaeruAI",
   },
   openGraph: {
-    title: "YouTuber企画メーカー",
-    description: "今日の気分から、企画を5つ生成。YouTuber専用AIツール。",
+    title: "KaeruAI",
+    description: "気分を一言入れるだけで、あなた専用の企画を5つ即生成",
     type: "website",
   },
 };

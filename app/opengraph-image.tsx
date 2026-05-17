@@ -23,13 +23,13 @@ export default function OGImage() {
             <path d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             <rect x="2" y="7" width="13" height="11" rx="2" stroke="#ef4444" strokeWidth="1.5" />
           </svg>
-          <span style={{ color: "#ef4444", fontSize: 48, fontWeight: 700 }}>企画メーカー</span>
+          <span style={{ color: "#ef4444", fontSize: 48, fontWeight: 700 }}>KaeruAI</span>
         </div>
         <p style={{ color: "#f0f0f0", fontSize: 32, fontWeight: 700, margin: 0 }}>
-          今日の気分から、企画を5つ生成
+          気分を一言入れるだけで、あなた専用の企画を5つ即生成
         </p>
         <p style={{ color: "#71717a", fontSize: 20, marginTop: 16 }}>
-          YouTuber専用・AIが本質を理解して提案
+          AIがあなたの本質を理解して提案
         </p>
       </div>
     ),
