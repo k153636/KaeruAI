@@ -246,10 +246,14 @@ function SetupContent() {
   function addCustom() {
     const trimmed = customInput.trim();
     if (!trimmed) return;
-    const vals = value ? value.split(SEPARATOR) : [];
-    if (current.maxSelect && vals.length >= current.maxSelect) return;
-    if (!vals.includes(trimmed)) {
-      setAnswers((a) => ({ ...a, [current.id]: [...vals, trimmed].join(SEPARATOR) }));
+    if (current.type === "select") {
+      setAnswers((a) => ({ ...a, [current.id]: trimmed }));
+    } else {
+      const vals = value ? value.split(SEPARATOR) : [];
+      if (current.maxSelect && vals.length >= current.maxSelect) return;
+      if (!vals.includes(trimmed)) {
+        setAnswers((a) => ({ ...a, [current.id]: [...vals, trimmed].join(SEPARATOR) }));
+      }
     }
     setCustomInput("");
   }
@@ -491,8 +495,17 @@ function SetupContent() {
                     </button>
                   ))
                 }
+                {current.type === "select" && value && !current.options?.includes(value) && (
+                  <button
+                    onClick={() => setAnswers((a) => ({ ...a, [current.id]: "" }))}
+                    className="px-4 py-2 rounded-full text-sm font-medium border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    {value}
+                    <span className="text-red-200 text-xs ml-0.5">×</span>
+                  </button>
+                )}
               </div>
-              {current.type === "multiselect" && (
+              {(current.type === "multiselect" || current.type === "select") && (
                 <FadeUp triggerKey={step} delay={300} className="flex gap-2 mt-3">
                   <input
                     type="text"
