@@ -108,7 +108,7 @@ export default function HistoryPage() {
             {entries.map((entry) => {
               const isOpen = expandedId === entry.id;
               return (
-                <div key={entry.id} className="bg-white border border-zinc-200 rounded-2xl overflow-hidden">
+                <div key={entry.id} className="bg-white border border-zinc-200 rounded-3xl overflow-hidden">
                   <div
                     className="flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-50 transition-colors"
                     onClick={() => setExpandedId(isOpen ? null : entry.id)}
@@ -158,15 +158,15 @@ export default function HistoryPage() {
                                 </div>
                                 {isIdeaOpen && (
                                   <div className="space-y-2 mt-2">
-                                    <div className="bg-zinc-100 rounded-lg px-3 py-2">
+                                    <div className="bg-zinc-100 rounded-xl px-3 py-2">
                                       <p className="text-xs text-zinc-500 font-medium mb-1">{platform.hookLabel}</p>
                                       <p className="text-xs text-zinc-700">{idea.hook}</p>
                                     </div>
-                                    <div className="bg-zinc-100 rounded-lg px-3 py-2">
+                                    <div className="bg-zinc-100 rounded-xl px-3 py-2">
                                       <p className="text-xs text-zinc-500 font-medium mb-1">{platform.visualLabel}</p>
                                       <p className="text-xs text-zinc-700">{idea.thumbnail}</p>
                                     </div>
-                                    <div className="bg-zinc-100 rounded-lg px-3 py-2">
+                                    <div className="bg-zinc-100 rounded-xl px-3 py-2">
                                       <p className="text-xs text-zinc-500 font-medium mb-1">{platform.productionLabel}</p>
                                       <p className="text-xs text-zinc-700 whitespace-pre-line">{idea.filming}</p>
                                     </div>

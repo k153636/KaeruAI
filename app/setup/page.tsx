@@ -354,7 +354,7 @@ function SetupContent() {
             </p>
           </FadeUp>
 
-          <FadeUp delay={120} className="bg-white border border-zinc-200 rounded-2xl p-5 mb-4">
+          <FadeUp delay={120} className="bg-white border border-zinc-200 rounded-3xl p-5 mb-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-medium text-zinc-500">回答すると精度が上がる項目</span>
               <span className="text-xs text-zinc-400">残り10問</span>
@@ -371,14 +371,14 @@ function SetupContent() {
           <FadeUp delay={200} className="flex flex-col gap-3">
             <button
               onClick={continueOptional}
-              className="w-full py-4 rounded-xl font-bold text-base bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full py-4 rounded-2xl font-bold text-base bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <span>続けて答える</span>
               <IconArrowRight size={18} />
             </button>
             <button
               onClick={exitToMain}
-              className="w-full py-3 rounded-xl text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
+              className="w-full py-3 rounded-2xl text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
             >
               あとで答える（企画生成へ）
             </button>
@@ -430,7 +430,7 @@ function SetupContent() {
           </div>
         </div>
 
-        <FadeUp key={step} delay={0} className="bg-white border border-zinc-200 rounded-2xl p-6 mb-6">
+        <FadeUp key={step} delay={0} className="bg-white border border-zinc-200 rounded-3xl p-6 mb-6">
           <h2 className="text-xl font-bold text-zinc-900 mb-1">{current.question}</h2>
           <div className="flex items-center justify-between mb-6">
             <p className="text-zinc-500 text-sm">{current.subtitle}</p>
@@ -448,7 +448,7 @@ function SetupContent() {
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && canNext() && next()}
               placeholder={current.placeholder}
               rows={3}
-              className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base resize-none"
+              className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base resize-none"
               autoFocus
             />
           ) : (
@@ -513,12 +513,12 @@ function SetupContent() {
                     onChange={(e) => setCustomInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addCustom()}
                     placeholder="その他を入力して追加..."
-                    className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
+                    className="flex-1 bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
                   />
                   <button
                     onClick={addCustom}
                     disabled={!customInput.trim()}
-                    className="px-4 py-2 rounded-xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-2xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                   >
                     追加
                   </button>
@@ -541,7 +541,7 @@ function SetupContent() {
                   goStep(step - 1);
                 }
               }}
-              className="flex items-center gap-2 px-6 py-4 rounded-xl font-medium text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
+              className="flex items-center gap-2 px-6 py-4 rounded-2xl font-medium text-sm text-zinc-500 border border-zinc-200 hover:border-zinc-400 transition-colors cursor-pointer"
             >
               <IconArrowLeft size={16} />
               戻る
@@ -551,7 +551,7 @@ function SetupContent() {
             <button
               onClick={next}
               disabled={!canNext()}
-              className="w-full py-4 rounded-xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
             >
               {step < STEPS.length - 1 ? (
                 <><span>次へ</span><IconArrowRight size={18} /></>

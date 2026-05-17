@@ -253,7 +253,7 @@ export default function ProfilePage() {
             return (
               <div
                 key={field.id}
-                className="bg-white border border-zinc-200 rounded-2xl p-4"
+                className="bg-white border border-zinc-200 rounded-3xl p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                         onChange={(e) => setDraft(e.target.value)}
                         rows={3}
                         autoFocus
-                        className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-4 py-3 text-zinc-900 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+                        className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
                       />
                     ) : (
                       <div>
@@ -351,12 +351,12 @@ export default function ProfilePage() {
                                 onChange={(e) => setCustomInput(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect)}
                                 placeholder="その他を入力して追加..."
-                                className="flex-1 bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                                className="flex-1 bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
                               />
                               <button
                                 onClick={() => addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect)}
                                 disabled={!customInput.trim()}
-                                className="px-3 py-2 rounded-xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                                className="px-3 py-2 rounded-2xl text-sm font-medium bg-zinc-200 hover:bg-zinc-300 text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
                               >
                                 追加
                               </button>
@@ -369,14 +369,14 @@ export default function ProfilePage() {
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={save}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-400 text-white text-sm font-medium rounded-xl transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-400 text-white text-sm font-medium rounded-2xl transition-colors cursor-pointer"
                       >
                         <IconCheck size={14} />
                         保存
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="px-4 py-2 text-zinc-500 text-sm border border-zinc-200 hover:border-zinc-400 rounded-xl transition-colors cursor-pointer"
+                        className="px-4 py-2 text-zinc-500 text-sm border border-zinc-200 hover:border-zinc-400 rounded-2xl transition-colors cursor-pointer"
                       >
                         キャンセル
                       </button>
