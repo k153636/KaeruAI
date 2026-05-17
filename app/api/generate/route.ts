@@ -6,7 +6,7 @@ import { getPlatform } from "@/lib/platforms";
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, "1 d"),
+  limiter: Ratelimit.fixedWindow(10, "1 d"),
   prefix: "kaeruai:generate",
 });
 
