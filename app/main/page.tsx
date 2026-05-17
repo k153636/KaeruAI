@@ -55,8 +55,7 @@ export default function MainPage() {
   const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState("");
   const [feedbackMap, setFeedbackMap] = useState<Record<string, "liked" | "disliked" | null>>({});
-  const [themes, setThemes] = useState<string[]>([]);
-  const [themeInput, setThemeInput] = useState("");
+  const [theme, setTheme] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [swipeDelta, setSwipeDelta] = useState<{ id: string; deltaX: number } | null>(null);
@@ -165,7 +164,7 @@ export default function MainPage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mood: mood.trim(), themes, profile, feedback: getFeedback() }),
+        body: JSON.stringify({ mood: mood.trim(), theme: theme.trim(), profile, feedback: getFeedback() }),
       });
 
       if (!res.ok) {
@@ -230,67 +229,33 @@ export default function MainPage() {
           ))}
         </FadeUp>
 
-        {/* Mood input */}
+        {/* Main input */}
         <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl p-6 mb-4">
-          <h1 className="text-zinc-900 dark:text-white font-bold text-xl mb-1">今日の気分は？</h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-4">一言入力するだけで企画を5つ生成します</p>
-          <input
-            type="text"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-            placeholder="例：やる気ない、元気、テンション高い..."
-            className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors text-base"
-            disabled={loading}
-          />
-
-          {/* Theme tags */}
-          <div className="mt-4">
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-2">テーマ・条件（任意）</p>
-            {themes.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {themes.map((t, i) => (
-                  <span key={i} className="flex items-center gap-1 px-2.5 py-1 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-full text-xs text-red-600 dark:text-red-400">
-                    {t}
-                    <button
-                      onClick={() => setThemes(themes.filter((_, j) => j !== i))}
-                      className="text-red-400 hover:text-red-600 cursor-pointer leading-none"
-                      disabled={loading}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-2">
+          <h1 className="text-zinc-900 dark:text-white font-bold text-xl mb-5">どんな企画がほしい？</h1>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
               <input
                 type="text"
-                value={themeInput}
-                onChange={(e) => setThemeInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && themeInput.trim()) {
-                    e.preventDefault();
-                    setThemes([...themes, themeInput.trim()]);
-                    setThemeInput("");
-                  }
-                }}
-                placeholder="例：AI系、努力しない、初心者向け..."
-                className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-400 transition-colors"
+                value={mood}
+                onChange={(e) => setMood(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+                placeholder="やる気ない、挑戦したい..."
+                className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
                 disabled={loading}
               />
-              <button
-                onClick={() => {
-                  if (themeInput.trim()) {
-                    setThemes([...themes, themeInput.trim()]);
-                    setThemeInput("");
-                  }
-                }}
-                disabled={!themeInput.trim() || loading}
-                className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-500 hover:border-red-400 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                ＋
-              </button>
+              <span className="text-zinc-400 dark:text-zinc-500 text-sm shrink-0">な感じで</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="text"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+                placeholder="AI系、短尺、初心者向け... （任意）"
+                className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+                disabled={loading}
+              />
+              <span className="text-zinc-400 dark:text-zinc-500 text-sm shrink-0">の企画</span>
             </div>
           </div>
         </FadeUp>
@@ -448,7 +413,7 @@ export default function MainPage() {
             })}
 
             <button
-              onClick={() => { setMood(""); setThemes([]); setThemeInput(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
+              onClick={() => { setMood(""); setTheme(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
               className="w-full py-3 rounded-2xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer mt-2"
             >
               もう一度生成する
