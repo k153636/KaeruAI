@@ -335,6 +335,8 @@ export default function MainPage() {
                       transformOrigin: "bottom center",
                       boxShadow: isDragging ? "0 16px 40px rgba(0,0,0,0.12)" : undefined,
                     }}
+                    draggable={false}
+                    onDragStart={(e) => e.preventDefault()}
                     className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
                     {/* Like overlay */}
