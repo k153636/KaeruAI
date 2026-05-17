@@ -190,6 +190,7 @@ export default function SetupPage() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [phase, setPhase] = useState<Phase>("required");
+  const [fromMain, setFromMain] = useState(false);
   const [answers, setAnswers] = useState<Partial<Record<keyof Profile, string>>>({});
 
   useEffect(() => {
@@ -214,6 +215,7 @@ export default function SetupPage() {
           successDefinition: existing.successDefinition ?? "",
         });
       }
+      setFromMain(true);
       setPhase("optional");
       setStep(REQUIRED_STEPS);
     }
@@ -510,7 +512,7 @@ export default function SetupPage() {
               delay={80}
               onClick={() => {
                 if (step === REQUIRED_STEPS && isOptionalPhase) {
-                  setPhase("interstitial");
+                  fromMain ? exitToMain() : setPhase("interstitial");
                 } else {
                   goStep(step - 1);
                 }
