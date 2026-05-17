@@ -1,14 +1,9 @@
 import Groq from "groq-sdk";
-import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import type { Profile, Idea, FeedbackStore } from "@/lib/types";
 import { getPlatform } from "@/lib/platforms";
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.fixedWindow(10, "1 d"),
-  prefix: "kaeruai:generate",
-});
+const redis = Redis.fromEnv();
 
 function getGroq() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -102,14 +97,15 @@ export async function POST(request: Request) {
     }
 
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
-    const { success, remaining } = await ratelimit.limit(ip);
-    if (!success) {
+    const key = `kaeruai:generate:${ip}`;
+    const count = await redis.incr(key);
+    if (count === 1) await redis.expire(key, 86400);
+    if (count > 10) {
       return Response.json(
         { error: "本日の生成上限（10回）に達しました。明日またお試しください。" },
         { status: 429 }
       );
     }
-    void remaining;
 
     if (!process.env.GROQ_API_KEY) {
       return Response.json({ error: "GROQ_API_KEY が設定されていません" }, { status: 500 });
