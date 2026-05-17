@@ -30,6 +30,23 @@ const SYSTEM_PROMPT = `あなたはコンテンツクリエイターの専属企
 返答は必ず指定されたJSON形式のみで行い、前後に余分なテキストを一切含めないでください。
 すべての出力は日本語で行ってください。`;
 
+function buildProfileNarrative(profile: Profile): string {
+  const sentences: string[] = [];
+  if (profile.creatorIdentity)   sentences.push(`${profile.creatorIdentity}タイプ`);
+  if (profile.motivation)        sentences.push(`${profile.motivation}という動機で発信`);
+  if (profile.contentApproach)   sentences.push(`${profile.contentApproach}を武器にする`);
+  if (profile.expertise)         sentences.push(`得意領域は${profile.expertise}`);
+  if (profile.hobby)             sentences.push(`${profile.hobby}に熱中している`);
+  if (profile.audienceRelation)  sentences.push(`視聴者とは${profile.audienceRelation}の関係性を理想とする`);
+  if (profile.targetAudience)    sentences.push(`届けたい相手は${profile.targetAudience}`);
+  if (profile.bestComment)       sentences.push(`${profile.bestComment}というコメントが最も嬉しい`);
+  if (profile.creativeTriger)    sentences.push(`${profile.creativeTriger}ときに作りたくなる`);
+  if (profile.processingStyle)   sentences.push(`面白いものを見ると${profile.processingStyle}`);
+  if (profile.successDefinition) sentences.push(`目指す状態は${profile.successDefinition}`);
+  if (profile.dreamGoal)         sentences.push(`1年後の理想は${profile.dreamGoal}`);
+  return sentences.join("。") + "。";
+}
+
 function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore): string {
   const platform = getPlatform(profile.platform);
   const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
@@ -40,40 +57,27 @@ function buildUserPrompt(mood: string, profile: Profile, feedback: FeedbackStore
       ? `\n【過去のフィードバック】\n${likedTitles ? `好みの傾向（このテイストに近づけて）：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}\n`
       : "";
 
-  const optionalFields = [
-    profile.motivation       && `- コンテンツを作る動機：${profile.motivation}`,
-    profile.bestComment      && `- 一番嬉しいフォロワーの反応：${profile.bestComment}`,
-    profile.creativeTriger   && `- 創作衝動が湧く瞬間：${profile.creativeTriger}`,
-    profile.audienceRelation && `- フォロワーとの距離感：${profile.audienceRelation}`,
-    profile.targetAudience   && `- 届けたいターゲット：${profile.targetAudience}`,
-    profile.contentApproach  && `- コンテンツの武器・アプローチ：${profile.contentApproach}`,
-    profile.avoid            && `- 絶対にやりたくないこと：${profile.avoid}`,
-    profile.processingStyle  && `- 情報処理スタイル：${profile.processingStyle}`,
-    profile.creatorIdentity  && `- クリエイターとしての本質：${profile.creatorIdentity}`,
-    profile.successDefinition && `- 成功の定義：${profile.successDefinition}`,
-    profile.hobby            && `- 趣味・熱中していること：${profile.hobby}`,
-    profile.expertise        && `- 得意なこと・強み：${profile.expertise}`,
-    profile.dreamGoal        && `- 1年後の目標（逆算）：${profile.dreamGoal}`,
-  ].filter(Boolean).join("\n");
+  const profileNarrative = buildProfileNarrative(profile);
 
   return `【プラットフォーム】
 ${platform.label}（${platform.contentWord}を作っているクリエイター）
 
-【ここへ来た目的】
+【発信目的】
 ${profile.contentNiche}
-${optionalFields ? `\n【クリエイタープロフィール】\n${optionalFields}` : ""}
+
+【このクリエイター像】
+${profileNarrative}
 ${feedbackSection}
 【今日の気分】
 ${mood}
+${profile.avoid ? `\n【絶対に含めないこと】\n${profile.avoid}` : ""}
 
-【重要】以下のプロフィールを持つこのクリエイター以外には提案できない、固有の企画を生成すること。汎用的・テンプレート的な企画は不合格。
-
-以下のJSON形式のみで5つの企画を返してください：
+上記のクリエイター像・気分・目的を企画の方向性に活かしつつ、以下のJSON形式のみで5つの企画を返してください：
 {
   "ideas": [
     {
-      "title": "タイトル（数字・感情ワード・具体性を含むクリックされるもの）",
-      "description": "このクリエイターがこれをやると面白い理由を2文で。プロフィールのキーワードを直接使わず、企画の核心と独自性を具体的に書く",
+      "title": "具体的で個性のあるタイトル（このクリエイターの視点・言葉が伝わるもの）",
+      "description": "視聴者が『見たい』と思う理由を2文。動画内で何が起きるか・どんな体験ができるかを具体的に書く。プロフィールの言葉をそのまま使わない",
       "hook": "${platform.hookPlaceholder}",
       "thumbnail": "${platform.visualLabel}の構成案（具体的に）",
       "filming": "${platform.productionLabel}（必要な素材・場所・道具・構成順を箇条書き）"
@@ -81,23 +85,10 @@ ${mood}
   ]
 }
 
-制約：
-${profile.avoid            ? `- 「${profile.avoid}」は絶対に含めない` : "- 過激・炎上狙い・不快感を与える内容は避ける"}
-${profile.creatorIdentity  ? `- ${profile.creatorIdentity}としての本質が滲み出る企画にする` : ""}
-${profile.targetAudience   ? `- 今日の気分（${mood}）と届けたいターゲット（${profile.targetAudience}）を接続する` : `- 今日の気分（${mood}）に合った企画にする`}
-${profile.contentApproach  ? `- コンテンツの武器（${profile.contentApproach}）を活かした企画にする` : ""}
-${profile.bestComment      ? `- 「${profile.bestComment}」と言ってもらえる方向性にする` : ""}
-${profile.motivation       ? `- 動機「${profile.motivation}」が体現される企画にする` : ""}
-${profile.audienceRelation ? `- フォロワーとの距離感「${profile.audienceRelation}」が伝わるトーン・構成にする` : ""}
-${profile.processingStyle  ? `- 情報処理スタイル「${profile.processingStyle}」がコンテンツ制作に活きる企画にする` : ""}
-${profile.successDefinition ? `- 「${profile.successDefinition}」という成功イメージに近づく企画にする` : ""}
-${profile.creativeTriger   ? `- 「${profile.creativeTriger}」という創作衝動が活きる企画にする` : ""}
-${profile.hobby            ? `- 趣味（${profile.hobby}）をコンテンツのネタ・切り口として活用する` : ""}
-${profile.expertise        ? `- 得意なこと（${profile.expertise}）を差別化ポイントとして活かす` : ""}
-${profile.dreamGoal        ? `- 1年後の目標「${profile.dreamGoal}」に近づくための企画にする` : ""}
-- ${platform.label}に適したフォーマット・尺感の企画にする
-- 一人で制作できるスケール感にする
-- 5つは互いに方向性が重複しないようにする`;
+条件：
+- ${platform.label}に適したフォーマット・尺感
+- 一人で制作できるスケール感
+- 5企画それぞれ異なる切り口・フォーマット・トーン`;
 }
 
 async function callGroq(systemPrompt: string, userPrompt: string): Promise<string> {
