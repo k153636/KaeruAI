@@ -1,9 +1,17 @@
+import OpenAI from "openai";
 import Groq from "groq-sdk";
 import { Redis } from "@upstash/redis";
 import type { Profile, Idea, FeedbackStore } from "@/lib/types";
 import { getPlatform } from "@/lib/platforms";
 
 const redis = Redis.fromEnv();
+
+function getOpenRouter() {
+  return new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY,
+  });
+}
 
 function getGroq() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -102,7 +110,21 @@ ${profile.avoid ? `\n【絶対に含めないこと】\n${profile.avoid}` : ""}
 - 5企画それぞれ異なる切り口・フォーマット・トーン`;
 }
 
-async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
+async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
+  const completion = await getOpenRouter().chat.completions.create({
+    model: "google/gemini-2.0-flash-001",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: 0.85,
+    max_tokens: 4096,
+    response_format: { type: "json_object" },
+  });
+  return completion.choices[0]?.message?.content?.trim() ?? "";
+}
+
+async function callGroq(systemPrompt: string, userPrompt: string): Promise<string> {
   const completion = await getGroq().chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [
@@ -114,6 +136,15 @@ async function callAI(systemPrompt: string, userPrompt: string): Promise<string>
     response_format: { type: "json_object" },
   });
   return completion.choices[0]?.message?.content?.trim() ?? "";
+}
+
+async function callAI(isOwner: boolean, systemPrompt: string, userPrompt: string): Promise<string> {
+  if (isOwner && process.env.OPENROUTER_API_KEY) {
+    console.log("[generate] model: gemini-2.0-flash");
+    return await callGemini(systemPrompt, userPrompt);
+  }
+  console.log("[generate] model: llama-3.3-70b");
+  return await callGroq(systemPrompt, userPrompt);
 }
 
 export async function POST(request: Request) {
@@ -131,7 +162,9 @@ export async function POST(request: Request) {
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
     const whitelisted = (process.env.WHITELISTED_IPS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     const isDev = process.env.NODE_ENV === "development";
-    if (!isDev && !whitelisted.includes(ip)) {
+    const isOwner = isDev || whitelisted.includes(ip);
+
+    if (!isOwner) {
       const key = `kaeruai:generate:${ip}`;
       const count = await redis.incr(key);
       if (count === 1) await redis.expire(key, 86400);
@@ -143,18 +176,18 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!process.env.GROQ_API_KEY) {
-      return Response.json({ error: "GROQ_API_KEY が設定されていません" }, { status: 500 });
+    if (!process.env.GROQ_API_KEY && !process.env.OPENROUTER_API_KEY) {
+      return Response.json({ error: "API キーが設定されていません" }, { status: 500 });
     }
 
     const userPrompt = buildUserPrompt(mood, profile, feedback ?? { liked: [], disliked: [] });
 
     let text = "";
     try {
-      text = await callAI(SYSTEM_PROMPT, userPrompt);
+      text = await callAI(isOwner, SYSTEM_PROMPT, userPrompt);
     } catch {
       await new Promise((r) => setTimeout(r, 2000));
-      text = await callAI(SYSTEM_PROMPT, userPrompt);
+      text = await callAI(isOwner, SYSTEM_PROMPT, userPrompt);
     }
 
     const jsonMatch = text.match(/\{[\s\S]*\}/);
