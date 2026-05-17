@@ -11,7 +11,6 @@ import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
 import ThemeToggle from "@/components/ThemeToggle";
 
-const THRESHOLD = 120;
 
 const OPTIONAL_FIELDS: (keyof Profile)[] = [
   "creatorIdentity", "targetAudience", "contentApproach", "motivation",
@@ -61,7 +60,6 @@ export default function MainPage() {
   const [swipeDelta, setSwipeDelta] = useState<{ id: string; deltaX: number } | null>(null);
   const [exitingId, setExitingId] = useState<string | null>(null);
   const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
-  const [likeAnimId, setLikeAnimId] = useState<string | null>(null);
 
   // Unified drag state for both pointer (mouse) and touch
   const dragStart = useRef<{ id: string; x: number; y: number; horizontal: boolean | null } | null>(null);
@@ -88,8 +86,6 @@ export default function MainPage() {
     const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
     dragStart.current = null;
     setSwipeDelta(null);
-    if (delta > THRESHOLD) triggerLike(idea);
-    else if (delta < -THRESHOLD) triggerDislike(idea);
   }
 
   // ── Touch events (mobile swipe) ──────────────────────────────────────
@@ -110,12 +106,9 @@ export default function MainPage() {
     setSwipeDelta({ id, deltaX: dx });
   }
 
-  function onTouchEnd(idea: Idea) {
-    const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
+  function onTouchEnd() {
     dragStart.current = null;
     setSwipeDelta(null);
-    if (delta > THRESHOLD) triggerLike(idea);
-    else if (delta < -THRESHOLD) triggerDislike(idea);
   }
 
   // ── Feedback actions ─────────────────────────────────────────────────
@@ -131,11 +124,8 @@ export default function MainPage() {
     }
   }
 
-  // いい感じ: bounce right and stay
   function triggerLike(idea: Idea) {
-    setLikeAnimId(idea.title);
     applyFeedback(idea, "liked");
-    setTimeout(() => setLikeAnimId(null), 400);
   }
 
   // 違う: slide left and disappear
@@ -291,11 +281,6 @@ export default function MainPage() {
           <div className="space-y-4">
             <div className="mb-1">
               <h2 className="text-zinc-500 dark:text-zinc-400 text-sm font-medium mb-2">生成された企画（{mood}）</h2>
-              <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-600 px-1">
-                <span>← 違う</span>
-                <span className="text-zinc-300 dark:text-zinc-700">ドラッグ or スワイプで評価</span>
-                <span>いい感じ →</span>
-              </div>
             </div>
 
             {displayedIdeas.map((idea, i) => {
@@ -305,16 +290,7 @@ export default function MainPage() {
 
               const isDragging = swipeDelta?.id === idea.title;
               const isExiting = exitingId === idea.title;
-              const isLikeAnim = likeAnimId === idea.title;
-
-              const deltaX = isExiting ? -360
-                : isLikeAnim ? 0
-                : isDragging ? swipeDelta!.deltaX
-                : 0;
-
-              const likeOpacity = Math.min(1, Math.max(0, deltaX / THRESHOLD));
-              const dislikeOpacity = Math.min(1, Math.max(0, -deltaX / THRESHOLD));
-
+              const deltaX = isExiting ? -360 : (isDragging ? swipeDelta!.deltaX : 0);
               const transition = isDragging ? "none"
                 : isExiting ? "transform 0.38s cubic-bezier(0.4,0,1,1), opacity 0.38s ease"
                 : "transform 0.35s ease";
@@ -327,7 +303,7 @@ export default function MainPage() {
                     onPointerUp={(e) => onPointerUp(e, idea)}
                     onTouchStart={(e) => onTouchStart(e, idea.title)}
                     onTouchMove={(e) => onTouchMove(e, idea.title)}
-                    onTouchEnd={() => onTouchEnd(idea)}
+                    onTouchEnd={() => onTouchEnd()}
                     style={{
                       transform: `translateX(${deltaX}px) rotate(${deltaX * 0.025}deg)`,
                       opacity: isExiting ? 0 : 1,
@@ -339,32 +315,6 @@ export default function MainPage() {
                     onDragStart={(e) => e.preventDefault()}
                     className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
-                    {/* Like overlay */}
-                    <div
-                      className="absolute inset-0 z-10 pointer-events-none flex items-center justify-start pl-6"
-                      style={{
-                        opacity: likeOpacity,
-                        background: `linear-gradient(to right, rgba(16,185,129,0.4), transparent)`,
-                      }}
-                    >
-                      <span className="text-emerald-600 font-black text-xl border-[3px] border-emerald-500 rounded-xl px-3 py-1 -rotate-12 tracking-wide">
-                        いい感じ
-                      </span>
-                    </div>
-
-                    {/* Dislike overlay */}
-                    <div
-                      className="absolute inset-0 z-10 pointer-events-none flex items-center justify-end pr-6"
-                      style={{
-                        opacity: dislikeOpacity,
-                        background: `linear-gradient(to left, rgba(239,68,68,0.4), transparent)`,
-                      }}
-                    >
-                      <span className="text-red-600 font-black text-xl border-[3px] border-red-500 rounded-xl px-3 py-1 rotate-12 tracking-wide">
-                        違う
-                      </span>
-                    </div>
-
                     <div className="p-5">
                       <div className="flex items-start gap-3">
                         <span className="text-red-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
