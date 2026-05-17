@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Profile } from "@/lib/types";
 import { loadProfile, saveProfile } from "@/lib/profile";
@@ -186,6 +186,14 @@ const SEPARATOR = "|||";
 type Phase = "required" | "interstitial" | "optional";
 
 export default function SetupPage() {
+  return (
+    <Suspense>
+      <SetupContent />
+    </Suspense>
+  );
+}
+
+function SetupContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
