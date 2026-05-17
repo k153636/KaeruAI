@@ -165,6 +165,7 @@ export async function POST(request: Request) {
     }
 
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "anonymous";
+    console.log("[generate] ip:", ip);
     const whitelisted = (process.env.WHITELISTED_IPS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
     const isDev = process.env.NODE_ENV === "development";
     const isOwner = isDev || whitelisted.includes(ip);
