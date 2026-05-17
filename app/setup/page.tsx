@@ -301,25 +301,37 @@ function SetupContent() {
   }
 
   function next() {
-    const isLastStep = step === STEPS.length - 1;
-
-    if (isLastStep) {
-      finishSetup();
-      return;
-    }
-
-    const nextStep = step + 1;
-
     // 必須2問完了 → 中間画面へ
-    if (nextStep === REQUIRED_STEPS && phase === "required") {
+    if (step + 1 === REQUIRED_STEPS && phase === "required") {
       saveProfile(buildProfile());
       setPhase("interstitial");
       return;
     }
 
     // 任意フェーズは1問ごとに保存
-    if (phase === "optional") saveProfile(buildProfile());
+    if (phase === "optional") {
+      const updated = buildProfile();
+      saveProfile(updated);
 
+      if (fromMain) {
+        // 未回答の次のステップへジャンプ
+        const nextUnanswered = STEPS.findIndex(
+          (s, i) => i > step && i >= REQUIRED_STEPS && !answers[s.id]
+        );
+        if (nextUnanswered !== -1) {
+          goStep(nextUnanswered);
+        } else {
+          router.push("/main");
+        }
+        return;
+      }
+    }
+
+    const nextStep = step + 1;
+    if (nextStep >= STEPS.length) {
+      finishSetup();
+      return;
+    }
     goStep(nextStep);
   }
 
@@ -334,9 +346,13 @@ function SetupContent() {
   }
 
   const isOptionalPhase = phase === "optional";
+  const optionalTotal = STEPS.length - REQUIRED_STEPS;
+  const optionalAnswered = STEPS.filter(
+    (s, i) => i >= REQUIRED_STEPS && !!answers[s.id]
+  ).length;
   const progress = phase === "required"
     ? ((step + 1) / REQUIRED_STEPS) * 100
-    : ((step + 1) / STEPS.length) * 100;
+    : (optionalAnswered / optionalTotal) * 100;
 
   // 中間画面
   if (phase === "interstitial") {
@@ -421,7 +437,7 @@ function SetupContent() {
           <div className="flex justify-between text-xs text-zinc-500 mb-2">
             <span>
               {isOptionalPhase
-                ? `STEP ${step + 1} / ${STEPS.length}（任意）`
+                ? `${optionalAnswered} / ${optionalTotal} 回答済み`
                 : `STEP ${step + 1} / ${REQUIRED_STEPS}`}
             </span>
             <span>{Math.round(progress)}%</span>
