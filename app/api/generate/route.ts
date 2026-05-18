@@ -251,7 +251,7 @@ export async function POST(request: Request) {
     const isOwner = isDev || whitelisted.includes(ip);
 
     if (!isOwner) {
-      const key = `kaeruai:generate:${ip}`;
+      const key = `caeruai:generate:${ip}`;
       const count = await redis.incr(key);
       if (count === 1) await redis.expire(key, 86400);
       if (count > 10) {

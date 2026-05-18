@@ -23,7 +23,7 @@ export default function OGImage() {
             <path d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             <rect x="2" y="7" width="13" height="11" rx="2" stroke="#ef4444" strokeWidth="1.5" />
           </svg>
-          <span style={{ color: "#ef4444", fontSize: 48, fontWeight: 700 }}>KaeruAI</span>
+          <span style={{ color: "#ef4444", fontSize: 48, fontWeight: 700 }}>CaeruAI</span>
         </div>
         <p style={{ color: "#f0f0f0", fontSize: 32, fontWeight: 700, margin: 0 }}>
           気分を一言入れるだけで、あなた専用の企画を5つ即生成

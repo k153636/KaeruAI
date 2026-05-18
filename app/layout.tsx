@@ -4,17 +4,17 @@ import PageTransition from "@/components/PageTransition";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://kaeruai.vercel.app"),
-  title: "KaeruAI",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://caeruai.vercel.app"),
+  title: "CaeruAI",
   description: "気分を一言入れるだけで、あなた専用の企画を5つ即生成",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "KaeruAI",
+    title: "CaeruAI",
   },
   openGraph: {
-    title: "KaeruAI",
+    title: "CaeruAI",
     description: "気分を一言入れるだけで、あなた専用の企画を5つ即生成",
     type: "website",
   },

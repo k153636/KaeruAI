@@ -83,7 +83,7 @@ export default function MainPage() {
   // 初回マウント
   useEffect(() => {
     const t = setTimeout(() => setQuickVisible(true), 60);
-    const seen = localStorage.getItem("kaeruai_tooltip_seen");
+    const seen = localStorage.getItem("caeruai_tooltip_seen");
     if (!seen) {
       const t2 = setTimeout(() => {
         setShowTooltip(true);
@@ -97,7 +97,7 @@ export default function MainPage() {
   function dismissTooltip() {
     setTooltipVisible(false);
     setTimeout(() => setShowTooltip(false), 250);
-    localStorage.setItem("kaeruai_tooltip_seen", "1");
+    localStorage.setItem("caeruai_tooltip_seen", "1");
   }
 
   function switchToMode(newMode: "detailed" | "quick") {
@@ -270,7 +270,7 @@ export default function MainPage() {
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg">
             <IconCamera size={22} />
-            <span>KaeruAI</span>
+            <span>CaeruAI</span>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => router.push("/history")} className="text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">

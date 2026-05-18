@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "KaeruAI",
-    short_name: "KaeruAI",
+    name: "CaeruAI",
+    short_name: "CaeruAI",
     description: "気分を一言入れるだけで、あなた専用の企画を5つ即生成",
     start_url: "/",
     display: "standalone",

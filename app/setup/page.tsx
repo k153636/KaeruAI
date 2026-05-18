@@ -411,7 +411,7 @@ function SetupContent() {
           <FadeUp delay={0} className="text-center mb-8">
             <div className="inline-flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg mb-6">
               <IconCamera size={22} />
-              <span>KaeruAI</span>
+              <span>CaeruAI</span>
             </div>
             <div className="text-4xl mb-4">✦</div>
             <h2 className="text-zinc-900 dark:text-white font-bold text-2xl mb-3">
@@ -475,7 +475,7 @@ function SetupContent() {
           </div>
           <div className="inline-flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg mb-2">
             <IconCamera size={22} />
-            <span>KaeruAI</span>
+            <span>CaeruAI</span>
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">
             {isOptionalPhase ? "答えるほど精度が上がります" : "あなたのことを教えてください"}

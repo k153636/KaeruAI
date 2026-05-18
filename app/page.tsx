@@ -186,7 +186,7 @@ export default function Home() {
         className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 ${navScrolled ? "bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200/60 dark:border-zinc-800/60" : "bg-transparent"}`}
       >
         <div className="flex items-center gap-2 font-bold text-lg text-zinc-900 dark:text-white">
-          <IconCamera size={20} /><span>KaeruAI</span>
+          <IconCamera size={20} /><span>CaeruAI</span>
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle size={15} />
@@ -216,7 +216,7 @@ export default function Home() {
                 企画は作れない。
               </h1>
               <p className="text-zinc-500 dark:text-zinc-400 text-lg sm:text-xl leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
-                KaeruAIはプロフィールを読む。あなたが何者で、なぜ作り、誰に届けたいか。<br className="hidden sm:block" />
+                CaeruAIはプロフィールを読む。あなたが何者で、なぜ作り、誰に届けたいか。<br className="hidden sm:block" />
                 その<strong className="text-zinc-900 dark:text-white">交差点</strong>から企画が生まれる。
               </p>
               <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
@@ -316,7 +316,7 @@ export default function Home() {
                 style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
               >
                 <div className="bg-white/10 px-5 py-3 border-b border-white/10">
-                  <p className="text-xs font-semibold text-white/70">KaeruAI ｜ プロフィール：コーダー × 音楽好き</p>
+                  <p className="text-xs font-semibold text-white/70">CaeruAI ｜ プロフィール：コーダー × 音楽好き</p>
                 </div>
                 <div className="p-5 space-y-3">
                   {[
@@ -382,7 +382,7 @@ export default function Home() {
           <Reveal delay={80}>
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden shadow-sm">
               <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
-                <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-white"><IconCamera size={16} /><span>KaeruAI</span></div>
+                <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-white"><IconCamera size={16} /><span>CaeruAI</span></div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">気分：探求したい</span>
                   <span className="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">企画 1/5</span>
@@ -429,7 +429,7 @@ export default function Home() {
             <div className="overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-700">
               <div className="grid grid-cols-3 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
                 <div className="p-4" />
-                <div className="p-4 text-sm font-bold text-center border-l border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white">KaeruAI</div>
+                <div className="p-4 text-sm font-bold text-center border-l border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white">CaeruAI</div>
                 <div className="p-4 text-sm font-bold text-center border-l border-zinc-200 dark:border-zinc-700 text-zinc-400">ChatGPT</div>
               </div>
               {[
@@ -465,7 +465,7 @@ export default function Home() {
           <div className="space-y-4">
             {[
               { q: "本当に無料ですか？", a: "はい、現在は完全無料で使えます。1日10回まで企画を生成できます。将来的に有料プランを導入予定ですが、無料プランは引き続き提供します。" },
-              { q: "ChatGPTに自分のプロフィールを貼れば同じことができませんか？", a: "形式上は似せられます。ただしKaeruAIは「複数の要素が交差する地点」から発想するよう設計されていて、生成後に別のAIが品質を批評して基準を満たさない企画だけを書き直します。好み・嫌いのフィードバックが蓄積されて次回の生成に反映される仕組みもあります。" },
+              { q: "ChatGPTに自分のプロフィールを貼れば同じことができませんか？", a: "形式上は似せられます。ただしCaeruAIは「複数の要素が交差する地点」から発想するよう設計されていて、生成後に別のAIが品質を批評して基準を満たさない企画だけを書き直します。好み・嫌いのフィードバックが蓄積されて次回の生成に反映される仕組みもあります。" },
               { q: "どんなプラットフォームに対応していますか？", a: "YouTube、TikTok、Instagram、Podcastに対応しています。それぞれのフォーマット・尺感に最適化した企画を生成します。" },
               { q: "生成した企画の著作権はどうなりますか？", a: "生成されたすべての企画はあなたのものです。自由に使用・改変・商用利用できます。" },
               { q: "プロフィールを全部入力しないといけませんか？", a: "いいえ。最初の2問だけで使い始められます。あとの質問は任意で、答えるほど企画の精度が上がる仕組みです。使いながら少しずつ追加できます。" },
@@ -508,8 +508,8 @@ export default function Home() {
       {/* ══ Footer ════════════════════════════════════════════════════════════ */}
       <footer className="bg-zinc-950 border-t border-zinc-900 py-10">
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 font-bold text-sm text-white"><IconCamera size={16} /><span>KaeruAI</span></div>
-          <p className="text-xs text-zinc-600">© 2026 KaeruAI · YouTuberのための企画AIアシスタント</p>
+          <div className="flex items-center gap-2 font-bold text-sm text-white"><IconCamera size={16} /><span>CaeruAI</span></div>
+          <p className="text-xs text-zinc-600">© 2026 CaeruAI · YouTuberのための企画AIアシスタント</p>
         </div>
       </footer>
     </div>
