@@ -356,13 +356,13 @@ export default function Home() {
                 style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
               >
                 <div className="bg-white/10 px-5 py-3 border-b border-white/10">
-                  <p className="text-xs font-semibold text-white/70">CaeruAI ｜ プロフィール：コーダー × 音楽好き</p>
+                  <p className="text-xs font-semibold text-white/70">CaeruAI ｜ プロフィール：料理 × 歴史</p>
                 </div>
                 <div className="p-5 space-y-3">
                   {[
-                    "バイブコーディングで書いたコードをドレミに変換したら、なぜか葬送行進曲になった",
-                    "批評家として断言する：今のAI音楽ツール、全部同じ理由でダメ",
-                    "GPTに自分のコードを全部読ませたら、俺の癖を言い当てた",
+                    "江戸時代の庶民が食べてた「1日15文の食事」を現代で再現したら、現代人には無理すぎた",
+                    "「戦国武将は何を食べて戦ったか」を完全再現したら、現代の栄養学が崩壊した",
+                    "明治時代の西洋料理を忠実に作ったら、日本人が本当に食べたかったものが見えてきた",
                   ].map(t => (
                     <div key={t} className="flex items-start gap-2.5">
                       <span className="mt-0.5 text-white shrink-0"><IconCheck size={14} /></span>
@@ -419,14 +419,14 @@ export default function Home() {
           <Reveal className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Output example</p>
             <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-4 text-white">プロフィールが違えば、<br />企画も変わる</h2>
-            <p className="text-zinc-500 text-base">コーダー × 音楽好きのクリエイター、気分「探求したい」で生成。<br className="hidden sm:block" />このクリエイター以外には出てこない企画が届いた。</p>
+            <p className="text-zinc-500 text-base">料理 × 歴史好きのクリエイター、気分「検証したい」で生成。<br className="hidden sm:block" />このクリエイター以外には出てこない企画が届いた。</p>
           </Reveal>
           <Reveal delay={80}>
             <div className="bg-zinc-900 border border-zinc-700 rounded-3xl overflow-hidden shadow-sm">
               <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
                 <div className="flex items-center gap-2 text-sm font-semibold text-white"><IconCamera size={16} /><span>CaeruAI</span></div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-400 bg-zinc-800 px-3 py-1 rounded-full">気分：探求したい</span>
+                  <span className="text-xs text-zinc-400 bg-zinc-800 px-3 py-1 rounded-full">気分：検証したい</span>
                   <span className="text-xs text-zinc-400 bg-zinc-800 px-3 py-1 rounded-full">企画 1/5</span>
                 </div>
               </div>
@@ -434,17 +434,17 @@ export default function Home() {
                 <div className="bg-zinc-800 border border-zinc-700 rounded-2xl p-5 mb-4">
                   <div className="flex items-start gap-3 mb-3">
                     <span className="text-zinc-400 font-bold text-lg shrink-0 mt-0.5">1</span>
-                    <h3 className="font-bold text-base leading-snug text-white">バイブコーディングで書いたコードをドレミに変換したら、なぜか葬送行進曲になった</h3>
+                    <h3 className="font-bold text-base leading-snug text-white">江戸時代の庶民が食べてた「1日15文の食事」を現代で再現したら、現代人には無理すぎた</h3>
                   </div>
-                  <p className="text-sm text-zinc-500 leading-relaxed mb-4 pl-6">Cマイナーのコードを書くつもりだったのに、デバッグしながら聴いたら葬送行進曲になっていた。偶然性と意図の境界線が曖昧になる瞬間を、コード画面と音声を同時に映して記録する。</p>
+                  <p className="text-sm text-zinc-500 leading-relaxed mb-4 pl-6">当時の物価換算・食材・調理法を忠実に再現。現代人の舌と胃が最初に拒絶したのは意外なものだった。</p>
                   <div className="space-y-2 mb-4">
                     <div className="bg-zinc-900 rounded-xl px-4 py-3">
                       <p className="text-xs font-semibold mb-1 text-white">フック（冒頭15秒）</p>
-                      <p className="text-xs text-zinc-500 leading-relaxed">コードを音符に変換するスクリプトをライブコーディング中に動かす。最初の音が出た瞬間の「え、これ葬式じゃん」というリアルなリアクションから始める。</p>
+                      <p className="text-xs text-zinc-500 leading-relaxed">江戸時代の食卓を再現した映像から始まり、一口食べた瞬間の「あ、これ無理かも」というリアルなリアクションで引き込む。</p>
                     </div>
                     <div className="bg-zinc-900 rounded-xl px-4 py-3">
                       <p className="text-xs font-semibold mb-1 text-white">制作手順</p>
-                      <p className="text-xs text-zinc-500 leading-relaxed">① Pythonで変数名→MIDIノート変換スクリプト作成（Midiutil使用）② OBSでコーディング画面を録画 ③ GarageBandで音楽を再生・録音 ④ Final Cut Proで画面+音を合わせて編集</p>
+                      <p className="text-xs text-zinc-500 leading-relaxed">① 古文書・料理書で当時のレシピを調査 ② 江戸時代の食材を現代で入手・代替品を選定 ③ 当時の調理法で再現 ④ 現代の栄養素と比較解説を追加</p>
                     </div>
                   </div>
                   <div className="flex gap-2 pt-4 border-t border-zinc-700">
