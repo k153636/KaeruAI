@@ -1,24 +1,40 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
-const isProtectedRoute = createRouteMatcher([
-  "/main(.*)",
-  "/setup(.*)",
-  "/profile(.*)",
-  "/history(.*)",
-]);
+const PROTECTED = ["/main", "/setup", "/profile", "/history"];
 
-// Clerk env vars が未設定の場合（ローカル開発中など）は素通り
-const hasClerkKeys =
-  !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-  !!process.env.CLERK_SECRET_KEY;
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request });
 
-export default hasClerkKeys
-  ? clerkMiddleware(async (auth, req) => {
-      if (isProtectedRoute(req)) await auth.protect();
-    })
-  : (_req: NextRequest) => NextResponse.next();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (cookiesToSet) => {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const { data: { user } } = await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
+  const isProtected = PROTECTED.some((p) => pathname.startsWith(p));
+
+  if (isProtected && !user) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  return response;
+}
 
 export const config = {
   matcher: [

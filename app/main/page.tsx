@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
 import type { Profile, Idea } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
 import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
 import { addHistory } from "@/lib/history";
 import { syncPush } from "@/lib/sync";
+import { createSupabaseBrowser } from "@/lib/supabase";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
@@ -284,7 +284,15 @@ export default function MainPage() {
               <IconUser size={14} />プロフィール
             </button>
             <ThemeToggle size={15} />
-            <UserButton />
+            <button
+              onClick={async () => {
+                await createSupabaseBrowser().auth.signOut();
+                window.location.href = "/";
+              }}
+              className="text-xs text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity cursor-pointer"
+            >
+              ログアウト
+            </button>
           </div>
         </FadeUp>
 

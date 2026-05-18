@@ -1,27 +1,44 @@
-import { auth } from "@clerk/nextjs/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { supabaseAdmin } from "@/lib/supabase";
 
+async function getUser() {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: () => {},
+      },
+    }
+  );
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+}
+
 export async function GET() {
-  const { userId } = await auth();
-  if (!userId) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const user = await getUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const { data } = await supabaseAdmin
     .from("user_data")
     .select("profile, feedback, history")
-    .eq("user_id", userId)
+    .eq("user_id", user.id)
     .single();
 
   return Response.json(data ?? { profile: null, feedback: null, history: null });
 }
 
 export async function PUT(req: Request) {
-  const { userId } = await auth();
-  if (!userId) return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const user = await getUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
 
   await supabaseAdmin.from("user_data").upsert({
-    user_id:    userId,
+    user_id:    user.id,
     profile:    body.profile  ?? null,
     feedback:   body.feedback ?? null,
     history:    body.history  ?? null,

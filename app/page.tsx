@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { createSupabaseBrowser } from "@/lib/supabase";
 import { loadProfile } from "@/lib/profile";
 import { syncPull } from "@/lib/sync";
 import { IconCamera, IconSparkle } from "@/components/icons";
@@ -156,20 +156,20 @@ function FAQ({ q, a }: { q: string; a: string }) {
 
 export default function Home() {
   const router = useRouter();
-  const { isSignedIn, isLoaded } = useUser();
   const [ready, setReady] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
-    if (!isLoaded) return;
-    if (!isSignedIn) { setReady(true); return; }
-    // サインイン済み：まずlocalStorageを確認し、なければSupabaseから取得
-    const p = loadProfile();
-    if (p) { router.replace("/main"); return; }
-    syncPull().then(() => {
-      router.replace(loadProfile() ? "/main" : "/setup");
+    const supabase = createSupabaseBrowser();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) { setReady(true); return; }
+      const p = loadProfile();
+      if (p) { router.replace("/main"); return; }
+      syncPull().then(() => {
+        router.replace(loadProfile() ? "/main" : "/setup");
+      });
     });
-  }, [isLoaded, isSignedIn, router]);
+  }, [router]);
 
   useEffect(() => {
     const fn = () => setNavScrolled(window.scrollY > 20);
