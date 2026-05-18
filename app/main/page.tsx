@@ -55,7 +55,10 @@ export default function MainPage() {
   const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState("");
   const [feedbackMap, setFeedbackMap] = useState<Record<string, "liked" | "disliked" | null>>({});
+  const [inputMode, setInputMode] = useState<"detailed" | "quick">("detailed");
   const [theme, setTheme] = useState("");
+  const [condition, setCondition] = useState("");
+  const [audience, setAudience] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [swipeDelta, setSwipeDelta] = useState<{ id: string; deltaX: number } | null>(null);
@@ -164,7 +167,7 @@ export default function MainPage() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mood: mood.trim(), theme: theme.trim(), profile, feedback: getFeedback() }),
+        body: JSON.stringify({ mood: mood.trim(), theme: theme.trim(), condition: condition.trim(), audience: audience.trim(), profile, feedback: getFeedback() }),
       });
 
       if (!res.ok) {
@@ -231,31 +234,61 @@ export default function MainPage() {
 
         {/* Main input */}
         <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl p-6 mb-4">
-          <h1 className="text-zinc-900 dark:text-white font-bold text-xl mb-5">どんな企画がほしい？</h1>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={mood}
-                onChange={(e) => setMood(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-                placeholder="やる気ない、挑戦したい..."
-                className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
-                disabled={loading}
-              />
-              <span className="text-zinc-400 dark:text-zinc-500 text-sm shrink-0">な感じで</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={theme}
-                onChange={(e) => setTheme(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-                placeholder="AI系、短尺、初心者向け... （任意）"
-                className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
-                disabled={loading}
-              />
-              <span className="text-zinc-400 dark:text-zinc-500 text-sm shrink-0">の企画</span>
+          <div className="flex items-center justify-between mb-5">
+            <h1 className="text-zinc-900 dark:text-white font-bold text-xl">どんな企画がほしい？</h1>
+            <button
+              onClick={() => setInputMode(m => m === "quick" ? "detailed" : "quick")}
+              className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2.5 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              {inputMode === "quick" ? "詳細入力" : "⚡ クイック"}
+            </button>
+          </div>
+
+          {/* Quick mode */}
+          <div style={{
+            opacity: inputMode === "quick" ? 1 : 0,
+            maxHeight: inputMode === "quick" ? "80px" : "0px",
+            overflow: "hidden",
+            transition: "opacity 0.25s ease, max-height 0.25s ease",
+          }}>
+            <input
+              type="text"
+              value={mood}
+              onChange={(e) => setMood(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+              placeholder="一言で... 例：やる気ない"
+              className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+              disabled={loading}
+            />
+          </div>
+
+          {/* Detailed mode */}
+          <div style={{
+            opacity: inputMode === "detailed" ? 1 : 0,
+            maxHeight: inputMode === "detailed" ? "300px" : "0px",
+            overflow: "hidden",
+            transition: "opacity 0.25s ease, max-height 0.3s ease",
+          }}>
+            <div className="space-y-2">
+              {[
+                { label: "今の状態", value: mood, setter: setMood, placeholder: "やる気ない、挑戦したい...", required: true },
+                { label: "テーマ", value: theme, setter: setTheme, placeholder: "AI系、プログラミング...", required: false },
+                { label: "条件", value: condition, setter: setCondition, placeholder: "短尺、笑える、感動系...", required: false },
+                { label: "視聴者", value: audience, setter: setAudience, placeholder: "初心者、エンジニア...", required: false },
+              ].map(({ label, value, setter, placeholder }) => (
+                <div key={label} className="flex items-center gap-3">
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 w-14 shrink-0">{label}</span>
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setter(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+                    placeholder={placeholder}
+                    className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+                    disabled={loading}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </FadeUp>
@@ -413,7 +446,7 @@ export default function MainPage() {
             })}
 
             <button
-              onClick={() => { setMood(""); setTheme(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
+              onClick={() => { setMood(""); setTheme(""); setCondition(""); setAudience(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
               className="w-full py-3 rounded-2xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer mt-2"
             >
               もう一度生成する

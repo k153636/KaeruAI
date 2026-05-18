@@ -73,7 +73,7 @@ function buildProfileNarrative(profile: Profile): string {
   return sentences.join("。") + "。";
 }
 
-function buildUserPrompt(mood: string, theme: string, profile: Profile, feedback: FeedbackStore): string {
+function buildUserPrompt(mood: string, theme: string, condition: string, audience: string, profile: Profile, feedback: FeedbackStore): string {
   const platform = getPlatform(profile.platform);
   const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
   const dislikedTitles = feedback.disliked.slice(0, 5).map((e) => `・${e.title}`).join("\n");
@@ -94,9 +94,9 @@ ${profile.contentNiche}
 【このクリエイター像】
 ${profileNarrative}
 ${feedbackSection}
-【今日の状態】
+【今の状態】
 ${mood}
-${theme ? `\n【テーマ・条件】（必ず反映すること）\n${theme}\n` : ""}${profile.avoid ? `\n【絶対に含めないこと】\n${profile.avoid}` : ""}
+${[theme && `テーマ：${theme}`, condition && `条件：${condition}`, audience && `視聴者：${audience}`].filter(Boolean).join("\n") ? `\n【追加指定】（必ず反映すること）\n${[theme && `テーマ：${theme}`, condition && `条件：${condition}`, audience && `視聴者：${audience}`].filter(Boolean).join("\n")}\n` : ""}${profile.avoid ? `\n【絶対に含めないこと】\n${profile.avoid}` : ""}
 
 上記のクリエイター像・気分・目的を企画の方向性に活かしつつ、以下のJSON形式のみで5つの企画を返してください：
 {
@@ -156,9 +156,11 @@ async function callAI(isOwner: boolean, systemPrompt: string, userPrompt: string
 
 export async function POST(request: Request) {
   try {
-    const { mood, theme, profile, feedback } = (await request.json()) as {
+    const { mood, theme, condition, audience, profile, feedback } = (await request.json()) as {
       mood: string;
       theme?: string;
+      condition?: string;
+      audience?: string;
       profile: Profile;
       feedback: FeedbackStore;
     };
@@ -188,7 +190,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "API キーが設定されていません" }, { status: 500 });
     }
 
-    const userPrompt = buildUserPrompt(mood, theme ?? "", profile, feedback ?? { liked: [], disliked: [] });
+    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, feedback ?? { liked: [], disliked: [] });
 
     let text = "";
     try {
