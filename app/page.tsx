@@ -48,10 +48,10 @@ function Reveal({
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 
-function IconArrowRight({ size = 16 }: { size?: number }) {
+function IconArrowRight({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M5 12h14M12 5l7 7-7 7" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
@@ -72,71 +72,72 @@ function IconXMark({ size = 16 }: { size?: number }) {
   );
 }
 
-// ── CTA ────────────────────────────────────────────────────────────────────
+// ── Buttons ────────────────────────────────────────────────────────────────
 
-function CTAButton({ label = "無料で企画を生成する", size = "lg", onClick }: { label?: string; size?: "sm" | "lg"; onClick: () => void }) {
+function RedCTA({ label = "無料で企画を生成する", onClick }: { label?: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-2.5 bg-red-500 hover:bg-red-400 active:scale-95 text-white font-bold border border-red-600 transition-all cursor-pointer rounded-2xl ${
-        size === "lg" ? "text-base px-8 py-4" : "text-sm px-6 py-3"
-      }`}
+      className="inline-flex items-center gap-2.5 bg-red-500 hover:bg-red-400 active:scale-95 text-white font-bold text-base px-8 py-4 rounded-2xl border border-red-600 transition-all cursor-pointer"
     >
-      <IconSparkle size={size === "lg" ? 18 : 15} />
+      <IconSparkle size={18} />
       {label}
-      <IconArrowRight size={size === "lg" ? 16 : 14} />
+      <IconArrowRight size={16} />
     </button>
   );
 }
 
-// ── Hero Idea Card (floating visual) ──────────────────────────────────────
+function WhiteCTA({ label = "無料で企画を生成する", onClick }: { label?: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="inline-flex items-center gap-2.5 bg-white hover:bg-red-50 active:scale-95 text-red-500 font-bold text-base px-8 py-4 rounded-2xl border border-white transition-all cursor-pointer"
+    >
+      <IconSparkle size={18} />
+      {label}
+      <IconArrowRight size={16} />
+    </button>
+  );
+}
+
+// ── Hero floating card ─────────────────────────────────────────────────────
 
 function HeroCard() {
   return (
     <div className="relative w-80 xl:w-96 select-none">
-      {/* Back card */}
       <div
-        className="absolute inset-0 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-3xl"
+        className="absolute inset-0 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-3xl"
         style={{ transform: "rotate(-3deg) translate(-8px, 8px)", animation: "float-card-back 6s ease-in-out infinite" }}
       />
-      {/* Front card */}
       <div
         className="relative bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl shadow-xl overflow-hidden"
         style={{ animation: "float-card 5s ease-in-out infinite" }}
       >
-        {/* Card header */}
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="flex items-center gap-2 text-xs font-semibold">
+          <div className="flex items-center gap-2 text-xs font-semibold text-zinc-900 dark:text-white">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             生成完了
           </div>
           <span className="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full">企画 1 / 5</span>
         </div>
-        {/* Card body */}
         <div className="p-5">
           <div className="flex items-start gap-2.5 mb-3">
             <span className="text-zinc-400 font-bold text-base shrink-0 mt-0.5">1</span>
-            <h3 className="font-bold text-sm leading-snug">
+            <h3 className="font-bold text-sm leading-snug text-zinc-900 dark:text-white">
               バイブコーディングで書いたコードをドレミに変換したら、なぜか葬送行進曲になった
             </h3>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4 pl-5">
+          <p className="text-xs text-zinc-500 leading-relaxed mb-4 pl-5">
             Cマイナーのコードを書くつもりだったのに、デバッグしながら聴いたら葬送行進曲になっていた。偶然性と意図の境界線が曖昧になる瞬間を記録する。
           </p>
-          {/* Collapsed detail chips */}
           <div className="pl-5 flex flex-wrap gap-1.5 mb-4">
             {["コーダー × 音楽好き", "考察", "意外な結末"].map((t) => (
-              <span key={t} className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full text-zinc-600 dark:text-zinc-400">{t}</span>
+              <span key={t} className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full text-zinc-500">{t}</span>
             ))}
           </div>
-          {/* Action row */}
           <div className="flex gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-            <div className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-semibold border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900">
-              ♡ いい感じ
-            </div>
-            <div className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs border border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300">
-              × 違う
-            </div>
+            <div className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs font-semibold border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900">♡ いい感じ</div>
+            <div className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl text-xs border border-zinc-300 dark:border-zinc-600 text-zinc-500">× 違う</div>
           </div>
         </div>
       </div>
@@ -144,7 +145,7 @@ function HeroCard() {
   );
 }
 
-// ── FAQ Accordion ──────────────────────────────────────────────────────────
+// ── FAQ ────────────────────────────────────────────────────────────────────
 
 function FAQItem({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
@@ -154,13 +155,8 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-6 py-4 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
       >
-        <span className="font-semibold text-sm pr-4">{q}</span>
-        <span
-          className="shrink-0 transition-transform duration-300"
-          style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}
-        >
-          ＋
-        </span>
+        <span className="font-semibold text-sm pr-4 text-zinc-900 dark:text-white">{q}</span>
+        <span className="shrink-0 text-zinc-900 dark:text-white transition-transform duration-300" style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}>＋</span>
       </button>
       <div style={{ display: "grid", gridTemplateRows: open ? "1fr" : "0fr", transition: "grid-template-rows 0.3s ease" }}>
         <div style={{ overflow: "hidden" }}>
@@ -212,140 +208,118 @@ export default function Home() {
             : "bg-transparent"
         }`}
       >
-        <div className="flex items-center gap-2 font-bold text-lg">
+        <div className="flex items-center gap-2 font-bold text-lg text-zinc-900 dark:text-white">
           <IconCamera size={20} />
           <span>KaeruAI</span>
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle size={15} />
-          <button onClick={goSetup} className="text-sm font-semibold hover:opacity-60 transition-opacity cursor-pointer">
+          <button onClick={goSetup} className="text-sm font-semibold text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
             はじめる →
           </button>
         </div>
       </nav>
 
-      {/* ── Hero ── */}
-      <section className="min-h-screen flex items-center">
+      {/* ══ HERO — 白 (入口感) ══════════════════════════════════════════════════ */}
+      <section className="min-h-screen flex items-center bg-white dark:bg-zinc-950">
         <div className="max-w-6xl mx-auto px-6 w-full pt-24 pb-16">
           <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-20">
-
-            {/* Left: copy */}
             <div className="flex-1 text-center lg:text-left">
-              <div
-                className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-full px-4 py-1.5 text-xs font-semibold mb-8"
-                style={{ opacity: 1 }}
-              >
+              <div className="inline-flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-full px-4 py-1.5 text-xs font-semibold mb-8 text-zinc-900 dark:text-white">
                 <IconSparkle size={11} />
                 ChatGPTで試したが、どこかで見た企画しか出なかった人へ
               </div>
-
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight mb-7">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight mb-7 text-zinc-900 dark:text-white">
                 AIは企画を<br />作れる。<br />
-                <span className="relative inline-block">
-                  <span className="relative z-10">でも、</span>
-                </span>
-                <span className="relative inline-block">
+                でも、<span className="relative inline-block">
                   あなたの
                   <span className="absolute left-0 right-0 -bottom-1 h-[4px] bg-red-500 rounded-full" />
-                </span>
-                <br />
+                </span><br />
                 企画は作れない。
               </h1>
-
               <p className="text-zinc-500 dark:text-zinc-400 text-lg sm:text-xl leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
                 KaeruAIはプロフィールを読む。あなたが何者で、なぜ作り、誰に届けたいか。<br className="hidden sm:block" />
                 その<strong className="text-zinc-900 dark:text-white">交差点</strong>から企画が生まれる。
               </p>
-
               <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                <CTAButton onClick={goSetup} />
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:self-center">
-                  登録不要・無料<br className="sm:hidden" />・2問答えるだけ
-                </p>
+                <RedCTA onClick={goSetup} />
+                <p className="text-xs text-zinc-500 sm:self-center">登録不要・無料・2問答えるだけ</p>
               </div>
             </div>
-
-            {/* Right: floating card (desktop only) */}
             <div className="hidden lg:flex items-center justify-center shrink-0">
               <HeroCard />
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* ── Stats strip ── */}
-      <div className="border-t border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-6">
+      {/* ══ STATS — zinc-900 (引き締め) ══════════════════════════════════════════ */}
+      <div className="bg-zinc-900 py-7">
         <div className="max-w-3xl mx-auto px-6">
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="grid grid-cols-3 gap-4 text-center divide-x divide-zinc-700">
             {[
               { num: "4", label: "対応プラットフォーム" },
               { num: "2問", label: "から使い始められる" },
               { num: "無料", label: "登録不要で今すぐ" },
             ].map((s) => (
-              <div key={s.label}>
-                <div className="font-bold text-2xl sm:text-3xl mb-1">{s.num}</div>
-                <div className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">{s.label}</div>
+              <div key={s.label} className="px-4">
+                <div className="font-bold text-2xl sm:text-3xl mb-1 text-white">{s.num}</div>
+                <div className="text-xs sm:text-sm text-zinc-400">{s.label}</div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Pain ── */}
-      <section className="py-28">
+      {/* ══ PAIN — zinc-50 (落ち着き) ═════════════════════════════════════════════ */}
+      <section className="bg-zinc-50 dark:bg-zinc-950 py-28">
         <div className="max-w-3xl mx-auto px-6">
           <Reveal className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">Problem</p>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Problem</p>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-10 text-zinc-900 dark:text-white">
               なぜ「AIで企画」が<br />自分らしくないのか
             </h2>
-            {/* Big creator quote */}
-            <blockquote className="text-left bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl px-8 py-7 max-w-xl mx-auto">
+            <blockquote className="text-left bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl px-8 py-7 max-w-xl mx-auto">
               <p className="text-xl sm:text-2xl font-bold leading-snug text-zinc-900 dark:text-white mb-3">
-                「AIに頼むと、なんか違う気がする。悪くはないけど、<span className="text-zinc-400 dark:text-zinc-500">自分のチャンネルじゃない。</span>」
+                「AIに頼むと、なんか違う気がする。悪くはないけど、<span className="text-zinc-400">自分のチャンネルじゃない。</span>」
               </p>
-              <footer className="text-sm text-zinc-500 dark:text-zinc-400">
-                — ChatGPTで企画を出し続けたクリエイターのあるある
-              </footer>
+              <footer className="text-sm text-zinc-500">— ChatGPTで企画を出し続けたクリエイターのあるある</footer>
             </blockquote>
-            <p className="text-zinc-500 dark:text-zinc-400 text-base mt-8 max-w-lg mx-auto">
+            <p className="text-zinc-500 text-base mt-8 max-w-lg mx-auto">
               AIに「AIジャンルで企画を出して」と頼むと、AIが知っている「AIジャンルの平均」が出てくる。あなたのチャンネルである必要が、どこにもない。
             </p>
           </Reveal>
-
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               { num: "01", title: "「どこかで見た」企画になる", desc: "プロフィールなしで生成すると、ジャンルの平均点しか出てこない。あなたのチャンネルである必要がない企画ばかり。" },
               { num: "02", title: "同じフォーマットの繰り返し", desc: "「〇〇してみた」「検証系」に偏りがち。視聴者は飽き、チャンネルの個性が薄れていく。" },
               { num: "03", title: "ネタ切れのたびに時間消費", desc: "企画を考えることで消耗し、肝心の制作時間が削られる。週1投稿が崩れていく。" },
             ].map((item, i) => (
-              <Reveal key={item.num} delay={i * 80} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-6">
+              <Reveal key={item.num} delay={i * 80} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl p-6">
                 <p className="text-xs font-bold text-zinc-300 dark:text-zinc-600 mb-4">{item.num}</p>
-                <h3 className="font-bold text-base mb-3">{item.title}</h3>
-                <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-base mb-3 text-zinc-900 dark:text-white">{item.title}</h3>
+                <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Before / After ── */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800 py-28 bg-white dark:bg-zinc-900">
+      {/* ══ BEFORE/AFTER — 黒 (ドラマ性) ════════════════════════════════════════ */}
+      <section className="bg-zinc-950 py-28">
         <div className="max-w-3xl mx-auto px-6">
           <Reveal className="text-center mb-14">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">Before / After</p>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">Before / After</p>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-tight text-white">
               タイトルの質が、ここまで変わる
             </h2>
           </Reveal>
-
           <div className="grid sm:grid-cols-2 gap-4">
             {/* Before */}
             <Reveal delay={0}>
-              <div className="border border-zinc-300 dark:border-zinc-600 rounded-3xl overflow-hidden h-full">
-                <div className="bg-zinc-100 dark:bg-zinc-800 px-5 py-3 border-b border-zinc-300 dark:border-zinc-600">
-                  <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">ChatGPT に「AIジャンルで企画を出して」</p>
+              <div className="border border-zinc-800 rounded-3xl overflow-hidden h-full">
+                <div className="bg-zinc-900 px-5 py-3 border-b border-zinc-800">
+                  <p className="text-xs font-semibold text-zinc-500">ChatGPT に「AIジャンルで企画を出して」</p>
                 </div>
                 <div className="p-5 space-y-3">
                   {[
@@ -355,20 +329,19 @@ export default function Home() {
                     "AIで〇〇を自動化してみた",
                   ].map((t) => (
                     <div key={t} className="flex items-start gap-2.5">
-                      <span className="mt-0.5 text-zinc-300 dark:text-zinc-600 shrink-0"><IconXMark size={14} /></span>
-                      <p className="text-sm text-zinc-400 dark:text-zinc-500 line-through leading-snug">{t}</p>
+                      <span className="mt-0.5 text-zinc-700 shrink-0"><IconXMark size={14} /></span>
+                      <p className="text-sm text-zinc-600 line-through leading-snug">{t}</p>
                     </div>
                   ))}
-                  <p className="text-xs text-zinc-400 dark:text-zinc-600 pt-1">誰でも思いつく。誰のチャンネルでも言える。</p>
+                  <p className="text-xs text-zinc-600 pt-1">誰でも思いつく。誰のチャンネルでも言える。</p>
                 </div>
               </div>
             </Reveal>
-
             {/* After */}
             <Reveal delay={100}>
-              <div className="border-2 border-zinc-900 dark:border-white rounded-3xl overflow-hidden h-full">
-                <div className="bg-zinc-900 dark:bg-white px-5 py-3 border-b border-zinc-800 dark:border-zinc-200">
-                  <p className="text-xs font-semibold text-white dark:text-zinc-900">KaeruAI ｜ プロフィール：コーダー × 音楽好き</p>
+              <div className="border-2 border-white rounded-3xl overflow-hidden h-full bg-white">
+                <div className="bg-zinc-900 px-5 py-3 border-b border-zinc-200">
+                  <p className="text-xs font-semibold text-white">KaeruAI ｜ プロフィール：コーダー × 音楽好き</p>
                 </div>
                 <div className="p-5 space-y-3">
                   {[
@@ -377,11 +350,11 @@ export default function Home() {
                     "GPTに自分のコードを全部読ませたら、俺の癖を言い当てた",
                   ].map((t) => (
                     <div key={t} className="flex items-start gap-2.5">
-                      <span className="mt-0.5 text-zinc-900 dark:text-white shrink-0"><IconCheckSmall size={14} /></span>
-                      <p className="text-sm font-medium leading-snug">{t}</p>
+                      <span className="mt-0.5 text-zinc-900 shrink-0"><IconCheckSmall size={14} /></span>
+                      <p className="text-sm font-semibold leading-snug text-zinc-900">{t}</p>
                     </div>
                   ))}
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 pt-1">このクリエイター以外には出てこない企画。</p>
+                  <p className="text-xs text-zinc-500 pt-1">このクリエイター以外には出てこない企画。</p>
                 </div>
               </div>
             </Reveal>
@@ -389,14 +362,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── How it works ── */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800 py-28">
+      {/* ══ HOW IT WORKS — 白 ════════════════════════════════════════════════════ */}
+      <section className="bg-white dark:bg-zinc-900 py-28">
         <div className="max-w-3xl mx-auto px-6">
           <Reveal className="text-center mb-16">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">How it works</p>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight">3ステップで企画ができる</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">How it works</p>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-tight text-zinc-900 dark:text-white">3ステップで企画ができる</h2>
           </Reveal>
-
           <div className="space-y-6">
             {[
               { step: "01", title: "2問だけ答える", desc: "プラットフォームと「なぜここに来たか」。これだけでAIはあなたのチャンネルの文脈を掴む。あとは気が向いたときに追加できる。", tag: "所要時間：約30秒" },
@@ -405,15 +377,15 @@ export default function Home() {
             ].map((item, i) => (
               <Reveal key={item.step} delay={i * 100}>
                 <div className="flex gap-6 items-start">
-                  <div className="shrink-0 w-14 h-14 rounded-2xl border-2 border-zinc-900 dark:border-white flex items-center justify-center font-bold text-sm">
+                  <div className="shrink-0 w-14 h-14 rounded-2xl border-2 border-zinc-900 dark:border-white flex items-center justify-center font-bold text-sm text-zinc-900 dark:text-white">
                     {item.step}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
-                      <h3 className="font-bold text-lg">{item.title}</h3>
-                      <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-zinc-500 dark:text-zinc-400">{item.tag}</span>
+                      <h3 className="font-bold text-lg text-zinc-900 dark:text-white">{item.title}</h3>
+                      <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 rounded-full text-zinc-500">{item.tag}</span>
                     </div>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
+                    <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
                 {i < 2 && <div className="ml-7 mt-6 w-px h-6 bg-zinc-200 dark:bg-zinc-700" />}
@@ -423,25 +395,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Product Mockup ── */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800 py-28 bg-white dark:bg-zinc-900">
+      {/* ══ MOCKUP — zinc-100 (奥まった感) ═══════════════════════════════════════ */}
+      <section className="bg-zinc-100 dark:bg-zinc-800 py-28">
         <div className="max-w-3xl mx-auto px-6">
           <Reveal className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">Output example</p>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Output example</p>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-4 text-zinc-900 dark:text-white">
               プロフィールが違えば、<br />企画も変わる
             </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 text-base">
+            <p className="text-zinc-500 text-base">
               コーダー × 音楽好きのクリエイター、気分「探求したい」で生成。<br className="hidden sm:block" />
               このクリエイター以外には出てこない企画が届いた。
             </p>
           </Reveal>
-
           <Reveal delay={80}>
-            <div className="bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-600 rounded-3xl overflow-hidden">
-              {/* App chrome */}
-              <div className="flex items-center justify-between px-5 py-4 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
-                <div className="flex items-center gap-2 text-sm font-semibold">
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden shadow-sm">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                <div className="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-white">
                   <IconCamera size={16} />
                   <span>KaeruAI</span>
                 </div>
@@ -450,60 +420,53 @@ export default function Home() {
                   <span className="text-xs text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full">企画 1/5</span>
                 </div>
               </div>
-
               <div className="p-6">
-                <div className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-2xl p-5 mb-4">
+                <div className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-5 mb-4">
                   <div className="flex items-start gap-3 mb-3">
                     <span className="text-zinc-400 font-bold text-lg shrink-0 mt-0.5">1</span>
-                    <h3 className="font-bold text-base leading-snug">
+                    <h3 className="font-bold text-base leading-snug text-zinc-900 dark:text-white">
                       バイブコーディングで書いたコードをドレミに変換したら、なぜか葬送行進曲になった
                     </h3>
                   </div>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4 pl-6">
+                  <p className="text-sm text-zinc-500 leading-relaxed mb-4 pl-6">
                     Cマイナーのコードを書くつもりだったのに、デバッグしながら聴いたら葬送行進曲になっていた。偶然性と意図の境界線が曖昧になる瞬間を、コード画面と音声を同時に映して記録する。
                   </p>
-
                   <div className="space-y-2 mb-4">
-                    <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-4 py-3">
-                      <p className="text-xs font-semibold mb-1">フック（冒頭15秒）</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">コードを音符に変換するスクリプトをライブコーディング中に動かす。最初の音が出た瞬間の「え、これ葬式じゃん」というリアルなリアクションから始める。</p>
+                    <div className="bg-white dark:bg-zinc-900 rounded-xl px-4 py-3">
+                      <p className="text-xs font-semibold mb-1 text-zinc-900 dark:text-white">フック（冒頭15秒）</p>
+                      <p className="text-xs text-zinc-500 leading-relaxed">コードを音符に変換するスクリプトをライブコーディング中に動かす。最初の音が出た瞬間の「え、これ葬式じゃん」というリアルなリアクションから始める。</p>
                     </div>
-                    <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-4 py-3">
-                      <p className="text-xs font-semibold mb-1">制作手順</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">① Pythonで変数名→MIDIノート変換スクリプト作成（Midiutil使用）② OBSでコーディング画面を録画 ③ GarageBandで音楽を再生・録音 ④ Final Cut Proで画面+音を合わせて編集</p>
+                    <div className="bg-white dark:bg-zinc-900 rounded-xl px-4 py-3">
+                      <p className="text-xs font-semibold mb-1 text-zinc-900 dark:text-white">制作手順</p>
+                      <p className="text-xs text-zinc-500 leading-relaxed">① Pythonで変数名→MIDIノート変換スクリプト作成（Midiutil使用）② OBSでコーディング画面を録画 ③ GarageBandで音楽を再生・録音 ④ Final Cut Proで画面+音を合わせて編集</p>
                     </div>
                   </div>
-
-                  <div className="flex gap-2 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                  <div className="flex gap-2 pt-4 border-t border-zinc-200 dark:border-zinc-700">
                     <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900 font-semibold">♡ いい感じ</div>
-                    <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-400">× 違う</div>
-                    <div className="flex items-center justify-center w-10 rounded-xl border border-zinc-300 dark:border-zinc-600 text-zinc-600 dark:text-zinc-400 text-sm">⎘</div>
+                    <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm border border-zinc-300 dark:border-zinc-600 text-zinc-500">× 違う</div>
+                    <div className="flex items-center justify-center w-10 rounded-xl border border-zinc-300 dark:border-zinc-600 text-zinc-500 text-sm">⎘</div>
                   </div>
                 </div>
-
-                <p className="text-center text-xs text-zinc-400 dark:text-zinc-600">
-                  「いい感じ」を押すと次回の生成がこのテイストに近づく ·「違う」で企画を消せる
-                </p>
+                <p className="text-center text-xs text-zinc-400">「いい感じ」を押すと次回の生成がこのテイストに近づく ·「違う」で企画を消せる</p>
               </div>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* ── Comparison ── */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800 py-28">
+      {/* ══ COMPARISON — zinc-50 ═════════════════════════════════════════════════ */}
+      <section className="bg-zinc-50 dark:bg-zinc-950 py-28">
         <div className="max-w-3xl mx-auto px-6">
           <Reveal className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">Comparison</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">ChatGPTとの違い</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">Comparison</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white">ChatGPTとの違い</h2>
           </Reveal>
-
           <Reveal delay={60}>
-            <div className="overflow-hidden rounded-3xl border border-zinc-300 dark:border-zinc-600">
-              <div className="grid grid-cols-3 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-300 dark:border-zinc-600">
+            <div className="overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-700">
+              <div className="grid grid-cols-3 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700">
                 <div className="p-4 text-xs font-semibold text-zinc-400" />
-                <div className="p-4 text-sm font-bold text-center border-l border-zinc-300 dark:border-zinc-600">KaeruAI</div>
-                <div className="p-4 text-sm font-bold text-center border-l border-zinc-300 dark:border-zinc-600 text-zinc-400 dark:text-zinc-500">ChatGPT</div>
+                <div className="p-4 text-sm font-bold text-center border-l border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white">KaeruAI</div>
+                <div className="p-4 text-sm font-bold text-center border-l border-zinc-200 dark:border-zinc-700 text-zinc-400">ChatGPT</div>
               </div>
               {[
                 ["プロフィールを読んで生成", true, false],
@@ -513,7 +476,7 @@ export default function Home() {
                 ["フィードバックで精度が上がる", true, false],
                 ["無料・登録不要", true, "△"],
               ].map(([label, kaeru, other], i) => (
-                <div key={String(label)} className={`grid grid-cols-3 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 ${i % 2 !== 0 ? "bg-zinc-50 dark:bg-zinc-800/40" : ""}`}>
+                <div key={String(label)} className={`grid grid-cols-3 border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 ${i % 2 !== 0 ? "bg-zinc-50 dark:bg-zinc-800/30" : "bg-white dark:bg-zinc-900"}`}>
                   <div className="p-4 text-sm text-zinc-700 dark:text-zinc-300">{String(label)}</div>
                   <div className="p-4 flex items-center justify-center border-l border-zinc-200 dark:border-zinc-700">
                     {kaeru === true ? <span className="text-zinc-900 dark:text-white"><IconCheckSmall size={18} /></span> : <span className="text-zinc-300"><IconXMark size={15} /></span>}
@@ -528,14 +491,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800 py-28 bg-white dark:bg-zinc-900">
+      {/* ══ FAQ — 白 ════════════════════════════════════════════════════════════ */}
+      <section className="bg-white dark:bg-zinc-900 py-28">
         <div className="max-w-2xl mx-auto px-6">
           <Reveal className="text-center mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">FAQ</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">よくある質問</h2>
+            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-4">FAQ</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white">よくある質問</h2>
           </Reveal>
-
           <div className="space-y-4">
             {[
               { q: "本当に無料ですか？", a: "はい、現在は完全無料で使えます。1日10回まで企画を生成できます。将来的に有料プランを導入予定ですが、無料プランは引き続き提供します。" },
@@ -552,30 +514,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Final CTA ── */}
-      <section className="border-t border-zinc-200 dark:border-zinc-800 py-32">
+      {/* ══ FINAL CTA — 赤 (圧力) ════════════════════════════════════════════════ */}
+      <section className="bg-red-500 py-32">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <Reveal>
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-8">Get started</p>
-            <h2 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
+            <p className="text-xs font-semibold uppercase tracking-widest text-red-200 mb-8">Get started</p>
+            <h2 className="text-4xl sm:text-5xl font-bold leading-tight mb-6 text-white">
               次のネタは、<br />もう考えなくていい。
             </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 text-lg mb-12 max-w-md mx-auto">
+            <p className="text-red-100 text-lg mb-12 max-w-md mx-auto">
               登録不要。無料。2問答えるだけで、あなたのチャンネルに合った企画が5つ届く。
             </p>
-            <CTAButton label="今すぐ無料で試す" onClick={goSetup} />
+            <WhiteCTA label="今すぐ無料で試す" onClick={goSetup} />
           </Reveal>
         </div>
       </section>
 
-      {/* ── Footer ── */}
-      <footer className="border-t border-zinc-200 dark:border-zinc-800 py-10 bg-white dark:bg-zinc-900">
+      {/* ══ Footer ════════════════════════════════════════════════════════════════ */}
+      <footer className="bg-zinc-950 border-t border-zinc-900 py-10">
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 font-bold text-sm">
+          <div className="flex items-center gap-2 font-bold text-sm text-white">
             <IconCamera size={16} />
             <span>KaeruAI</span>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">© 2026 KaeruAI · YouTuberのための企画AIアシスタント</p>
+          <p className="text-xs text-zinc-500">© 2026 KaeruAI · YouTuberのための企画AIアシスタント</p>
         </div>
       </footer>
     </div>
