@@ -75,6 +75,20 @@ export default function MainPage() {
   const [error, setError] = useState("");
   const [feedbackMap, setFeedbackMap] = useState<Record<string, "liked" | "disliked" | null>>({});
   const [inputMode, setInputMode] = useState<"detailed" | "quick">("detailed");
+  const [detailedVisible, setDetailedVisible] = useState(false);
+  const [quickVisible, setQuickVisible] = useState(false);
+
+  useEffect(() => {
+    if (inputMode === "detailed") {
+      setQuickVisible(false);
+      const t = setTimeout(() => setDetailedVisible(true), 60);
+      return () => clearTimeout(t);
+    } else {
+      setDetailedVisible(false);
+      const t = setTimeout(() => setQuickVisible(true), 60);
+      return () => clearTimeout(t);
+    }
+  }, [inputMode]);
   const [theme, setTheme] = useState("");
   const [condition, setCondition] = useState("");
   const [audience, setAudience] = useState("");
@@ -265,51 +279,52 @@ export default function MainPage() {
 
           {/* Quick mode */}
           <div style={{
-            opacity: inputMode === "quick" ? 1 : 0,
             maxHeight: inputMode === "quick" ? "80px" : "0px",
             overflow: "hidden",
-            transition: "opacity 0.25s ease, max-height 0.25s ease",
+            transition: "max-height 0.25s ease",
           }}>
-            <input
-              type="text"
-              value={mood}
-              onChange={(e) => setMood(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-              placeholder="例：やる気ない"
-              className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
-              disabled={loading}
-            />
+            <div style={{
+              opacity: quickVisible ? 1 : 0,
+              transform: quickVisible ? "translateY(0)" : "translateY(10px)",
+              transition: "opacity 0.25s ease, transform 0.25s ease",
+            }}>
+              <input
+                type="text"
+                value={mood}
+                onChange={(e) => setMood(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+                placeholder="例：やる気ない"
+                className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+                disabled={loading}
+              />
+            </div>
           </div>
 
           {/* Detailed mode */}
           <div style={{
-            opacity: inputMode === "detailed" ? 1 : 0,
             maxHeight: inputMode === "detailed" ? "320px" : "0px",
             overflow: "hidden",
-            transition: "opacity 0.25s ease, max-height 0.3s ease",
+            transition: "max-height 0.3s ease",
           }}>
             <div className="space-y-0">
-              {/* Required */}
-              <div className="flex items-center gap-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800">
-                <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 w-16 shrink-0">今の状態</span>
-                <input
-                  type="text"
-                  value={mood}
-                  onChange={(e) => setMood(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-                  placeholder="やる気ない、挑戦したい..."
-                  className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none"
-                  disabled={loading}
-                />
-              </div>
-              {/* Optional */}
               {[
-                { label: "テーマ",   value: theme,     setter: setTheme,     placeholder: "AI系、プログラミング..." },
-                { label: "条件",     value: condition,  setter: setCondition,  placeholder: "短尺、笑える、感動系..." },
-                { label: "視聴者",   value: audience,   setter: setAudience,   placeholder: "初心者、エンジニア..." },
-              ].map(({ label, value, setter, placeholder }, i, arr) => (
-                <div key={label} className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-100 dark:border-zinc-800" : ""}`}>
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500 w-16 shrink-0">{label}</span>
+                { label: "今の状態", value: mood,      setter: setMood,      placeholder: "やる気ない、挑戦したい...", required: true },
+                { label: "テーマ",   value: theme,     setter: setTheme,     placeholder: "AI系、プログラミング...",   required: false },
+                { label: "条件",     value: condition, setter: setCondition, placeholder: "短尺、笑える、感動系...",   required: false },
+                { label: "視聴者",   value: audience,  setter: setAudience,  placeholder: "初心者、エンジニア...",     required: false },
+              ].map(({ label, value, setter, placeholder, required }, i, arr) => (
+                <div
+                  key={label}
+                  style={{
+                    opacity: detailedVisible ? 1 : 0,
+                    transform: detailedVisible ? "translateY(0)" : "translateY(10px)",
+                    transition: `opacity 0.25s ease ${i * 60}ms, transform 0.25s ease ${i * 60}ms`,
+                  }}
+                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-100 dark:border-zinc-800" : ""}`}
+                >
+                  <span className={`text-xs w-16 shrink-0 ${required ? "font-semibold text-zinc-700 dark:text-zinc-200" : "text-zinc-400 dark:text-zinc-500"}`}>
+                    {label}
+                  </span>
                   <input
                     type="text"
                     value={value}
