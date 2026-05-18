@@ -171,11 +171,14 @@ export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
+    // 未ログインでもlocalStorageにプロフィールがあれば/mainへ
+    const p = loadProfile();
+    if (p) { router.replace("/main"); return; }
+
     const supabase = createSupabaseBrowser();
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { setReady(true); return; }
-      const p = loadProfile();
-      if (p) { router.replace("/main"); return; }
+      // ログイン済みでlocalStorageが空 → Supabaseから取得
       syncPull().then(() => {
         router.replace(loadProfile() ? "/main" : "/setup");
       });
