@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { UserButton } from "@clerk/nextjs";
 import type { Profile, Idea } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
 import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
 import { addHistory } from "@/lib/history";
+import { syncPush } from "@/lib/sync";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
@@ -186,6 +188,7 @@ export default function MainPage() {
     } else {
       setFeedbackMap((m) => ({ ...m, [idea.title]: null }));
     }
+    syncPush();
   }
 
   function triggerLike(idea: Idea) {
@@ -241,6 +244,7 @@ export default function MainPage() {
       setIdeas(ideas);
       refreshFeedbackMap(ideas.map((i) => i.title));
       addHistory(mood.trim(), ideas);
+      syncPush();
     } catch (e) {
       setError(e instanceof Error ? e.message : "エラーが発生しました");
     } finally {
@@ -280,6 +284,7 @@ export default function MainPage() {
               <IconUser size={14} />プロフィール
             </button>
             <ThemeToggle size={15} />
+            <UserButton />
           </div>
         </FadeUp>
 

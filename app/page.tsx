@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { loadProfile } from "@/lib/profile";
+import { syncPull } from "@/lib/sync";
 import { IconCamera, IconSparkle } from "@/components/icons";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -154,14 +156,20 @@ function FAQ({ q, a }: { q: string; a: string }) {
 
 export default function Home() {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useUser();
   const [ready, setReady] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
+    if (!isLoaded) return;
+    if (!isSignedIn) { setReady(true); return; }
+    // サインイン済み：まずlocalStorageを確認し、なければSupabaseから取得
     const p = loadProfile();
     if (p) { router.replace("/main"); return; }
-    setReady(true);
-  }, [router]);
+    syncPull().then(() => {
+      router.replace(loadProfile() ? "/main" : "/setup");
+    });
+  }, [isLoaded, isSignedIn, router]);
 
   useEffect(() => {
     const fn = () => setNavScrolled(window.scrollY > 20);
@@ -175,7 +183,7 @@ export default function Home() {
     </div>
   );
 
-  const go = () => router.push("/setup");
+  const go = () => router.push("/sign-up");
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white">
@@ -190,6 +198,9 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-4">
           <ThemeToggle size={15} />
+          <button onClick={() => router.push("/sign-in")} className="text-sm text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity cursor-pointer">
+            ログイン
+          </button>
           <button onClick={go} className="text-sm font-semibold text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
             はじめる →
           </button>

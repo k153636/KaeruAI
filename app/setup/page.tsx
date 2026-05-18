@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Profile } from "@/lib/types";
 import { loadProfile, saveProfile } from "@/lib/profile";
+import { syncPush } from "@/lib/sync";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 import FadeUp from "@/components/FadeUp";
@@ -349,6 +350,7 @@ function SetupContent() {
 
   function finishSetup() {
     saveProfile(buildProfile());
+    syncPush();
     router.push("/main");
   }
 
@@ -370,6 +372,7 @@ function SetupContent() {
         if (nextUnanswered !== -1) {
           goStep(nextUnanswered);
         } else {
+          syncPush();
           router.push("/main");
         }
         return;
@@ -391,6 +394,7 @@ function SetupContent() {
 
   function exitToMain() {
     saveProfile(buildProfile());
+    syncPush();
     router.push("/main");
   }
 

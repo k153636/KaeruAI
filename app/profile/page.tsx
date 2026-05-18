@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { Profile } from "@/lib/types";
 import { loadProfile, saveProfile } from "@/lib/profile";
+import { syncPush } from "@/lib/sync";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -265,6 +266,7 @@ export default function ProfilePage() {
     const updated = { ...profile, [editingId]: draft };
     setProfile(updated);
     saveProfile(updated);
+    syncPush();
     setEditingId(null);
     setCustomInput("");
   }
