@@ -71,7 +71,14 @@ function IconX({ size = 15 }: { size?: number }) {
 
 function LightBtn({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="inline-flex items-center gap-2.5 bg-white hover:bg-zinc-100 active:scale-95 text-zinc-900 font-bold text-base px-8 py-4 rounded-2xl border border-white transition-all cursor-pointer">
+    <button
+      onClick={onClick}
+      className="inline-flex items-center gap-2.5 text-zinc-900 font-bold text-base px-8 py-4 rounded-2xl transition-all active:scale-[0.97] cursor-pointer"
+      style={{
+        background: "linear-gradient(180deg, #ffffff 0%, #e4e4e7 100%)",
+        boxShadow: "0 1px 0 rgba(255,255,255,0.5) inset, 0 6px 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35)",
+      }}
+    >
       <IconSparkle size={18} />
       {label}
       <IconArrow size={16} />
@@ -148,8 +155,8 @@ function HeroCard() {
 function FAQ({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden">
-      <button onClick={() => setOpen(v => !v)} className="w-full flex items-center justify-between px-6 py-4 text-left cursor-pointer hover:bg-zinc-800 transition-colors">
+    <div className="rounded-2xl overflow-hidden border border-zinc-700/80" style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)" }}>
+      <button onClick={() => setOpen(v => !v)} className="w-full flex items-center justify-between px-6 py-4 text-left cursor-pointer hover:bg-white/[0.03] transition-colors">
         <span className="font-semibold text-sm pr-4 text-white">{q}</span>
         <span className="shrink-0 text-white transition-transform duration-300" style={{ transform: open ? "rotate(45deg)" : "rotate(0deg)" }}>＋</span>
       </button>
@@ -225,7 +232,8 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <button
             onClick={signInWithGoogle}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-zinc-800 border border-zinc-600 rounded-lg text-white hover:bg-zinc-700 transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg text-white cursor-pointer transition-all active:scale-95"
+            style={{ background: "linear-gradient(180deg, rgb(52,52,58) 0%, rgb(36,36,40) 100%)", border: "1px solid rgba(255,255,255,0.12)", boxShadow: "0 1px 0 rgba(255,255,255,0.06) inset, 0 2px 8px rgba(0,0,0,0.4)" }}
           >
             <IconGoogle />
             Googleでログイン
@@ -302,7 +310,7 @@ export default function Home() {
               { num: "02", title: "同じフォーマットの繰り返し", desc: "「〇〇してみた」「検証系」に偏りがち。視聴者は飽き、チャンネルの個性が薄れていく。" },
               { num: "03", title: "ネタ切れのたびに時間消費", desc: "企画を考えることで消耗し、肝心の制作時間が削られる。週1投稿が崩れていく。" },
             ].map((item, i) => (
-              <Reveal key={item.num} delay={i * 80} className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6">
+              <Reveal key={item.num} delay={i * 80} className="rounded-3xl p-6 border border-zinc-700/80" style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)", boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset" }}>
                 <p className="text-xs font-bold text-zinc-600 mb-4">{item.num}</p>
                 <h3 className="font-bold text-base mb-3 text-white">{item.title}</h3>
                 <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
@@ -382,7 +390,7 @@ export default function Home() {
             ].map((item, i) => (
               <Reveal key={item.step} delay={i * 100}>
                 <div className="flex gap-6 items-start">
-                  <div className="shrink-0 w-14 h-14 rounded-2xl border-2 border-white flex items-center justify-center font-bold text-sm text-white">{item.step}</div>
+                  <div className="shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-sm text-white" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)", border: "1.5px solid rgba(255,255,255,0.25)", boxShadow: "0 1px 0 rgba(255,255,255,0.12) inset, 0 4px 12px rgba(0,0,0,0.4)" }}>{item.step}</div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <h3 className="font-bold text-lg text-white">{item.title}</h3>
