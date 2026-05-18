@@ -249,7 +249,7 @@ export default function Home() {
                 その<strong className="text-zinc-900 dark:text-white">交差点</strong>から企画が生まれる。
               </p>
               <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                <DarkBtn label="無料で企画を生成する" onClick={signInWithGoogle} />
+                <DarkBtn label="無料で企画を生成する" onClick={() => router.push("/setup")} />
                 <p className="text-xs text-zinc-400 sm:self-center">登録不要・無料・2問答えるだけ</p>
               </div>
             </div>
@@ -528,7 +528,7 @@ export default function Home() {
               <p className="text-zinc-400 text-lg mb-10 max-w-md mx-auto">
                 登録不要。無料。2問答えるだけで、あなたのチャンネルに合った企画が5つ届く。
               </p>
-              <LightBtn label="今すぐ無料で試す" onClick={signInWithGoogle} />
+              <LightBtn label="今すぐ無料で試す" onClick={() => router.push("/setup")} />
             </div>
           </Reveal>
         </div>
