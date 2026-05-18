@@ -27,6 +27,25 @@ function IconCopy({ size = 14 }: { size?: number }) {
   );
 }
 
+function IconLightning({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/>
+    </svg>
+  );
+}
+
+function IconSliders({ size = 13 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="18" cy="12" r="2" stroke="currentColor" strokeWidth="2"/>
+      <circle cx="14" cy="6" r="2" stroke="currentColor" strokeWidth="2"/>
+      <circle cx="10" cy="18" r="2" stroke="currentColor" strokeWidth="2"/>
+    </svg>
+  );
+}
+
 function IconFilm({ size = 13 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -238,9 +257,9 @@ export default function MainPage() {
             <h1 className="text-zinc-900 dark:text-white font-bold text-xl">どんな企画がほしい？</h1>
             <button
               onClick={() => setInputMode(m => m === "quick" ? "detailed" : "quick")}
-              className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer px-2.5 py-1 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="flex items-center gap-1.5 text-xs border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer px-3 py-1.5 rounded-full"
             >
-              {inputMode === "quick" ? "詳細入力" : "⚡ クイック"}
+              {inputMode === "quick" ? <><IconSliders size={12} />詳細入力</> : <><IconLightning size={12} />クイック</>}
             </button>
           </div>
 
@@ -256,8 +275,8 @@ export default function MainPage() {
               value={mood}
               onChange={(e) => setMood(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-              placeholder="一言で... 例：やる気ない"
-              className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+              placeholder="例：やる気ない"
+              className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
               disabled={loading}
             />
           </div>
@@ -265,26 +284,39 @@ export default function MainPage() {
           {/* Detailed mode */}
           <div style={{
             opacity: inputMode === "detailed" ? 1 : 0,
-            maxHeight: inputMode === "detailed" ? "300px" : "0px",
+            maxHeight: inputMode === "detailed" ? "320px" : "0px",
             overflow: "hidden",
             transition: "opacity 0.25s ease, max-height 0.3s ease",
           }}>
-            <div className="space-y-2">
+            <div className="space-y-0">
+              {/* Required */}
+              <div className="flex items-center gap-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800">
+                <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 w-16 shrink-0">今の状態</span>
+                <input
+                  type="text"
+                  value={mood}
+                  onChange={(e) => setMood(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+                  placeholder="やる気ない、挑戦したい..."
+                  className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none"
+                  disabled={loading}
+                />
+              </div>
+              {/* Optional */}
               {[
-                { label: "今の状態", value: mood, setter: setMood, placeholder: "やる気ない、挑戦したい...", required: true },
-                { label: "テーマ", value: theme, setter: setTheme, placeholder: "AI系、プログラミング...", required: false },
-                { label: "条件", value: condition, setter: setCondition, placeholder: "短尺、笑える、感動系...", required: false },
-                { label: "視聴者", value: audience, setter: setAudience, placeholder: "初心者、エンジニア...", required: false },
-              ].map(({ label, value, setter, placeholder }) => (
-                <div key={label} className="flex items-center gap-3">
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500 w-14 shrink-0">{label}</span>
+                { label: "テーマ",   value: theme,     setter: setTheme,     placeholder: "AI系、プログラミング..." },
+                { label: "条件",     value: condition,  setter: setCondition,  placeholder: "短尺、笑える、感動系..." },
+                { label: "視聴者",   value: audience,   setter: setAudience,   placeholder: "初心者、エンジニア..." },
+              ].map(({ label, value, setter, placeholder }, i, arr) => (
+                <div key={label} className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-100 dark:border-zinc-800" : ""}`}>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 w-16 shrink-0">{label}</span>
                   <input
                     type="text"
                     value={value}
                     onChange={(e) => setter(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                     placeholder={placeholder}
-                    className="flex-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3 py-2 text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+                    className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none"
                     disabled={loading}
                   />
                 </div>
