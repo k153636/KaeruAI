@@ -122,14 +122,14 @@ function HeroCard() {
           <div className="flex items-start gap-2.5 mb-3">
             <span className="text-white/25 font-bold text-base shrink-0 mt-0.5">1</span>
             <h3 className="font-bold text-sm leading-snug text-white/90">
-              バイブコーディングで書いたコードをドレミに変換したら、なぜか葬送行進曲になった
+              江戸時代の庶民が食べてた「1日15文の食事」を現代で再現したら、現代人には無理すぎた
             </h3>
           </div>
           <p className="text-xs leading-relaxed mb-4 pl-5" style={{ color: "rgba(255,255,255,0.38)" }}>
-            偶然性と意図の境界線が曖昧になる瞬間を、コード画面と音声を同時に映して記録する。
+            当時の物価換算・食材・調理法を忠実に再現。現代人の舌と胃が最初に拒絶したのは意外なものだった。
           </p>
           <div className="pl-5 flex flex-wrap gap-1.5 mb-4">
-            {["コーダー × 音楽好き", "考察", "意外な結末"].map((t) => (
+            {["料理 × 歴史", "検証", "衝撃結果"].map((t) => (
               <span key={t} className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.45)" }}>{t}</span>
             ))}
           </div>
