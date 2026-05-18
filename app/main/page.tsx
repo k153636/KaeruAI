@@ -254,20 +254,20 @@ export default function MainPage() {
   const displayedIdeas = ideas.filter((idea) => !removedIds.has(idea.title));
 
   return (
-    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
+    <div className="min-h-dvh bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-xl mx-auto">
 
         {/* Header */}
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg">
+          <div className="flex items-center gap-2 text-white font-bold text-lg">
             <IconCamera size={22} />
             <span>CaeruAI</span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push("/history")} className="text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
+            <button onClick={() => router.push("/history")} className="text-xs text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer">
               履歴
             </button>
-            <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
+            <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer">
               <IconUser size={14} />プロフィール
             </button>
             <button
@@ -275,7 +275,7 @@ export default function MainPage() {
                 await createSupabaseBrowser().auth.signOut();
                 window.location.href = "/";
               }}
-              className="text-xs text-zinc-500 dark:text-zinc-400 hover:opacity-60 transition-opacity cursor-pointer"
+              className="text-xs text-zinc-500 hover:opacity-60 transition-opacity cursor-pointer"
             >
               ログアウト
             </button>
@@ -285,16 +285,16 @@ export default function MainPage() {
         {/* Profile tags */}
         <FadeUp delay={60} className="flex flex-wrap gap-2 mb-8">
           {[profile.contentNiche, profile.creatorIdentity].filter(Boolean).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-full text-xs text-zinc-900 dark:text-white font-medium">
+            <span key={tag} className="px-3 py-1 bg-zinc-800 border border-zinc-600 rounded-full text-xs text-zinc-200 font-medium">
               {tag}
             </span>
           ))}
         </FadeUp>
 
         {/* Main input */}
-        <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-6 mb-4">
+        <FadeUp delay={120} className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4">
           <div className="flex items-center justify-between mb-5">
-            <h1 className="text-zinc-900 dark:text-white font-bold text-xl">どんな企画がほしい？</h1>
+            <h1 className="text-white font-bold text-xl">どんな企画がほしい？</h1>
 
             {/* Toggle button */}
             <button
@@ -323,7 +323,7 @@ export default function MainPage() {
                   onChange={(e) => setMood(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                   placeholder="例：やる気ない"
-                  className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors"
+                  className="w-full bg-zinc-800 border border-zinc-600 rounded-2xl px-4 py-3.5 text-base text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-400 transition-colors"
                   disabled={loading}
                 />
               </div>
@@ -350,9 +350,9 @@ export default function MainPage() {
                     transform: detailedVisible ? "translateY(0)" : "translateY(10px)",
                     transition: `opacity 0.22s ease ${i * 55}ms, transform 0.22s ease ${i * 55}ms`,
                   }}
-                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-200 dark:border-zinc-700" : ""}`}
+                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-700" : ""}`}
                 >
-                  <span className={`text-xs w-16 shrink-0 ${required ? "font-semibold text-zinc-800 dark:text-zinc-100" : "text-zinc-500 dark:text-zinc-400"}`}>
+                  <span className={`text-xs w-16 shrink-0 ${required ? "font-semibold text-zinc-200" : "text-zinc-500"}`}>
                     {label}
                   </span>
                   <input
@@ -361,7 +361,7 @@ export default function MainPage() {
                     onChange={(e) => setter(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                     placeholder={placeholder}
-                    className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-500 focus:outline-none"
+                    className="flex-1 bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
                     disabled={loading}
                   />
                 </div>
@@ -375,7 +375,7 @@ export default function MainPage() {
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
-            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white border border-red-600 flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed bg-white hover:bg-zinc-100 text-zinc-900 flex items-center justify-center gap-2"
           >
             {loading ? (
               <><IconLoader size={18} className="animate-spin" />{retrying ? "リトライ中..." : "企画を考え中..."}</>
@@ -390,7 +390,7 @@ export default function MainPage() {
           <FadeUp delay={200} className="mb-8">
             <button
               onClick={() => router.push("/setup?continue=true")}
-              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-600 text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer flex items-center justify-center gap-2"
             >
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
@@ -407,7 +407,7 @@ export default function MainPage() {
         {displayedIdeas.length > 0 && (
           <div className="space-y-4">
             <div className="mb-1">
-              <h2 className="text-zinc-900 dark:text-white text-sm font-medium mb-2">生成された企画（{mood}）</h2>
+              <h2 className="text-zinc-400 text-sm font-medium mb-2">生成された企画（{mood}）</h2>
             </div>
 
             {displayedIdeas.map((idea, i) => {
@@ -440,71 +440,71 @@ export default function MainPage() {
                     }}
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
-                    className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl overflow-hidden relative touch-pan-y select-none"
+                    className="bg-zinc-900 border border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
                     <div className="p-5">
                       <div className="flex items-start gap-3">
-                        <span className="text-zinc-500 dark:text-zinc-400 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
+                        <span className="text-zinc-600 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
                         <div className="flex-1 min-w-0">
 
-                          <h3 className="text-zinc-900 dark:text-white font-bold text-base mb-2 leading-tight">
+                          <h3 className="text-white font-bold text-base mb-2 leading-tight">
                             {idea.title}
                           </h3>
 
-                          <p className="text-zinc-900 dark:text-white text-sm mb-3 leading-relaxed">
+                          <p className="text-zinc-300 text-sm mb-3 leading-relaxed">
                             {idea.description}
                           </p>
 
                           <button
                             onClick={() => setExpandedId(expanded ? null : idea.title)}
-                            className="text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer mb-3 flex items-center gap-1"
+                            className="text-xs text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer mb-3 flex items-center gap-1"
                           >
                             {expanded ? "▲ 閉じる" : "▼ フック・構成案・制作手順を見る"}
                           </button>
 
                           {expanded && (
                             <div className="space-y-2 mb-3">
-                              <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <span className="text-xs text-zinc-900 dark:text-white font-semibold">{platform.hookLabel}：</span>
+                              <div className="bg-zinc-800 rounded-xl px-3 py-2">
+                                <span className="text-xs text-white font-semibold">{platform.hookLabel}：</span>
                                 <span className="text-xs text-zinc-900 dark:text-white ml-1">{idea.hook}</span>
                               </div>
-                              <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <div className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white font-semibold mb-1">
+                              <div className="bg-zinc-800 rounded-xl px-3 py-2">
+                                <div className="flex items-center gap-1.5 text-xs text-white font-semibold mb-1">
                                   <IconImage size={12} />{platform.visualLabel}
                                 </div>
-                                <p className="text-xs text-zinc-900 dark:text-white leading-relaxed">{idea.thumbnail}</p>
+                                <p className="text-xs text-zinc-400 leading-relaxed">{idea.thumbnail}</p>
                               </div>
-                              <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <div className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white font-semibold mb-1">
+                              <div className="bg-zinc-800 rounded-xl px-3 py-2">
+                                <div className="flex items-center gap-1.5 text-xs text-white font-semibold mb-1">
                                   <IconFilm size={12} />{platform.productionLabel}
                                 </div>
-                                <p className="text-xs text-zinc-900 dark:text-white leading-relaxed whitespace-pre-line">{idea.filming}</p>
+                                <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-line">{idea.filming}</p>
                               </div>
                             </div>
                           )}
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                          <div className="flex items-center gap-2 pt-3 border-t border-zinc-700">
                             <button
                               onClick={() => triggerLike(idea)}
                               className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
                                 fb === "liked"
-                                  ? "bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900"
-                                  : "border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60"
+                                  ? "bg-white border-white text-zinc-900"
+                                  : "border-zinc-600 text-zinc-300 hover:opacity-60"
                               }`}
                             >
                               <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
                             <button
                               onClick={() => triggerDislike(idea)}
-                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60"
+                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-600 text-zinc-300 hover:opacity-60"
                             >
                               <IconThumbDown size={14} /><span>違う</span>
                             </button>
                             <button
                               onClick={() => copyIdea(idea)}
                               title={copied ? "コピー済み" : "コピー"}
-                              className="flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60"
+                              className="flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-zinc-600 text-zinc-300 hover:opacity-60"
                             >
                               <IconCopy size={15} />
                             </button>
@@ -520,7 +520,7 @@ export default function MainPage() {
 
             <button
               onClick={() => { setMood(""); setTheme(""); setCondition(""); setAudience(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
-              className="w-full py-3 rounded-2xl text-sm text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:opacity-60 transition-all cursor-pointer mt-2"
+              className="w-full py-3 rounded-2xl text-sm text-zinc-300 border border-zinc-600 hover:opacity-60 transition-all cursor-pointer mt-2"
             >
               もう一度生成する
             </button>

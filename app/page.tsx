@@ -235,40 +235,27 @@ export default function Home() {
 
       {/* ══ HERO — 黒 ════════════════════════════════════════════════════════ */}
       <section className="min-h-screen flex items-center bg-zinc-950 relative overflow-hidden">
-        {/* Subtle ambient glow */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 60%)" }} />
-        <div className="max-w-6xl mx-auto px-6 w-full pt-24 pb-16">
-          <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-20">
-
-            {/* Copy */}
-            <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-full px-4 py-1.5 text-xs font-semibold mb-8 text-zinc-300">
-                <IconSparkle size={11} />
-                ChatGPTで試したが、どこかで見た企画しか出なかった人へ
-              </div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight mb-7 text-white">
-                AIは企画を<br />作れる。<br />
-                でも、<span className="relative inline-block">
-                  あなたの
-                  <span className="absolute left-0 right-0 -bottom-1 h-[3px] bg-white rounded-full" />
-                </span><br />
-                企画は作れない。
-              </h1>
-              <p className="text-zinc-400 text-lg sm:text-xl leading-relaxed mb-10 max-w-lg mx-auto lg:mx-0">
-                CaeruAIはプロフィールを読む。あなたが何者で、なぜ作り、誰に届けたいか。<br className="hidden sm:block" />
-                その<strong className="text-white">交差点</strong>から企画が生まれる。
-              </p>
-              <div className="flex flex-col sm:flex-row items-center lg:items-start gap-4">
-                <LightBtn label="無料で企画を生成する" onClick={() => router.push("/setup")} />
-                <p className="text-xs text-zinc-400 sm:self-center">登録不要・無料・2問答えるだけ</p>
-              </div>
-            </div>
-
-            {/* Glass card */}
-            <div className="hidden lg:flex items-center justify-center shrink-0">
-              <HeroCard />
-            </div>
-
+        <div className="max-w-3xl mx-auto px-6 w-full pt-24 pb-16 text-center">
+          <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-full px-4 py-1.5 text-xs font-semibold mb-8 text-zinc-300">
+            <IconSparkle size={11} />
+            ChatGPTで試したが、どこかで見た企画しか出なかった人へ
+          </div>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight mb-7 text-white">
+            AIは企画を<br />作れる。<br />
+            でも、<span className="relative inline-block">
+              あなたの
+              <span className="absolute left-0 right-0 -bottom-1 h-[3px] bg-white rounded-full" />
+            </span><br />
+            企画は作れない。
+          </h1>
+          <p className="text-zinc-400 text-lg sm:text-xl leading-relaxed mb-10 max-w-xl mx-auto">
+            CaeruAIはプロフィールを読む。あなたが何者で、なぜ作り、誰に届けたいか。<br className="hidden sm:block" />
+            その3つが重なる場所に、あなたにしか作れないコンテンツがある。
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <LightBtn label="無料で企画を生成する" onClick={() => router.push("/setup")} />
+            <p className="text-xs text-zinc-400 sm:self-center">登録不要・無料・2問答えるだけ</p>
           </div>
         </div>
       </section>
@@ -511,10 +498,11 @@ export default function Home() {
           <div className="space-y-4">
             {[
               { q: "本当に無料ですか？", a: "はい、現在は完全無料で使えます。1日10回まで企画を生成できます。将来的に有料プランを導入予定ですが、無料プランは引き続き提供します。" },
-              { q: "ChatGPTに自分のプロフィールを貼れば同じことができませんか？", a: "形式上は似せられます。ただしCaeruAIは「複数の要素が交差する地点」から発想するよう設計されていて、生成後に別のAIが品質を批評して基準を満たさない企画だけを書き直します。好み・嫌いのフィードバックが蓄積されて次回の生成に反映される仕組みもあります。" },
-              { q: "どんなプラットフォームに対応していますか？", a: "YouTube、TikTok、Instagram、Podcastに対応しています。それぞれのフォーマット・尺感に最適化した企画を生成します。" },
+              { q: "ChatGPTに自分のプロフィールを貼れば同じことができませんか？", a: "形式上は似せられます。ただしCaeruAIはあなたの背景・動機・ターゲットを組み合わせて発想するよう設計されていて、生成後に別のAIが品質を批評して基準を満たさない企画だけを書き直します。好み・嫌いのフィードバックが蓄積されて次回の生成に反映される仕組みもあります。" },
+              { q: "どんなプラットフォームに対応していますか？", a: "YouTube・TikTok・Instagram・Podcast・ブログ・X・配信・Robloxなど9種類に対応しています。それぞれのフォーマットに最適化した企画を生成します。" },
               { q: "生成した企画の著作権はどうなりますか？", a: "生成されたすべての企画はあなたのものです。自由に使用・改変・商用利用できます。" },
               { q: "プロフィールを全部入力しないといけませんか？", a: "いいえ。最初の2問だけで使い始められます。あとの質問は任意で、答えるほど企画の精度が上がる仕組みです。使いながら少しずつ追加できます。" },
+              { q: "YouTuber以外でも使えますか？", a: "はい。YouTube・TikTok・Instagram・Podcast・ブログ・X・配信・Robloxなど、あらゆるコンテンツクリエイターを対象にしています。プラットフォームを選ぶとそれぞれに最適化された企画が届きます。" },
             ].map((item, i) => (
               <Reveal key={i} delay={i * 40}><FAQ q={item.q} a={item.a} /></Reveal>
             ))}
@@ -555,7 +543,7 @@ export default function Home() {
       <footer className="bg-zinc-950 border-t border-zinc-900 py-10">
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 font-bold text-sm text-white"><IconCamera size={16} /><span>CaeruAI</span></div>
-          <p className="text-xs text-zinc-600">© 2026 CaeruAI · YouTuberのための企画AIアシスタント</p>
+          <p className="text-xs text-zinc-600">© 2026 CaeruAI · クリエイターのための企画生成AI</p>
         </div>
       </footer>
     </div>
