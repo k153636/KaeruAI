@@ -170,18 +170,21 @@ export default function Home() {
   const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
-    // 未ログインでもlocalStorageにプロフィールがあれば/mainへ
     const p = loadProfile();
     if (p) { router.replace("/main"); return; }
 
-    const supabase = createSupabaseBrowser();
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { setReady(true); return; }
-      // ログイン済みでlocalStorageが空 → Supabaseから取得
-      syncPull().then(() => {
-        router.replace(loadProfile() ? "/main" : "/setup");
-      });
-    });
+    try {
+      const supabase = createSupabaseBrowser();
+      supabase.auth.getUser().then(({ data }) => {
+        const user = data?.user ?? null;
+        if (!user) { setReady(true); return; }
+        syncPull().then(() => {
+          router.replace(loadProfile() ? "/main" : "/setup");
+        });
+      }).catch(() => setReady(true));
+    } catch {
+      setReady(true);
+    }
   }, [router]);
 
   useEffect(() => {
@@ -197,11 +200,15 @@ export default function Home() {
   );
 
   async function signInWithGoogle() {
-    const supabase = createSupabaseBrowser();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${location.origin}/auth/callback` },
-    });
+    try {
+      const supabase = createSupabaseBrowser();
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${location.origin}/auth/callback` },
+      });
+    } catch {
+      // Supabase 未設定時はサイレントに無視
+    }
   }
 
   return (
