@@ -312,7 +312,7 @@ export default function ProfilePage() {
                   {!isEditing && (
                     <button
                       onClick={() => startEdit(field)}
-                      className="flex items-center gap-1 text-xs text-zinc-400 hover:text-red-500 transition-colors cursor-pointer shrink-0 mt-1"
+                      className="flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer shrink-0 mt-1"
                     >
                       <IconEdit size={13} />
                       変更
@@ -328,7 +328,7 @@ export default function ProfilePage() {
                         onChange={(e) => setDraft(e.target.value)}
                         rows={3}
                         autoFocus
-                        className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 focus:outline-none focus:border-red-500 transition-colors text-sm resize-none"
+                        className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 focus:outline-none focus:border-zinc-400 transition-colors text-sm resize-none"
                       />
                     ) : (
                       <div>
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                                   disabled={atLimit}
                                   className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                                     active
-                                      ? "bg-red-500 border-red-500 text-white"
+                                      ? "bg-zinc-900 border-zinc-900 text-white"
                                       : "bg-white border-zinc-300 text-zinc-700 hover:border-zinc-400"
                                   }`}
                                 >
@@ -371,20 +371,20 @@ export default function ProfilePage() {
                                 <button
                                   key={custom}
                                   onClick={() => toggleMulti(custom, editingField.maxSelect)}
-                                  className="px-3 py-1.5 rounded-full text-sm border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                                  className="px-3 py-1.5 rounded-full text-sm border bg-zinc-900 border-zinc-900 text-white transition-all cursor-pointer flex items-center gap-1"
                                 >
                                   {custom}
-                                  <span className="text-red-200 text-xs ml-0.5">×</span>
+                                  <span className="text-white/60 text-xs ml-0.5">×</span>
                                 </button>
                               ))
                             }
                             {editingField.type === "select" && draft && !editingField.options?.includes(draft) && (
                               <button
                                 onClick={() => setDraft("")}
-                                className="px-3 py-1.5 rounded-full text-sm border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                                className="px-3 py-1.5 rounded-full text-sm border bg-zinc-900 border-zinc-900 text-white transition-all cursor-pointer flex items-center gap-1"
                               >
                                 {draft}
-                                <span className="text-red-200 text-xs ml-0.5">×</span>
+                                <span className="text-white/60 text-xs ml-0.5">×</span>
                               </button>
                             )}
                           </div>
@@ -397,7 +397,7 @@ export default function ProfilePage() {
                                 onKeyDown={(e) => { if (e.key === "Enter") { addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect); (e.target as HTMLInputElement).blur(); } }}
                                 onBlur={() => addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect)}
                                 placeholder="その他を入力...（入力後、画面を触れば確定）"
-                                className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-sm"
+                                className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors text-sm"
                               />
                             </div>
                           )}
@@ -408,7 +408,7 @@ export default function ProfilePage() {
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={save}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-red-500 hover:bg-red-400 text-white text-sm font-medium rounded-2xl transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-700 text-white text-sm font-medium rounded-2xl transition-colors cursor-pointer"
                       >
                         <IconCheck size={14} />
                         保存

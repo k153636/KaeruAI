@@ -268,7 +268,7 @@ export default function MainPage() {
 
         {/* Header */}
         <FadeUp delay={0} className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
+          <div className="flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg">
             <IconCamera size={22} />
             <span>KaeruAI</span>
           </div>
@@ -342,7 +342,7 @@ export default function MainPage() {
                   onChange={(e) => setMood(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                   placeholder="例：やる気ない"
-                  className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+                  className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
                   disabled={loading}
                 />
               </div>
@@ -409,7 +409,7 @@ export default function MainPage() {
           <FadeUp delay={200} className="mb-8">
             <button
               onClick={() => router.push("/setup?continue=true")}
-              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-200 dark:border-zinc-700 hover:border-red-400 hover:text-red-500 text-zinc-400 dark:text-zinc-500 transition-colors cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-200 dark:border-zinc-700 hover:border-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-zinc-400 dark:text-zinc-500 transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
@@ -463,7 +463,7 @@ export default function MainPage() {
                   >
                     <div className="p-5">
                       <div className="flex items-start gap-3">
-                        <span className="text-red-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
+                        <span className="text-zinc-400 dark:text-zinc-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
                         <div className="flex-1 min-w-0">
 
                           <h3 className="text-zinc-900 dark:text-white font-bold text-base mb-2 leading-tight">
@@ -508,15 +508,15 @@ export default function MainPage() {
                               onClick={() => triggerLike(idea)}
                               className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
                                 fb === "liked"
-                                  ? "bg-emerald-50 dark:bg-emerald-950 border-emerald-400 text-emerald-600"
-                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-emerald-300 hover:text-emerald-500"
+                                  ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-400 dark:border-zinc-500 text-zinc-700 dark:text-zinc-300"
+                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                               }`}
                             >
                               <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
                             <button
                               onClick={() => triggerDislike(idea)}
-                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-red-300 hover:text-red-500"
+                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                             >
                               <IconThumbDown size={14} /><span>違う</span>
                             </button>

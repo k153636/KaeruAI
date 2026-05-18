@@ -414,7 +414,7 @@ function SetupContent() {
       <div className="min-h-dvh bg-zinc-50 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
         <div className="w-full max-w-lg">
           <FadeUp delay={0} className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-6">
+            <div className="inline-flex items-center gap-2 text-zinc-900 font-bold text-lg mb-6">
               <IconCamera size={22} />
               <span>KaeruAI</span>
             </div>
@@ -445,7 +445,7 @@ function SetupContent() {
           <FadeUp delay={200} className="flex flex-col gap-3">
             <button
               onClick={continueOptional}
-              className="w-full py-4 rounded-2xl font-bold text-base bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full py-4 rounded-2xl font-bold text-base bg-zinc-900 hover:bg-zinc-700 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <span>続けて答える</span>
               <IconArrowRight size={18} />
@@ -478,7 +478,7 @@ function SetupContent() {
             )}
             <ThemeToggle size={15} />
           </div>
-          <div className="inline-flex items-center gap-2 text-red-500 font-bold text-lg mb-2">
+          <div className="inline-flex items-center gap-2 text-zinc-900 font-bold text-lg mb-2">
             <IconCamera size={22} />
             <span>KaeruAI</span>
           </div>
@@ -498,7 +498,7 @@ function SetupContent() {
           </div>
           <div className="h-1 bg-zinc-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-red-500 rounded-full transition-all duration-500"
+              className="h-full bg-zinc-900 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -522,7 +522,7 @@ function SetupContent() {
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && canNext() && next()}
               placeholder={current.placeholder}
               rows={3}
-              className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base resize-none"
+              className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-4 py-3 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors text-base resize-none"
               autoFocus
             />
           ) : (
@@ -549,7 +549,7 @@ function SetupContent() {
                       disabled={atLimit}
                       className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
                         active
-                          ? "bg-red-500 border-red-500 text-white"
+                          ? "bg-zinc-900 border-zinc-900 text-white"
                           : "bg-white border-zinc-300 text-zinc-700 hover:border-zinc-400"
                       }`}
                     >
@@ -562,20 +562,20 @@ function SetupContent() {
                     <button
                       key={custom}
                       onClick={() => toggleMulti(custom)}
-                      className="px-4 py-2 rounded-full text-sm font-medium border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                      className="px-4 py-2 rounded-full text-sm font-medium border bg-zinc-900 border-zinc-900 text-white transition-all cursor-pointer flex items-center gap-1"
                     >
                       {custom}
-                      <span className="text-red-200 text-xs ml-0.5">×</span>
+                      <span className="text-white/60 text-xs ml-0.5">×</span>
                     </button>
                   ))
                 }
                 {current.type === "select" && value && !current.options?.includes(value) && (
                   <button
                     onClick={() => setAnswers((a) => ({ ...a, [current.id]: "" }))}
-                    className="px-4 py-2 rounded-full text-sm font-medium border bg-red-500 border-red-500 text-white transition-all cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2 rounded-full text-sm font-medium border bg-zinc-900 border-zinc-900 text-white transition-all cursor-pointer flex items-center gap-1"
                   >
                     {value}
-                    <span className="text-red-200 text-xs ml-0.5">×</span>
+                    <span className="text-white/60 text-xs ml-0.5">×</span>
                   </button>
                 )}
               </div>
@@ -588,7 +588,7 @@ function SetupContent() {
                     onKeyDown={(e) => { if (e.key === "Enter") { addCustom(); (e.target as HTMLInputElement).blur(); } }}
                     onBlur={addCustom}
                     placeholder="その他を入力...（入力後、画面を触れば確定）"
-                    className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-red-500 transition-colors text-base"
+                    className="w-full bg-zinc-100 border border-zinc-200 rounded-2xl px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 transition-colors text-base"
                   />
                 </FadeUp>
               )}
@@ -619,7 +619,7 @@ function SetupContent() {
             <button
               onClick={next}
               disabled={!canNext()}
-              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-red-500 hover:bg-red-400 text-white flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 hover:bg-zinc-700 text-white flex items-center justify-center gap-2"
             >
               {step < STEPS.length - 1 ? (
                 <><span>次へ</span><IconArrowRight size={18} /></>

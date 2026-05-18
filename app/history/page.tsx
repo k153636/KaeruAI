@@ -77,7 +77,7 @@ export default function HistoryPage() {
     <div className="min-h-screen bg-zinc-50 px-4 py-10">
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2 text-red-500 font-bold text-lg">
+          <div className="flex items-center gap-2 text-zinc-900 font-bold text-lg">
             <IconCamera size={22} />
             <span>履歴</span>
           </div>
@@ -98,7 +98,7 @@ export default function HistoryPage() {
             <p className="text-zinc-400 text-sm">まだ生成した企画がありません</p>
             <button
               onClick={() => router.push("/main")}
-              className="mt-4 text-red-500 text-sm hover:text-red-400 transition-colors cursor-pointer"
+              className="mt-4 text-zinc-500 text-sm hover:text-zinc-700 transition-colors cursor-pointer"
             >
               企画を生成する →
             </button>
@@ -120,7 +120,7 @@ export default function HistoryPage() {
                     <div className="flex items-center gap-2 ml-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}
-                        className="text-zinc-400 hover:text-red-500 transition-colors cursor-pointer p-1"
+                        className="text-zinc-400 hover:text-zinc-600 transition-colors cursor-pointer p-1"
                       >
                         <IconTrash size={14} />
                       </button>
@@ -137,7 +137,7 @@ export default function HistoryPage() {
                         return (
                           <div key={i} className="border-b border-zinc-100 last:border-b-0 px-4 py-3">
                             <div className="flex items-start gap-2">
-                              <span className="text-red-500 font-bold text-sm shrink-0 mt-0.5">{i + 1}</span>
+                              <span className="text-zinc-400 font-bold text-sm shrink-0 mt-0.5">{i + 1}</span>
                               <div className="flex-1 min-w-0">
                                 <p className="text-zinc-900 text-sm font-medium leading-snug mb-1">{idea.title}</p>
                                 <p className="text-zinc-500 text-xs leading-relaxed mb-2">{idea.description}</p>

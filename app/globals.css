@@ -67,10 +67,6 @@ html {
 .dark .border-red-200 { border-color: #7f1d1d; }
 .dark .text-red-600  { color: #f87171; }
 
-/* Feedback: liked */
-.dark .bg-emerald-50   { background-color: rgba(5, 46, 22, 0.3); }
-.dark .text-emerald-600 { color: #34d399; }
-
 /* ── Animations ── */
 
 @keyframes fadeIn {
