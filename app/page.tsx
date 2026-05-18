@@ -158,7 +158,7 @@ export default function Home() {
           className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-full px-4 py-1.5 text-xs font-semibold mb-10"
         >
           <IconSparkle size={11} />
-          生成→批評→改善。2段階AIで企画品質を保証
+          ChatGPTで試したが、どこかで見た企画しか出なかった人へ
         </div>
 
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.1] tracking-tight mb-8">
@@ -200,7 +200,7 @@ export default function Home() {
               なぜ「AIで企画」が<br />自分らしくないのか
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 text-lg max-w-xl mx-auto">
-              ChatGPTはあなたのことを知らない。だから誰でも言えそうな企画が出てくる。
+              AIに「AIジャンルで企画を出して」と頼むと、AIが知っている「AIジャンルの平均」が出てくる。<br className="hidden sm:block" />あなたのチャンネルである必要が、どこにもない。
             </p>
           </Reveal>
 
@@ -289,10 +289,11 @@ export default function Home() {
           <Reveal className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">Output example</p>
             <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-4">
-              これがAIの出力だ
+              プロフィールが違えば、<br />企画も変わる
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 text-base">
-              コーダー × 音楽好きのクリエイター、気分「探求したい」で生成した例
+              コーダー × 音楽好きのクリエイター、気分「探求したい」で生成。<br className="hidden sm:block" />
+              このクリエイター以外には出てこない企画が届いた。
             </p>
           </Reveal>
 
@@ -442,7 +443,7 @@ export default function Home() {
               },
               {
                 q: "ChatGPTに自分のプロフィールを貼れば同じことができませんか？",
-                a: "形式上は似ていますが、KaeruAIは「プロフィールの複数要素の交差点」から発想するよう専用設計されています。また2段階AI（生成→批評→改善）で弱い企画を自動で書き直します。ChatGPTの汎用プロンプトでは再現が難しい精度です。",
+                a: "形式上は似せられます。ただしKaeruAIは「複数の要素が交差する地点」から発想するよう設計されていて、生成後に別のAIが品質を批評して基準を満たさない企画だけを書き直します。また好み・嫌いのフィードバックが蓄積されて次回の生成に反映されます。この仕組みをプロンプトで再現するのはかなり手間がかかる部分です。",
               },
               {
                 q: "どんなプラットフォームに対応していますか？",
@@ -471,10 +472,10 @@ export default function Home() {
           <Reveal>
             <div className="text-5xl mb-6">✦</div>
             <h2 className="text-4xl sm:text-5xl font-bold leading-tight mb-6">
-              あなたの企画を、<br />今日変える。
+              次のネタは、<br />もう考えなくていい。
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 text-lg mb-10 max-w-md mx-auto">
-              登録不要。無料。2問答えるだけで、あなた専用の企画生成AIが動き出す。
+              登録不要。無料。2問答えるだけで、あなたのチャンネルに合った企画が5つ届く。
             </p>
             <CTAButton label="今すぐ無料で試す" onClick={goSetup} />
           </Reveal>
