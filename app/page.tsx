@@ -310,10 +310,12 @@ export default function Home() {
               { num: "02", title: "同じフォーマットの繰り返し", desc: "「〇〇してみた」「検証系」に偏りがち。視聴者は飽き、チャンネルの個性が薄れていく。" },
               { num: "03", title: "ネタ切れのたびに時間消費", desc: "企画を考えることで消耗し、肝心の制作時間が削られる。週1投稿が崩れていく。" },
             ].map((item, i) => (
-              <Reveal key={item.num} delay={i * 80} className="rounded-3xl p-6 border border-zinc-700/80" style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)", boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset" }}>
+              <Reveal key={item.num} delay={i * 80}>
+                <div className="rounded-3xl p-6 border border-zinc-700/80" style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)", boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset" }}>
                 <p className="text-xs font-bold text-zinc-600 mb-4">{item.num}</p>
                 <h3 className="font-bold text-base mb-3 text-white">{item.title}</h3>
                 <p className="text-zinc-500 text-sm leading-relaxed">{item.desc}</p>
+                </div>
               </Reveal>
             ))}
           </div>
