@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 async function getUser() {
   const cookieStore = await cookies();
@@ -22,7 +22,7 @@ export async function GET() {
   const user = await getUser();
   if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from("user_data")
     .select("profile, feedback, history")
     .eq("user_id", user.id)
@@ -37,7 +37,7 @@ export async function PUT(req: Request) {
 
   const body = await req.json();
 
-  await supabaseAdmin.from("user_data").upsert({
+  await getSupabaseAdmin().from("user_data").upsert({
     user_id:    user.id,
     profile:    body.profile  ?? null,
     feedback:   body.feedback ?? null,
