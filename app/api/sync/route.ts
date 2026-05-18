@@ -37,7 +37,8 @@ export async function PUT(req: Request) {
 
   const body = await req.json();
 
-  await getSupabaseAdmin().from("user_data").upsert({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (getSupabaseAdmin() as any).from("user_data").upsert({
     user_id:    user.id,
     profile:    body.profile  ?? null,
     feedback:   body.feedback ?? null,
