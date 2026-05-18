@@ -7,7 +7,6 @@ import { loadProfile, saveProfile } from "@/lib/profile";
 import { syncPush } from "@/lib/sync";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const SEPARATOR = "|||";
 
@@ -281,7 +280,6 @@ export default function ProfilePage() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-zinc-900 dark:text-white font-bold text-xl">プロフィール編集</h1>
           <div className="flex items-center gap-3">
-            <ThemeToggle size={15} />
             <button
               onClick={() => router.push("/main")}
               className="flex items-center gap-1.5 text-sm text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer"

@@ -16,7 +16,7 @@ ChatGPTとの違い：CaeruAIはあなたのチャンネルの文脈を知って
 - **プログレッシブセットアップ** — 2問答えればすぐ使える。追加回答するほどAI精度が上がる
 - **フィードバック学習** — 「いい感じ」「違う」の評価が次回生成に反映される
 - **履歴管理** — 過去の生成結果をいつでも確認
-- **ダークモード対応**
+- **データ同期** — ログイン時にlocalStorageとSupabaseを自動同期（複数デバイス対応）
 
 ---
 
@@ -25,11 +25,11 @@ ChatGPTとの違い：CaeruAIはあなたのチャンネルの文脈を知って
 | 項目 | 内容 |
 |------|------|
 | フレームワーク | Next.js (App Router) |
-| AI | Groq API — llama-3.3-70b-versatile |
 | スタイリング | Tailwind CSS v4 |
 | 言語 | TypeScript |
+| 認証 | Supabase Auth（Google OAuth） |
+| データ永続化 | localStorage + Supabase |
 | デプロイ | Vercel |
-| データ永続化 | localStorage |
 
 ---
 

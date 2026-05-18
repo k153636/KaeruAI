@@ -8,7 +8,6 @@ import { syncPush } from "@/lib/sync";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconCamera, IconArrowRight, IconArrowLeft, IconCheck } from "@/components/icons";
 import FadeUp from "@/components/FadeUp";
-import ThemeToggle from "@/components/ThemeToggle";
 
 type StepType = "text" | "select" | "multiselect";
 
@@ -422,7 +421,7 @@ function SetupContent() {
               まず使ってみましょう！
             </h2>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
-              あと10問答えると、あなたにしか作れない企画が生まれます。<br />
+              あと{optionalTotal}問答えると、あなたにしか作れない企画が生まれます。<br />
               続ける？それともあとで？
             </p>
           </FadeUp>
@@ -430,7 +429,7 @@ function SetupContent() {
           <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-5 mb-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">回答すると精度が上がる項目</span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">残り10問</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">残り{optionalTotal}問</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {["クリエイター像", "届けたい人", "コンテンツの武器", "作る理由", "NGこと", "距離感", "他5問"].map((tag) => (
@@ -465,8 +464,8 @@ function SetupContent() {
     <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center relative">
-          <div className="absolute right-0 top-0 flex items-center gap-2">
-            {isOptionalPhase && (
+          {isOptionalPhase && (
+            <div className="absolute right-0 top-0">
               <button
                 onClick={exitToMain}
                 className="text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer p-1 text-lg leading-none"
@@ -474,9 +473,8 @@ function SetupContent() {
               >
                 ✕
               </button>
-            )}
-            <ThemeToggle size={15} />
-          </div>
+            </div>
+          )}
           <div className="inline-flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg mb-2">
             <IconCamera size={22} />
             <span>CaeruAI</span>

@@ -11,7 +11,6 @@ import { createSupabaseBrowser } from "@/lib/supabase";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
-import ThemeToggle from "@/components/ThemeToggle";
 
 
 const OPTIONAL_FIELDS: (keyof Profile)[] = [
@@ -152,6 +151,8 @@ export default function MainPage() {
     const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
     dragStart.current = null;
     setSwipeDelta(null);
+    if (delta < -80) triggerDislike(idea);
+    else if (delta > 80) triggerLike(idea);
   }
 
   // ── Touch events (mobile swipe) ──────────────────────────────────────
@@ -172,9 +173,12 @@ export default function MainPage() {
     setSwipeDelta({ id, deltaX: dx });
   }
 
-  function onTouchEnd() {
+  function onTouchEnd(idea: Idea) {
+    const delta = swipeDelta?.id === idea.title ? swipeDelta.deltaX : 0;
     dragStart.current = null;
     setSwipeDelta(null);
+    if (delta < -80) triggerDislike(idea);
+    else if (delta > 80) triggerLike(idea);
   }
 
   // ── Feedback actions ─────────────────────────────────────────────────
@@ -283,7 +287,6 @@ export default function MainPage() {
             <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
               <IconUser size={14} />プロフィール
             </button>
-            <ThemeToggle size={15} />
             <button
               onClick={async () => {
                 await createSupabaseBrowser().auth.signOut();
@@ -462,7 +465,7 @@ export default function MainPage() {
                     onPointerUp={(e) => onPointerUp(e, idea)}
                     onTouchStart={(e) => onTouchStart(e, idea.title)}
                     onTouchMove={(e) => onTouchMove(e, idea.title)}
-                    onTouchEnd={() => onTouchEnd()}
+                    onTouchEnd={() => onTouchEnd(idea)}
                     style={{
                       transform: `translateX(${deltaX}px) rotate(${deltaX * 0.025}deg)`,
                       opacity: isExiting ? 0 : 1,

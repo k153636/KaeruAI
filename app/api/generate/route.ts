@@ -266,12 +266,12 @@ export async function POST(request: Request) {
       return Response.json({ error: "API キーが設定されていません" }, { status: 500 });
     }
 
-    const safeFeeback: FeedbackStore = feedback ?? { liked: [], disliked: [] };
+    const safeFeedback: FeedbackStore = feedback ?? { liked: [], disliked: [] };
     const platform = getPlatform(profile.platform);
 
     // ── Stage 1: ドラフト生成 ────────────────────────────────────────────────
     console.log("[generate] stage1: drafting");
-    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, safeFeeback);
+    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, safeFeedback);
 
     let stage1Text = "";
     try {
@@ -286,7 +286,7 @@ export async function POST(request: Request) {
 
     // ── Stage 2: 批評・改善 ──────────────────────────────────────────────────
     console.log("[generate] stage2: critiquing");
-    const critiquePrompt = buildCritiquePrompt(draftIdeas, profile, safeFeeback, platform);
+    const critiquePrompt = buildCritiquePrompt(draftIdeas, profile, safeFeedback, platform);
 
     let finalIdeas = draftIdeas;
     try {
