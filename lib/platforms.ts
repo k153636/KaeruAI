@@ -72,6 +72,15 @@ export const PLATFORMS: Platform[] = [
     productionLabel: "配信構成メモ",
     hookPlaceholder: "配信開始直後のあいさつと今日のテーマ告知（1分以内）",
   },
+  {
+    id: "roblox",
+    label: "Roblox",
+    contentWord: "ゲーム / 体験",
+    hookLabel: "ゲーム紹介文",
+    visualLabel: "アイコン / サムネイル案",
+    productionLabel: "開発メモ",
+    hookPlaceholder: "ゲームページの最初の説明文（プレイヤーを引き込む2〜3文）",
+  },
 ];
 
 export function getPlatform(id: string): Platform {
