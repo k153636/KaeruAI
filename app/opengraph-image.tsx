@@ -10,27 +10,65 @@ export default function OGImage() {
         style={{
           width: 1200,
           height: 630,
-          background: "#0a0a0a",
+          background: "#09090b",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
           justifyContent: "center",
+          padding: "72px 80px",
           fontFamily: "sans-serif",
+          position: "relative",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-            <path d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <rect x="2" y="7" width="13" height="11" rx="2" stroke="#ef4444" strokeWidth="1.5" />
+        {/* Subtle glow */}
+        <div style={{
+          position: "absolute",
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.05) 0%, transparent 60%)",
+          display: "flex",
+        }} />
+
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40 }}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <path d="M15 10l4.553-2.277A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <rect x="2" y="7" width="13" height="11" rx="2" stroke="white" strokeWidth="1.5" />
           </svg>
-          <span style={{ color: "#ef4444", fontSize: 48, fontWeight: 700 }}>CaeruAI</span>
+          <span style={{ color: "white", fontSize: 28, fontWeight: 700, letterSpacing: "-0.5px" }}>CaeruAI</span>
         </div>
-        <p style={{ color: "#f0f0f0", fontSize: 32, fontWeight: 700, margin: 0 }}>
-          気分を一言入れるだけで、あなた専用の企画を5つ即生成
+
+        {/* Main headline */}
+        <p style={{
+          color: "white",
+          fontSize: 52,
+          fontWeight: 800,
+          lineHeight: 1.15,
+          margin: "0 0 24px 0",
+          letterSpacing: "-1px",
+          maxWidth: 820,
+        }}>
+          AIは企画を作れる。<br />
+          でも、<span style={{ borderBottom: "4px solid white" }}>あなたの</span>企画は作れない。
         </p>
-        <p style={{ color: "#71717a", fontSize: 20, marginTop: 16 }}>
-          AIがあなたの本質を理解して提案
+
+        {/* Sub */}
+        <p style={{ color: "#a1a1aa", fontSize: 24, margin: "0 0 48px 0", fontWeight: 400 }}>
+          プロフィールを読むAI。気分を一言入れるだけで、あなた専用の企画が5つ届く。
         </p>
+
+        {/* Tags */}
+        <div style={{ display: "flex", gap: 12 }}>
+          {["登録不要", "無料", "2問から使える"].map((t) => (
+            <div key={t} style={{
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: 100,
+              padding: "8px 20px",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: 18,
+              fontWeight: 500,
+            }}>{t}</div>
+          ))}
+        </div>
       </div>
     ),
     { ...size }
