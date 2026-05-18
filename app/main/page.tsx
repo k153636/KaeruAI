@@ -74,21 +74,48 @@ export default function MainPage() {
   const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState("");
   const [feedbackMap, setFeedbackMap] = useState<Record<string, "liked" | "disliked" | null>>({});
-  const [inputMode, setInputMode] = useState<"detailed" | "quick">("detailed");
+  const [inputMode, setInputMode] = useState<"detailed" | "quick">("quick");
   const [detailedVisible, setDetailedVisible] = useState(false);
   const [quickVisible, setQuickVisible] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
+  // 初回マウント
   useEffect(() => {
-    if (inputMode === "detailed") {
-      setQuickVisible(false);
-      const t = setTimeout(() => setDetailedVisible(true), 60);
-      return () => clearTimeout(t);
-    } else {
-      setDetailedVisible(false);
-      const t = setTimeout(() => setQuickVisible(true), 60);
-      return () => clearTimeout(t);
+    const t = setTimeout(() => setQuickVisible(true), 60);
+    const seen = localStorage.getItem("kaeruai_tooltip_seen");
+    if (!seen) {
+      const t2 = setTimeout(() => {
+        setShowTooltip(true);
+        setTimeout(() => setTooltipVisible(true), 30);
+      }, 800);
+      return () => { clearTimeout(t); clearTimeout(t2); };
     }
-  }, [inputMode]);
+    return () => clearTimeout(t);
+  }, []);
+
+  function dismissTooltip() {
+    setTooltipVisible(false);
+    setTimeout(() => setShowTooltip(false), 250);
+    localStorage.setItem("kaeruai_tooltip_seen", "1");
+  }
+
+  function switchToMode(newMode: "detailed" | "quick") {
+    if (newMode === "quick") {
+      setDetailedVisible(false);
+      setTimeout(() => {
+        setInputMode("quick");
+        setTimeout(() => setQuickVisible(true), 60);
+      }, 300);
+    } else {
+      dismissTooltip();
+      setQuickVisible(false);
+      setTimeout(() => {
+        setInputMode("detailed");
+        setTimeout(() => setDetailedVisible(true), 60);
+      }, 280);
+    }
+  }
   const [theme, setTheme] = useState("");
   const [condition, setCondition] = useState("");
   const [audience, setAudience] = useState("");
@@ -269,44 +296,66 @@ export default function MainPage() {
         <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl p-6 mb-4">
           <div className="flex items-center justify-between mb-5">
             <h1 className="text-zinc-900 dark:text-white font-bold text-xl">どんな企画がほしい？</h1>
-            <button
-              onClick={() => setInputMode(m => m === "quick" ? "detailed" : "quick")}
-              className="flex items-center gap-1.5 text-xs border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer px-3 py-1.5 rounded-full"
-            >
-              {inputMode === "quick" ? <><IconSliders size={12} />詳細入力</> : <><IconLightning size={12} />クイック</>}
-            </button>
-          </div>
 
-          {/* Quick mode */}
-          <div style={{
-            maxHeight: inputMode === "quick" ? "80px" : "0px",
-            overflow: "hidden",
-            transition: "max-height 0.25s ease",
-          }}>
-            <div style={{
-              opacity: quickVisible ? 1 : 0,
-              transform: quickVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "opacity 0.25s ease, transform 0.25s ease",
-            }}>
-              <input
-                type="text"
-                value={mood}
-                onChange={(e) => setMood(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
-                placeholder="例：やる気ない"
-                className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
-                disabled={loading}
-              />
+            {/* Toggle button + tooltip */}
+            <div className="relative">
+              {showTooltip && (
+                <div
+                  onClick={dismissTooltip}
+                  style={{
+                    opacity: tooltipVisible ? 1 : 0,
+                    transform: tooltipVisible ? "translateY(0) scale(1)" : "translateY(4px) scale(0.97)",
+                    transition: "opacity 0.25s ease, transform 0.25s ease",
+                  }}
+                  className="absolute bottom-full right-0 mb-2.5 cursor-pointer w-52"
+                >
+                  <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs px-3.5 py-2.5 rounded-2xl leading-relaxed shadow-lg">
+                    詳細入力で企画の解像度が上がります
+                  </div>
+                  <div className="absolute top-full right-5 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-zinc-900 dark:border-t-zinc-100" />
+                </div>
+              )}
+              <button
+                onClick={() => switchToMode(inputMode === "quick" ? "detailed" : "quick")}
+                className="flex items-center gap-1.5 text-xs border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer px-3 py-1.5 rounded-full"
+              >
+                {inputMode === "quick" ? <><IconSliders size={12} />詳細入力</> : <><IconLightning size={12} />クイック</>}
+              </button>
             </div>
           </div>
 
-          {/* Detailed mode */}
+          {/* Quick mode — grid for exact height fit */}
           <div style={{
-            maxHeight: inputMode === "detailed" ? "320px" : "0px",
-            overflow: "hidden",
-            transition: "max-height 0.3s ease",
+            display: "grid",
+            gridTemplateRows: inputMode === "quick" ? "1fr" : "0fr",
+            transition: "grid-template-rows 0.3s ease",
           }}>
-            <div className="space-y-0">
+            <div style={{ overflow: "hidden" }}>
+              <div style={{
+                opacity: quickVisible ? 1 : 0,
+                transform: quickVisible ? "translateY(0)" : "translateY(10px)",
+                transition: "opacity 0.25s ease, transform 0.25s ease",
+              }}>
+                <input
+                  type="text"
+                  value={mood}
+                  onChange={(e) => setMood(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+                  placeholder="例：やる気ない"
+                  className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-red-500 transition-colors"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Detailed mode — grid for exact height fit */}
+          <div style={{
+            display: "grid",
+            gridTemplateRows: inputMode === "detailed" ? "1fr" : "0fr",
+            transition: "grid-template-rows 0.35s ease",
+          }}>
+            <div style={{ overflow: "hidden" }}>
               {[
                 { label: "今の状態", value: mood,      setter: setMood,      placeholder: "やる気ない、挑戦したい...", required: true },
                 { label: "テーマ",   value: theme,     setter: setTheme,     placeholder: "AI系、プログラミング...",   required: false },
@@ -318,7 +367,7 @@ export default function MainPage() {
                   style={{
                     opacity: detailedVisible ? 1 : 0,
                     transform: detailedVisible ? "translateY(0)" : "translateY(10px)",
-                    transition: `opacity 0.25s ease ${i * 60}ms, transform 0.25s ease ${i * 60}ms`,
+                    transition: `opacity 0.22s ease ${i * 55}ms, transform 0.22s ease ${i * 55}ms`,
                   }}
                   className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-100 dark:border-zinc-800" : ""}`}
                 >
