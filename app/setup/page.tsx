@@ -445,7 +445,7 @@ function SetupContent() {
           <FadeUp delay={200} className="flex flex-col gap-3">
             <button
               onClick={continueOptional}
-              className="w-full py-4 rounded-2xl font-bold text-base bg-zinc-900 hover:bg-zinc-700 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full py-4 rounded-2xl font-bold text-base bg-zinc-900 hover:opacity-80 text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
             >
               <span>続けて答える</span>
               <IconArrowRight size={18} />
@@ -619,7 +619,7 @@ function SetupContent() {
             <button
               onClick={next}
               disabled={!canNext()}
-              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 hover:bg-zinc-700 text-white flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 hover:opacity-80 text-white flex items-center justify-center gap-2"
             >
               {step < STEPS.length - 1 ? (
                 <><span>次へ</span><IconArrowRight size={18} /></>

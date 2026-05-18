@@ -273,10 +273,10 @@ export default function MainPage() {
             <span>KaeruAI</span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push("/history")} className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer">
+            <button onClick={() => router.push("/history")} className="text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
               履歴
             </button>
-            <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer">
+            <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer">
               <IconUser size={14} />プロフィール
             </button>
             <ThemeToggle size={15} />
@@ -286,14 +286,14 @@ export default function MainPage() {
         {/* Profile tags */}
         <FadeUp delay={60} className="flex flex-wrap gap-2 mb-8">
           {[profile.contentNiche, profile.creatorIdentity].filter(Boolean).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full text-xs text-zinc-500 dark:text-zinc-400">
+            <span key={tag} className="px-3 py-1 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-full text-xs text-zinc-900 dark:text-white font-medium">
               {tag}
             </span>
           ))}
         </FadeUp>
 
         {/* Main input */}
-        <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl p-6 mb-4">
+        <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-6 mb-4">
           <div className="flex items-center justify-between mb-5">
             <h1 className="text-zinc-900 dark:text-white font-bold text-xl">どんな企画がほしい？</h1>
 
@@ -317,7 +317,7 @@ export default function MainPage() {
               )}
               <button
                 onClick={() => switchToMode(inputMode === "quick" ? "detailed" : "quick")}
-                className="flex items-center gap-1.5 text-xs border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer px-3 py-1.5 rounded-full"
+                className="flex items-center gap-1.5 text-xs border border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer px-3 py-1.5 rounded-full"
               >
                 {inputMode === "quick" ? <><IconSliders size={12} />詳細入力</> : <><IconLightning size={12} />クイック</>}
               </button>
@@ -342,7 +342,7 @@ export default function MainPage() {
                   onChange={(e) => setMood(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                   placeholder="例：やる気ない"
-                  className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-500 transition-colors"
+                  className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-4 py-3.5 text-base text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors"
                   disabled={loading}
                 />
               </div>
@@ -369,9 +369,9 @@ export default function MainPage() {
                     transform: detailedVisible ? "translateY(0)" : "translateY(10px)",
                     transition: `opacity 0.22s ease ${i * 55}ms, transform 0.22s ease ${i * 55}ms`,
                   }}
-                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-100 dark:border-zinc-800" : ""}`}
+                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-200 dark:border-zinc-700" : ""}`}
                 >
-                  <span className={`text-xs w-16 shrink-0 ${required ? "font-semibold text-zinc-700 dark:text-zinc-200" : "text-zinc-400 dark:text-zinc-500"}`}>
+                  <span className={`text-xs w-16 shrink-0 ${required ? "font-semibold text-zinc-800 dark:text-zinc-100" : "text-zinc-500 dark:text-zinc-400"}`}>
                     {label}
                   </span>
                   <input
@@ -380,7 +380,7 @@ export default function MainPage() {
                     onChange={(e) => setter(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                     placeholder={placeholder}
-                    className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none"
+                    className="flex-1 bg-transparent text-sm text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-500 focus:outline-none"
                     disabled={loading}
                   />
                 </div>
@@ -409,7 +409,7 @@ export default function MainPage() {
           <FadeUp delay={200} className="mb-8">
             <button
               onClick={() => router.push("/setup?continue=true")}
-              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-200 dark:border-zinc-700 hover:border-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-zinc-400 dark:text-zinc-500 transition-colors cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer flex items-center justify-center gap-2"
             >
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
@@ -426,7 +426,7 @@ export default function MainPage() {
         {displayedIdeas.length > 0 && (
           <div className="space-y-4">
             <div className="mb-1">
-              <h2 className="text-zinc-500 dark:text-zinc-400 text-sm font-medium mb-2">生成された企画（{mood}）</h2>
+              <h2 className="text-zinc-900 dark:text-white text-sm font-medium mb-2">生成された企画（{mood}）</h2>
             </div>
 
             {displayedIdeas.map((idea, i) => {
@@ -459,75 +459,71 @@ export default function MainPage() {
                     }}
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
-                    className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
+                    className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
                     <div className="p-5">
                       <div className="flex items-start gap-3">
-                        <span className="text-zinc-400 dark:text-zinc-500 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
+                        <span className="text-zinc-500 dark:text-zinc-400 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
                         <div className="flex-1 min-w-0">
 
                           <h3 className="text-zinc-900 dark:text-white font-bold text-base mb-2 leading-tight">
                             {idea.title}
                           </h3>
 
-                          <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-3 leading-relaxed">
+                          <p className="text-zinc-900 dark:text-white text-sm mb-3 leading-relaxed">
                             {idea.description}
                           </p>
 
                           <button
                             onClick={() => setExpandedId(expanded ? null : idea.title)}
-                            className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer mb-3 flex items-center gap-1"
+                            className="text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer mb-3 flex items-center gap-1"
                           >
                             {expanded ? "▲ 閉じる" : "▼ フック・構成案・制作手順を見る"}
                           </button>
 
                           {expanded && (
                             <div className="space-y-2 mb-3">
-                              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">{platform.hookLabel}：</span>
-                                <span className="text-xs text-zinc-700 dark:text-zinc-300 ml-1">{idea.hook}</span>
+                              <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
+                                <span className="text-xs text-zinc-900 dark:text-white font-semibold">{platform.hookLabel}：</span>
+                                <span className="text-xs text-zinc-900 dark:text-white ml-1">{idea.hook}</span>
                               </div>
-                              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1">
+                              <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
+                                <div className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white font-semibold mb-1">
                                   <IconImage size={12} />{platform.visualLabel}
                                 </div>
-                                <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">{idea.thumbnail}</p>
+                                <p className="text-xs text-zinc-900 dark:text-white leading-relaxed">{idea.thumbnail}</p>
                               </div>
-                              <div className="bg-zinc-50 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                <div className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 font-medium mb-1">
+                              <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
+                                <div className="flex items-center gap-1.5 text-xs text-zinc-900 dark:text-white font-semibold mb-1">
                                   <IconFilm size={12} />{platform.productionLabel}
                                 </div>
-                                <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-line">{idea.filming}</p>
+                                <p className="text-xs text-zinc-900 dark:text-white leading-relaxed whitespace-pre-line">{idea.filming}</p>
                               </div>
                             </div>
                           )}
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                          <div className="flex items-center gap-2 pt-3 border-t border-zinc-200 dark:border-zinc-700">
                             <button
                               onClick={() => triggerLike(idea)}
                               className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
                                 fb === "liked"
-                                  ? "bg-zinc-100 dark:bg-zinc-800 border-zinc-400 dark:border-zinc-500 text-zinc-700 dark:text-zinc-300"
-                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                                  ? "bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900"
+                                  : "border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60"
                               }`}
                             >
                               <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
                             <button
                               onClick={() => triggerDislike(idea)}
-                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60"
                             >
                               <IconThumbDown size={14} /><span>違う</span>
                             </button>
                             <button
                               onClick={() => copyIdea(idea)}
                               title={copied ? "コピー済み" : "コピー"}
-                              className={`flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer ${
-                                copied
-                                  ? "border-zinc-400 dark:border-zinc-500 text-zinc-700 dark:text-zinc-300"
-                                  : "border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 hover:border-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                              }`}
+                              className="flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60"
                             >
                               <IconCopy size={15} />
                             </button>
@@ -543,7 +539,7 @@ export default function MainPage() {
 
             <button
               onClick={() => { setMood(""); setTheme(""); setCondition(""); setAudience(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
-              className="w-full py-3 rounded-2xl text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 border border-zinc-200 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-500 transition-all cursor-pointer mt-2"
+              className="w-full py-3 rounded-2xl text-sm text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:opacity-60 transition-all cursor-pointer mt-2"
             >
               もう一度生成する
             </button>

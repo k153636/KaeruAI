@@ -408,7 +408,7 @@ export default function ProfilePage() {
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={save}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-zinc-700 text-white text-sm font-medium rounded-2xl transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:opacity-80 text-white text-sm font-medium rounded-2xl transition-colors cursor-pointer"
                       >
                         <IconCheck size={14} />
                         保存
