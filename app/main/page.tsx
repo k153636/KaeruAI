@@ -78,28 +78,12 @@ export default function MainPage() {
   const [inputMode, setInputMode] = useState<"detailed" | "quick">("quick");
   const [detailedVisible, setDetailedVisible] = useState(false);
   const [quickVisible, setQuickVisible] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   // 初回マウント
   useEffect(() => {
     const t = setTimeout(() => setQuickVisible(true), 60);
-    const seen = localStorage.getItem("caeruai_tooltip_seen");
-    if (!seen) {
-      const t2 = setTimeout(() => {
-        setShowTooltip(true);
-        setTimeout(() => setTooltipVisible(true), 30);
-      }, 800);
-      return () => { clearTimeout(t); clearTimeout(t2); };
-    }
     return () => clearTimeout(t);
   }, []);
-
-  function dismissTooltip() {
-    setTooltipVisible(false);
-    setTimeout(() => setShowTooltip(false), 250);
-    localStorage.setItem("caeruai_tooltip_seen", "1");
-  }
 
   function switchToMode(newMode: "detailed" | "quick") {
     if (newMode === "quick") {
@@ -109,7 +93,6 @@ export default function MainPage() {
         setTimeout(() => setQuickVisible(true), 60);
       }, 300);
     } else {
-      dismissTooltip();
       setQuickVisible(false);
       setTimeout(() => {
         setInputMode("detailed");
@@ -313,31 +296,13 @@ export default function MainPage() {
           <div className="flex items-center justify-between mb-5">
             <h1 className="text-zinc-900 dark:text-white font-bold text-xl">どんな企画がほしい？</h1>
 
-            {/* Toggle button + tooltip */}
-            <div className="relative">
-              {showTooltip && (
-                <div
-                  onClick={dismissTooltip}
-                  style={{
-                    opacity: tooltipVisible ? 1 : 0,
-                    transform: tooltipVisible ? "translateY(0) scale(1)" : "translateY(4px) scale(0.97)",
-                    transition: "opacity 0.25s ease, transform 0.25s ease",
-                  }}
-                  className="absolute bottom-full right-0 mb-2.5 cursor-pointer w-52"
-                >
-                  <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-xs px-3.5 py-2.5 rounded-2xl leading-relaxed shadow-lg">
-                    詳細入力で企画の解像度が上がります
-                  </div>
-                  <div className="absolute top-full right-5 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-zinc-900 dark:border-t-zinc-100" />
-                </div>
-              )}
-              <button
-                onClick={() => switchToMode(inputMode === "quick" ? "detailed" : "quick")}
-                className="flex items-center gap-1.5 text-xs border border-zinc-900 dark:border-white text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer px-3 py-1.5 rounded-full"
-              >
-                {inputMode === "quick" ? <><IconSliders size={12} />詳細入力</> : <><IconLightning size={12} />クイック</>}
-              </button>
-            </div>
+            {/* Toggle button */}
+            <button
+              onClick={() => switchToMode(inputMode === "quick" ? "detailed" : "quick")}
+              className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+            >
+              {inputMode === "quick" ? <><IconSliders size={11} />絞り込む</> : <>▲ 閉じる</>}
+            </button>
           </div>
 
           {/* Quick mode — grid for exact height fit */}
