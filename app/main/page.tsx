@@ -292,7 +292,7 @@ export default function MainPage() {
         </FadeUp>
 
         {/* Main input */}
-        <FadeUp delay={120} className="rounded-3xl p-6 mb-4 border border-zinc-700/80" style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)", boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset" }}>
+        <FadeUp delay={120} className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4">
           <div className="flex items-center justify-between mb-5">
             <h1 className="text-white font-bold text-xl">どんな企画がほしい？</h1>
 
@@ -375,11 +375,7 @@ export default function MainPage() {
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
-            className="w-full py-4 rounded-2xl font-bold text-base transition-all active:scale-[0.98] cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed text-zinc-900 flex items-center justify-center gap-2"
-            style={{
-              background: "linear-gradient(180deg, #ffffff 0%, #e4e4e7 100%)",
-              boxShadow: "0 1px 0 rgba(255,255,255,0.6) inset, 0 6px 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.35)",
-            }}
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed bg-white hover:bg-zinc-100 text-zinc-900 flex items-center justify-center gap-2"
           >
             {loading ? (
               <><IconLoader size={18} className="animate-spin" />{retrying ? "リトライ中..." : "企画を考え中..."}</>
@@ -394,8 +390,7 @@ export default function MainPage() {
           <FadeUp delay={200} className="mb-8">
             <button
               onClick={() => router.push("/setup?continue=true")}
-              className="w-full py-3 rounded-2xl text-sm font-medium text-zinc-300 hover:opacity-70 transition-opacity cursor-pointer flex items-center justify-center gap-2"
-              style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset" }}
+              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-600 text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer flex items-center justify-center gap-2"
             >
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
@@ -441,12 +436,11 @@ export default function MainPage() {
                       opacity: isExiting ? 0 : 1,
                       transition,
                       transformOrigin: "bottom center",
-                      background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)",
-                      boxShadow: isDragging ? "0 16px 40px rgba(0,0,0,0.5)" : "0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 8px rgba(0,0,0,0.3)",
+                      boxShadow: isDragging ? "0 16px 40px rgba(0,0,0,0.12)" : undefined,
                     }}
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
-                    className="rounded-3xl overflow-hidden relative touch-pan-y select-none border border-zinc-700/80"
+                    className="bg-zinc-900 border border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
                     <div className="p-5">
                       <div className="flex items-start gap-3">
@@ -495,10 +489,9 @@ export default function MainPage() {
                               onClick={() => triggerLike(idea)}
                               className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
                                 fb === "liked"
-                                  ? "border-white/80 text-zinc-900"
+                                  ? "bg-white border-white text-zinc-900"
                                   : "border-zinc-600 text-zinc-300 hover:opacity-60"
                               }`}
-                            style={fb === "liked" ? { background: "linear-gradient(180deg,#fff 0%,#e4e4e7 100%)", boxShadow: "0 1px 0 rgba(255,255,255,0.5) inset, 0 2px 8px rgba(0,0,0,0.4)" } : undefined}
                             >
                               <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
@@ -527,8 +520,7 @@ export default function MainPage() {
 
             <button
               onClick={() => { setMood(""); setTheme(""); setCondition(""); setAudience(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
-              className="w-full py-3 rounded-2xl text-sm text-zinc-300 hover:opacity-70 transition-all cursor-pointer mt-2"
-              style={{ background: "linear-gradient(135deg, rgb(28,28,32) 0%, rgb(18,18,21) 100%)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 1px 0 rgba(255,255,255,0.05) inset" }}
+              className="w-full py-3 rounded-2xl text-sm text-zinc-300 border border-zinc-600 hover:opacity-60 transition-all cursor-pointer mt-2"
             >
               もう一度生成する
             </button>
