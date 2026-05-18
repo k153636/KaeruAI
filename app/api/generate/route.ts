@@ -17,6 +17,7 @@ function getGroq() {
   return new Groq({ apiKey: process.env.GROQ_API_KEY });
 }
 
+// ── Stage 1: 生成プロンプト ──────────────────────────────────────────────────
 
 const SYSTEM_PROMPT = `あなたは鋭い企画眼を持つコンテンツプロデューサーです。
 
@@ -56,6 +57,31 @@ const SYSTEM_PROMPT = `あなたは鋭い企画眼を持つコンテンツプロ
 返答は必ず指定されたJSON形式のみで行い、前後に余分なテキストを一切含めないでください。
 すべての出力は日本語で行ってください。`;
 
+// ── Stage 2: 批評・改善プロンプト ─────────────────────────────────────────────
+
+const CRITIQUE_SYSTEM_PROMPT = `あなたは厳格な企画品質審査員です。渡された5つの企画ドラフトを審査し、基準を満たしていないものを書き直して返します。
+
+【審査基準】
+1. タイトルに「意外な結果・断言・具体的すぎる状況・未完の問い」のいずれかがあるか
+2. プロフィールの複数の要素が交差しているか（1つの要素だけに依存していないか）
+3. 「〇〇してみた」「〜の記録」「おすすめ〇選」「ツール紹介」など禁止パターンに引っかかっていないか
+4. 5企画それぞれが異なるフォーマット（考察・批評・実験・ドキュメント・対話 など）になっているか
+5. プロフィールにない属性が主役になっていないか
+
+【過去フィードバックの扱い】
+- 「好みの傾向」に近いテイストの企画は積極的に残す・強化する
+- 「避けてほしい傾向」に近いタイトルや企画は必ず書き直す
+
+【改善の方針】
+- 基準を満たしている企画はそのまま返す（過剰に書き直さない）
+- 基準を満たしていない企画だけを書き直す
+- 書き直す際はプロフィールの別の交差点を探して完全に作り直す
+
+返答は必ず指定されたJSON形式のみで行い、前後に余分なテキストを一切含めないでください。
+すべての出力は日本語で行ってください。`;
+
+// ── プロフィール narrative ────────────────────────────────────────────────────
+
 function buildProfileNarrative(profile: Profile): string {
   const sentences: string[] = [];
   if (profile.creatorIdentity)   sentences.push(`${profile.creatorIdentity}タイプ`);
@@ -72,6 +98,8 @@ function buildProfileNarrative(profile: Profile): string {
   if (profile.dreamGoal)         sentences.push(`1年後の理想は${profile.dreamGoal}`);
   return sentences.join("。") + "。";
 }
+
+// ── Stage 1 ユーザープロンプト ─────────────────────────────────────────────────
 
 function buildUserPrompt(mood: string, theme: string, condition: string, audience: string, profile: Profile, feedback: FeedbackStore): string {
   const platform = getPlatform(profile.platform);
@@ -93,8 +121,7 @@ ${profile.contentNiche}
 
 【このクリエイター像】
 ${profileNarrative}
-${feedbackSection}
-【今の状態】
+${feedbackSection}【今の状態】
 ${mood}
 ${[theme && `テーマ：${theme}`, condition && `条件：${condition}`, audience && `視聴者：${audience}`].filter(Boolean).join("\n") ? `\n【追加指定】（必ず反映すること）\n${[theme && `テーマ：${theme}`, condition && `条件：${condition}`, audience && `視聴者：${audience}`].filter(Boolean).join("\n")}\n` : ""}${profile.avoid ? `\n【絶対に含めないこと】\n${profile.avoid}` : ""}
 
@@ -116,6 +143,44 @@ ${[theme && `テーマ：${theme}`, condition && `条件：${condition}`, audien
 - 一人で制作できるスケール感
 - 5企画それぞれ異なる切り口・フォーマット・トーン`;
 }
+
+// ── Stage 2 批評プロンプト ────────────────────────────────────────────────────
+
+function buildCritiquePrompt(ideas: Idea[], profile: Profile, feedback: FeedbackStore, platform: ReturnType<typeof getPlatform>): string {
+  const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
+  const dislikedTitles = feedback.disliked.slice(0, 5).map((e) => `・${e.title}`).join("\n");
+
+  const feedbackSection =
+    likedTitles || dislikedTitles
+      ? `【過去フィードバック】\n${likedTitles ? `好みの傾向：\n${likedTitles}\n` : ""}${dislikedTitles ? `避けてほしい傾向：\n${dislikedTitles}` : ""}\n\n`
+      : "";
+
+  const profileNarrative = buildProfileNarrative(profile);
+
+  const ideasJson = JSON.stringify({ ideas }, null, 2);
+
+  return `【クリエイター情報】
+${profileNarrative}
+${profile.avoid ? `絶対に含めないこと：${profile.avoid}\n` : ""}
+${feedbackSection}【審査対象の企画ドラフト】
+${ideasJson}
+
+上記5企画を審査基準に照らして評価し、必要なものだけ書き直してください。
+同じJSON形式で5企画を返してください：
+{
+  "ideas": [
+    {
+      "title": "...",
+      "description": "...",
+      "hook": "${platform.hookPlaceholder}",
+      "thumbnail": "...",
+      "filming": "..."
+    }
+  ]
+}`;
+}
+
+// ── AI呼び出し ────────────────────────────────────────────────────────────────
 
 async function callGemini(systemPrompt: string, userPrompt: string): Promise<string> {
   const completion = await getOpenRouter().chat.completions.create({
@@ -154,6 +219,17 @@ async function callAI(isOwner: boolean, systemPrompt: string, userPrompt: string
   return await callGroq(systemPrompt, userPrompt);
 }
 
+function parseIdeas(text: string): Idea[] {
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("JSONが見つかりませんでした");
+  const repaired = jsonMatch[0].replace(/,(\s*[}\]])/g, "$1");
+  const parsed = JSON.parse(repaired) as { ideas: Idea[] };
+  if (!Array.isArray(parsed.ideas)) throw new Error("ideasが配列ではありません");
+  return parsed.ideas;
+}
+
+// ── POST ──────────────────────────────────────────────────────────────────────
+
 export async function POST(request: Request) {
   try {
     const { mood, theme, condition, audience, profile, feedback } = (await request.json()) as {
@@ -190,28 +266,44 @@ export async function POST(request: Request) {
       return Response.json({ error: "API キーが設定されていません" }, { status: 500 });
     }
 
-    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, feedback ?? { liked: [], disliked: [] });
+    const safeFeeback: FeedbackStore = feedback ?? { liked: [], disliked: [] };
+    const platform = getPlatform(profile.platform);
 
-    let text = "";
+    // ── Stage 1: ドラフト生成 ────────────────────────────────────────────────
+    console.log("[generate] stage1: drafting");
+    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, safeFeeback);
+
+    let stage1Text = "";
     try {
-      text = await callAI(isOwner, SYSTEM_PROMPT, userPrompt);
+      stage1Text = await callAI(isOwner, SYSTEM_PROMPT, userPrompt);
     } catch {
       await new Promise((r) => setTimeout(r, 2000));
-      text = await callAI(isOwner, SYSTEM_PROMPT, userPrompt);
+      stage1Text = await callAI(isOwner, SYSTEM_PROMPT, userPrompt);
     }
 
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error("Groq raw response:", text);
-      return Response.json(
-        { error: "AIの返答を解析できませんでした。もう一度お試しください。" },
-        { status: 500 }
-      );
+    const draftIdeas = parseIdeas(stage1Text);
+    console.log("[generate] stage1: got", draftIdeas.length, "drafts");
+
+    // ── Stage 2: 批評・改善 ──────────────────────────────────────────────────
+    console.log("[generate] stage2: critiquing");
+    const critiquePrompt = buildCritiquePrompt(draftIdeas, profile, safeFeeback, platform);
+
+    let finalIdeas = draftIdeas;
+    try {
+      const stage2Text = await callAI(isOwner, CRITIQUE_SYSTEM_PROMPT, critiquePrompt);
+      const refined = parseIdeas(stage2Text);
+      if (refined.length === 5) {
+        finalIdeas = refined;
+        console.log("[generate] stage2: refined successfully");
+      } else {
+        console.warn("[generate] stage2: unexpected count, using draft");
+      }
+    } catch (e) {
+      // Stage 2が失敗してもStage 1の結果を返す（品質より可用性を優先）
+      console.warn("[generate] stage2 failed, using draft:", e instanceof Error ? e.message : e);
     }
 
-    const repaired = jsonMatch[0].replace(/,(\s*[}\]])/g, "$1");
-    const parsed = JSON.parse(repaired) as { ideas: Idea[] };
-    return Response.json(parsed);
+    return Response.json({ ideas: finalIdeas });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     console.error("Generate error:", message);
