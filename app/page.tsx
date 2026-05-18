@@ -73,8 +73,12 @@ function LightBtn({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="inline-flex items-center gap-2.5 bg-white hover:bg-zinc-100 active:scale-95 text-zinc-900 font-bold text-base px-8 py-4 rounded-2xl border border-white transition-all cursor-pointer"
-      style={{ boxShadow: "0 6px 24px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.3)" }}
+      className="inline-flex items-center gap-2.5 font-bold text-base px-8 py-4 rounded-2xl transition-all active:scale-95 hover:opacity-90 cursor-pointer"
+      style={{
+        backgroundColor: '#ffffff',
+        color: '#09090b',
+        boxShadow: "0 6px 24px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.3)",
+      }}
     >
       <IconSparkle size={18} />
       {label}
@@ -442,7 +446,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex gap-2 pt-4 border-t border-zinc-700">
-                    <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm border bg-white border-white text-zinc-900 font-semibold">♡ いい感じ</div>
+                    <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm border font-semibold" style={{ backgroundColor: '#ffffff', color: '#09090b', borderColor: '#ffffff' }}>♡ いい感じ</div>
                     <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm border border-zinc-600 text-zinc-500">× 違う</div>
                     <div className="flex items-center justify-center w-10 rounded-xl border border-zinc-600 text-zinc-500 text-sm">⎘</div>
                   </div>

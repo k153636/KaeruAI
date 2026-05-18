@@ -375,7 +375,8 @@ export default function MainPage() {
           <button
             onClick={generate}
             disabled={!mood.trim() || loading}
-            className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed bg-white hover:bg-zinc-100 text-zinc-900 flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl font-bold text-base transition-all active:scale-[0.98] cursor-pointer disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:opacity-90"
+            style={{ backgroundColor: '#ffffff', color: '#09090b' }}
           >
             {loading ? (
               <><IconLoader size={18} className="animate-spin" />{retrying ? "リトライ中..." : "企画を考え中..."}</>
@@ -489,9 +490,10 @@ export default function MainPage() {
                               onClick={() => triggerLike(idea)}
                               className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
                                 fb === "liked"
-                                  ? "bg-white border-white text-zinc-900"
+                                  ? "border-white/80"
                                   : "border-zinc-600 text-zinc-300 hover:opacity-60"
                               }`}
+                            style={fb === "liked" ? { backgroundColor: '#ffffff', color: '#09090b' } : undefined}
                             >
                               <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
