@@ -279,7 +279,7 @@ export default function Home() {
       <div className="bg-zinc-900 py-7">
         <div className="max-w-3xl mx-auto px-6">
           <div className="grid grid-cols-3 gap-4 text-center divide-x divide-zinc-700/60">
-            {[{ num: "8", label: "対応プラットフォーム" }, { num: "2問", label: "から使い始められる" }, { num: "無料", label: "登録不要で今すぐ" }].map(s => (
+            {[{ num: "9", label: "対応プラットフォーム" }, { num: "2問", label: "から使い始められる" }, { num: "無料", label: "登録不要で今すぐ" }].map(s => (
               <div key={s.label} className="px-4">
                 <div className="font-bold text-2xl sm:text-3xl mb-1 text-white">{s.num}</div>
                 <div className="text-xs sm:text-sm text-zinc-400">{s.label}</div>

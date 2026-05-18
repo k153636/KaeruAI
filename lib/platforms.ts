@@ -73,13 +73,22 @@ export const PLATFORMS: Platform[] = [
     hookPlaceholder: "配信開始直後のあいさつと今日のテーマ告知（1分以内）",
   },
   {
-    id: "roblox",
-    label: "Roblox",
+    id: "roblox-dev",
+    label: "Roblox（ゲーム制作）",
     contentWord: "ゲーム / 体験",
     hookLabel: "ゲーム紹介文",
     visualLabel: "アイコン / サムネイル案",
     productionLabel: "開発メモ",
     hookPlaceholder: "ゲームページの最初の説明文（プレイヤーを引き込む2〜3文）",
+  },
+  {
+    id: "roblox-play",
+    label: "Roblox（実況・プレイ動画）",
+    contentWord: "動画",
+    hookLabel: "冒頭15秒のフック",
+    visualLabel: "サムネイル案",
+    productionLabel: "撮影メモ",
+    hookPlaceholder: "冒頭15秒のセリフ（視聴者を引き込む一言から始める）",
   },
 ];
 
