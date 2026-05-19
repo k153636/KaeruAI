@@ -405,12 +405,18 @@ export default function MainPage() {
         {unansweredCount > 0 && (
           <FadeUp delay={200} className="mb-8">
 
-            {/* 吹き出し警告 */}
+            <div className="relative">
+            {/* 吹き出し警告（レイアウトに影響しない absolute） */}
             {warningMounted && unansweredCount >= 10 && (
               <div
                 onClick={dismissWarning}
-                className="mb-2 cursor-pointer"
+                className="cursor-pointer"
                 style={{
+                  position: "absolute",
+                  bottom: "calc(100% + 2px)",
+                  left: 0,
+                  right: 0,
+                  zIndex: 10,
                   opacity: warningVisible ? 1 : 0,
                   transform: warningVisible ? "translateY(0)" : "translateY(6px)",
                   transition: "opacity 0.35s ease, transform 0.35s ease",
@@ -446,6 +452,7 @@ export default function MainPage() {
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
             </button>
+            </div>
           </FadeUp>
         )}
 
