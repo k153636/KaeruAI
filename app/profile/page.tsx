@@ -17,6 +17,7 @@ const FIELDS: {
   options?: string[];
   optionLabels?: Record<string, string>;
   maxSelect?: number;
+  placeholder?: string;
 }[] = [
   {
     id: "platform",
@@ -27,18 +28,9 @@ const FIELDS: {
   },
   {
     id: "contentNiche",
-    label: "ここへ来た目的",
-    type: "multiselect",
-    options: [
-      "ネタ切れを解消したい",
-      "バズる企画を量産したい",
-      "チャンネルの方向性を固めたい",
-      "継続して投稿できるようになりたい",
-      "新しいジャンルに挑戦したい",
-      "フォロワーを増やしたい",
-      "収益化を目指したい",
-      "自分らしい発信スタイルを見つけたい",
-    ],
+    label: "発信ジャンル・テーマ",
+    type: "text",
+    placeholder: "例：Roblox開発、料理、プログラミング、ファッション、筋トレ",
   },
   {
     id: "motivation",
@@ -328,7 +320,8 @@ export default function ProfilePage() {
                         onChange={(e) => setDraft(e.target.value)}
                         rows={3}
                         autoFocus
-                        className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors text-sm resize-none"
+                        placeholder={editingField.placeholder}
+                        className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors text-sm resize-none"
                       />
                     ) : (
                       <div>
