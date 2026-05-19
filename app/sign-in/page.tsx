@@ -19,31 +19,26 @@ export default function SignInPage() {
     const supabase = createSupabaseBrowser();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
+      options: { redirectTo: `${location.origin}/auth/callback` },
     });
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950 px-4">
       <div className="w-full max-w-sm">
-        <div className="flex items-center justify-center gap-2 text-zinc-900 dark:text-white font-bold text-xl mb-10">
+        <div className="flex items-center justify-center gap-2 text-white font-bold text-xl mb-10">
           <IconCamera size={22} />
           <span>CaeruAI</span>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 shadow-sm">
-          <h1 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">
-            ログイン
-          </h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-            Googleアカウントで続けてください
-          </p>
+        <div className="rounded-3xl p-8" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
+          <h1 className="text-lg font-semibold text-white mb-1 tracking-tight">ログイン</h1>
+          <p className="text-sm text-white/40 mb-6">Googleアカウントで続けてください</p>
 
           <button
             onClick={signInWithGoogle}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-xl text-sm font-semibold text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-white/80 hover:text-white transition-colors cursor-pointer"
+            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)" }}
           >
             <IconGoogle />
             Googleでログイン
