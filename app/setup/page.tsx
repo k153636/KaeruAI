@@ -315,6 +315,12 @@ function SetupContent() {
     return value.split(SEPARATOR).includes(opt);
   }
 
+  function shouldSkip(stepIndex: number, currentAnswers: typeof answers): boolean {
+    const s = STEPS[stepIndex];
+    if (s?.id === "youtubeChannelUrl" && currentAnswers.platform !== "youtube") return true;
+    return false;
+  }
+
   function goStep(n: number) {
     setCustomInput("");
     setStep(n);
@@ -380,7 +386,8 @@ function SetupContent() {
       return;
     }
 
-    const nextStep = step + 1;
+    let nextStep = step + 1;
+    while (nextStep < STEPS.length && shouldSkip(nextStep, answers)) nextStep++;
     if (nextStep >= STEPS.length) {
       finishSetup();
       return;
@@ -390,7 +397,9 @@ function SetupContent() {
 
   function continueOptional() {
     setPhase("optional");
-    goStep(REQUIRED_STEPS);
+    let firstStep = REQUIRED_STEPS;
+    while (firstStep < STEPS.length && shouldSkip(firstStep, answers)) firstStep++;
+    goStep(firstStep);
   }
 
   function exitToMain() {
@@ -607,7 +616,9 @@ function SetupContent() {
                 if (step === REQUIRED_STEPS && isOptionalPhase) {
                   fromMain ? exitToMain() : setPhase("interstitial");
                 } else {
-                  goStep(step - 1);
+                  let prevStep = step - 1;
+                  while (prevStep > 0 && shouldSkip(prevStep, answers)) prevStep--;
+                  goStep(prevStep);
                 }
               }}
               className="flex items-center gap-2 px-6 py-4 rounded-2xl font-medium text-sm text-white/50 hover:opacity-60 transition-opacity cursor-pointer"
