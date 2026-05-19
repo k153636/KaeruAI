@@ -1,6 +1,7 @@
 export interface Profile {
   platform: string;
   contentNiche: string;
+  youtubeChannelUrl?: string;
   motivation?: string;
   bestComment?: string;
   creativeTriger?: string;
@@ -14,6 +15,25 @@ export interface Profile {
   hobby?: string;
   expertise?: string;
   dreamGoal?: string;
+}
+
+export interface YoutubeChannelData {
+  channelId: string;
+  channelName: string;
+  subscriberCount: number;
+  videoCount: number;
+  topVideos: Array<{ title: string; viewCount: number }>;
+  fetchedAt: number;
+}
+
+export interface TrendingVideo {
+  title: string;
+  viewCount: number;
+}
+
+export interface TrendingData {
+  videos: TrendingVideo[];
+  fetchedAt: number;
 }
 
 export interface Idea {

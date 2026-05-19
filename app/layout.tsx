@@ -1,7 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { Inter, Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
 import { Analytics } from "@vercel/analytics/next";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ["latin"],
+  variable: "--font-noto",
+  weight: ["300", "400", "500", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? "https://caeruai.vercel.app"),
@@ -30,7 +44,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className="h-full dark">
+    <html lang="ja" className={`h-full dark ${inter.variable} ${notoSansJP.variable}`}>
       <body className="min-h-full"><PageTransition>{children}</PageTransition><Analytics /></body>
     </html>
   );

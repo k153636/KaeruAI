@@ -8,7 +8,10 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-noto), var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-feature-settings: "palt";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Theme transition */
@@ -82,8 +85,20 @@ html {
 /* ── Animations ── */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes revealUp {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* モバイル（タッチデバイス）: opacityのみでアニメーション（transformはiOS Safariのヒットテストバグを引き起こす） */
+@media (pointer: coarse) {
+  .reveal-mobile {
+    animation: revealUp 0.55s ease var(--reveal-delay, 0ms) both;
+  }
 }
 
 .page-fade {
@@ -91,8 +106,8 @@ html {
 }
 
 @keyframes staggerIn {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .stagger-item {
