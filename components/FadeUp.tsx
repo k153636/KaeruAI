@@ -28,7 +28,7 @@ export default function FadeUp({
     const el = ref.current;
     if (!el) return;
     el.style.opacity = "0";
-    el.style.transform = "translateY(18px)";
+    el.style.transform = "";
     el.style.transition = "none";
   }, [triggerKey]);
 
@@ -40,9 +40,8 @@ export default function FadeUp({
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
         if (!el) return;
-        el.style.transition = `opacity 0.2s ease-out ${delay}ms, transform 0.2s ease-out ${delay}ms`;
+        el.style.transition = `opacity 0.2s ease-out ${delay}ms`;
         el.style.opacity = "1";
-        el.style.transform = "translateY(0)";
       });
     });
     return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
@@ -50,7 +49,7 @@ export default function FadeUp({
 
   const AnyTag = Tag as any;
   return (
-    <AnyTag ref={ref} className={className} style={{ ...style, opacity: 0, transform: "translateY(18px)" }} {...rest}>
+    <AnyTag ref={ref} className={className} style={{ ...style, opacity: 0 }} {...rest}>
       {children}
     </AnyTag>
   );
