@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { Profile, Idea } from "@/lib/types";
+import type { Profile, Idea, YoutubeChannelData, TrendingData } from "@/lib/types";
 import { loadProfile } from "@/lib/profile";
+import { storage } from "@/lib/storage";
 import { getFeedback, getFeedbackState, addLiked, addDisliked, removeFeedback } from "@/lib/feedback";
 import { addHistory } from "@/lib/history";
 import { syncPush } from "@/lib/sync";
@@ -11,13 +12,57 @@ import { createSupabaseBrowser } from "@/lib/supabase";
 import { IconCamera, IconThumbUp, IconThumbDown, IconSparkle, IconUser, IconLoader } from "@/components/icons";
 import { getPlatform } from "@/lib/platforms";
 import FadeUp from "@/components/FadeUp";
+import BottomNav from "@/components/BottomNav";
 
 
 const OPTIONAL_FIELDS: (keyof Profile)[] = [
-  "creatorIdentity", "targetAudience", "contentApproach", "motivation",
+  "youtubeChannelUrl", "creatorIdentity", "targetAudience", "contentApproach", "motivation",
   "avoid", "audienceRelation", "bestComment", "creativeTriger",
   "processingStyle", "successDefinition", "hobby", "expertise", "dreamGoal",
 ];
+
+const YT_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7日
+const TREND_CACHE_TTL = 60 * 60 * 1000; // 1時間
+
+async function fetchTrendingData(niche: string): Promise<TrendingData | null> {
+  const cacheKey = `trend_cache_${niche}`;
+  if (typeof window !== "undefined") {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const data: TrendingData = JSON.parse(cached);
+      if (Date.now() - data.fetchedAt < TREND_CACHE_TTL) return data;
+    }
+  }
+  try {
+    const res = await fetch(`/api/trending?niche=${encodeURIComponent(niche)}`);
+    if (!res.ok) return null;
+    const data: TrendingData = await res.json();
+    if (typeof window !== "undefined") localStorage.setItem(cacheKey, JSON.stringify(data));
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchYoutubeData(channelUrl: string): Promise<YoutubeChannelData | null> {
+  const cacheKey = `yt_cache_${channelUrl}`;
+  if (typeof window !== "undefined") {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const data: YoutubeChannelData = JSON.parse(cached);
+      if (Date.now() - data.fetchedAt < YT_CACHE_TTL) return data;
+    }
+  }
+  try {
+    const res = await fetch(`/api/youtube?channelUrl=${encodeURIComponent(channelUrl)}`);
+    if (!res.ok) return null;
+    const data: YoutubeChannelData = await res.json();
+    if (typeof window !== "undefined") localStorage.setItem(cacheKey, JSON.stringify(data));
+    return data;
+  } catch {
+    return null;
+  }
+}
 
 function IconCopy({ size = 14 }: { size?: number }) {
   return (
@@ -129,6 +174,7 @@ export default function MainPage() {
   // ── Pointer events (mouse drag on desktop) ──────────────────────────
   function onPointerDown(e: React.PointerEvent, id: string) {
     if (e.pointerType === "touch") return; // touch handled separately
+    if ((e.target as HTMLElement).closest("button")) return; // ボタンクリックは通す
     dragStart.current = { id, x: e.clientX, y: e.clientY, horizontal: true };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }
@@ -154,6 +200,7 @@ export default function MainPage() {
 
   // ── Touch events (mobile swipe) ──────────────────────────────────────
   function onTouchStart(e: React.TouchEvent, id: string) {
+    if ((e.target as HTMLElement).closest("button")) return; // ボタンタップは通す
     dragStart.current = { id, x: e.touches[0].clientX, y: e.touches[0].clientY, horizontal: null };
   }
 
@@ -228,10 +275,15 @@ export default function MainPage() {
     setRemovedIds(new Set());
 
     try {
+      const [youtubeData, trendingData] = await Promise.all([
+        profile.youtubeChannelUrl ? fetchYoutubeData(profile.youtubeChannelUrl) : null,
+        profile.contentNiche ? fetchTrendingData(profile.contentNiche) : null,
+      ]);
+
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mood: mood.trim(), theme: theme.trim(), condition: condition.trim(), audience: audience.trim(), profile, feedback: getFeedback() }),
+        body: JSON.stringify({ mood: mood.trim(), theme: theme.trim(), condition: condition.trim(), audience: audience.trim(), profile, feedback: getFeedback(), youtubeData, trendingData }),
       });
 
       if (!res.ok) {
@@ -268,7 +320,8 @@ export default function MainPage() {
   const displayedIdeas = ideas.filter((idea) => !removedIds.has(idea.title));
 
   return (
-    <div className="min-h-dvh bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
+    <>
+    <div className="min-h-dvh bg-zinc-950 px-4 py-10 pb-[calc(env(safe-area-inset-bottom)+72px)] sm:pb-10">
 
       <div className="max-w-xl mx-auto">
 
@@ -279,18 +332,20 @@ export default function MainPage() {
             <span>CaeruAI</span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push("/history")} className="text-xs text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer">
+            {/* デスクトップのみ表示 — モバイルはBottomNavで代替 */}
+            <button onClick={() => router.push("/history")} className="hidden sm:inline text-xs text-white/50 hover:opacity-60 transition-opacity cursor-pointer">
               履歴
             </button>
-            <button onClick={() => router.push("/profile")} className="flex items-center gap-1.5 text-xs text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer">
+            <button onClick={() => router.push("/profile")} className="hidden sm:flex items-center gap-1.5 text-xs text-white/50 hover:opacity-60 transition-opacity cursor-pointer">
               <IconUser size={14} />プロフィール
             </button>
             <button
               onClick={async () => {
+                storage.clear();
                 await createSupabaseBrowser().auth.signOut();
                 window.location.href = "/";
               }}
-              className="text-xs text-zinc-500 hover:opacity-60 transition-opacity cursor-pointer"
+              className="text-xs text-white/30 hover:opacity-60 transition-opacity cursor-pointer"
             >
               ログアウト
             </button>
@@ -300,21 +355,21 @@ export default function MainPage() {
         {/* Profile tags */}
         <FadeUp delay={60} className="flex flex-wrap gap-2 mb-8">
           {[profile.contentNiche, profile.creatorIdentity].filter(Boolean).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-zinc-800 border border-zinc-600 rounded-full text-xs text-zinc-200 font-medium">
+            <span key={tag} className="px-3 py-1 rounded-full text-xs text-white/60 font-medium" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
               {tag}
             </span>
           ))}
         </FadeUp>
 
         {/* Main input */}
-        <FadeUp delay={120} className="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4">
+        <FadeUp delay={120} className="rounded-3xl p-6 mb-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
           <div className="flex items-center justify-between mb-5">
-            <h1 className="text-white font-bold text-xl">どんな企画がほしい？</h1>
+            <h1 className="text-white font-semibold text-xl tracking-tight">どんな企画がほしい？</h1>
 
             {/* Toggle button */}
             <button
               onClick={() => switchToMode(inputMode === "quick" ? "detailed" : "quick")}
-              className="flex items-center gap-1 text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs text-white/35 hover:text-white/60 transition-colors cursor-pointer"
             >
               {inputMode === "quick" ? <><IconSliders size={11} />絞り込む</> : <>▲ 閉じる</>}
             </button>
@@ -338,7 +393,8 @@ export default function MainPage() {
                   onChange={(e) => setMood(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                   placeholder="例：やる気ない"
-                  className="w-full bg-zinc-800 border border-zinc-600 rounded-2xl px-4 py-3.5 text-base text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-400 transition-colors"
+                  className="w-full rounded-2xl px-4 py-3.5 text-base text-white placeholder-white/25 focus:outline-none transition-colors"
+                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
                   disabled={loading}
                 />
               </div>
@@ -365,9 +421,9 @@ export default function MainPage() {
                     transform: detailedVisible ? "translateY(0)" : "translateY(10px)",
                     transition: `opacity 0.22s ease ${i * 55}ms, transform 0.22s ease ${i * 55}ms`,
                   }}
-                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-zinc-700" : ""}`}
+                  className={`flex items-center gap-4 py-2.5 ${i < arr.length - 1 ? "border-b border-white/[0.07]" : ""}`}
                 >
-                  <span className={`text-xs w-16 shrink-0 ${required ? "font-semibold text-zinc-200" : "text-zinc-500"}`}>
+                  <span className={`text-xs w-16 shrink-0 ${required ? "font-medium text-white/80" : "text-white/30"}`}>
                     {label}
                   </span>
                   <input
@@ -376,7 +432,8 @@ export default function MainPage() {
                     onChange={(e) => setter(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
                     placeholder={placeholder}
-                    className="flex-1 bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+                    className="flex-1 bg-transparent text-white placeholder-white/25 focus:outline-none"
+                    style={{ fontSize: 16 }}
                     disabled={loading}
                   />
                 </div>
@@ -420,6 +477,7 @@ export default function MainPage() {
                   opacity: warningVisible ? 1 : 0,
                   transform: warningVisible ? "translateY(0)" : "translateY(6px)",
                   transition: "opacity 0.35s ease, transform 0.35s ease",
+                  pointerEvents: warningVisible ? "auto" : "none",
                 }}
               >
                 <div style={{
@@ -447,7 +505,8 @@ export default function MainPage() {
 
             <button
               onClick={() => router.push("/setup?continue=true")}
-              className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-600 text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-2xl text-sm font-medium text-white/40 hover:text-white/60 transition-colors cursor-pointer flex items-center justify-center gap-2"
+              style={{ border: "1px solid rgba(255,255,255,0.1)" }}
             >
               ✦ 精度を上げる
               <span className="text-xs opacity-70">（残り {unansweredCount} 問）</span>
@@ -458,14 +517,14 @@ export default function MainPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl p-4 mb-6 text-red-600 dark:text-red-400 text-sm">{error}</div>
+          <div className="rounded-2xl p-4 mb-6 text-sm text-white/70" style={{ background: "rgba(255,80,80,0.1)", border: "1px solid rgba(255,80,80,0.2)" }}>{error}</div>
         )}
 
         {/* Ideas */}
         {displayedIdeas.length > 0 && (
           <div className="space-y-4">
             <div className="mb-1">
-              <h2 className="text-zinc-400 text-sm font-medium mb-2">生成された企画（{mood}）</h2>
+              <h2 className="text-white/40 text-sm font-medium mb-2">生成された企画（{mood}）</h2>
             </div>
 
             {displayedIdeas.map((idea, i) => {
@@ -495,75 +554,80 @@ export default function MainPage() {
                       transition,
                       transformOrigin: "bottom center",
                       boxShadow: isDragging ? "0 16px 40px rgba(0,0,0,0.12)" : undefined,
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.09)",
                     }}
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
-                    className="bg-zinc-900 border border-zinc-700 rounded-3xl overflow-hidden relative touch-pan-y select-none"
+                    className="rounded-3xl overflow-hidden relative touch-pan-y select-none"
                   >
                     <div className="p-5">
                       <div className="flex items-start gap-3">
-                        <span className="text-zinc-600 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
+                        <span className="text-white/20 font-semibold text-base leading-none mt-0.5 shrink-0">{i + 1}</span>
                         <div className="flex-1 min-w-0">
 
-                          <h3 className="text-white font-bold text-base mb-2 leading-tight select-text">
+                          <h3 className="text-white font-semibold text-base mb-2 leading-snug tracking-tight select-text">
                             {idea.title}
                           </h3>
 
-                          <p className="text-zinc-300 text-sm mb-3 leading-relaxed select-text">
+                          <p className="text-white/60 text-sm mb-3 leading-relaxed select-text">
                             {idea.description}
                           </p>
 
                           <button
                             onClick={() => setExpandedId(expanded ? null : idea.title)}
-                            className="text-xs text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer mb-3 flex items-center gap-1"
+                            className="text-xs text-white/35 hover:text-white/60 transition-colors cursor-pointer mb-3 flex items-center gap-1"
+                            style={{ touchAction: "manipulation" }}
                           >
-                            {expanded ? "▲ 閉じる" : "▼ フック・構成案・制作手順を見る"}
+                            {expanded ? "▲ 閉じる" : "▼ フック・構成案・制作手順"}
                           </button>
 
                           {expanded && (
                             <div className="space-y-2 mb-3">
-                              <div className="bg-zinc-800 rounded-xl px-3 py-2">
-                                <span className="text-xs text-white font-semibold">{platform.hookLabel}：</span>
-                                <span className="text-xs text-zinc-900 dark:text-white ml-1 select-text">{idea.hook}</span>
+                              <div className="rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                <span className="text-xs text-white/50 font-medium">{platform.hookLabel}：</span>
+                                <span className="text-xs text-white/80 ml-1 select-text">{idea.hook}</span>
                               </div>
-                              <div className="bg-zinc-800 rounded-xl px-3 py-2">
-                                <div className="flex items-center gap-1.5 text-xs text-white font-semibold mb-1">
+                              <div className="rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                <div className="flex items-center gap-1.5 text-xs text-white/50 font-medium mb-1">
                                   <IconImage size={12} />{platform.visualLabel}
                                 </div>
-                                <p className="text-xs text-zinc-400 leading-relaxed select-text">{idea.thumbnail}</p>
+                                <p className="text-xs text-white/60 leading-relaxed select-text">{idea.thumbnail}</p>
                               </div>
-                              <div className="bg-zinc-800 rounded-xl px-3 py-2">
-                                <div className="flex items-center gap-1.5 text-xs text-white font-semibold mb-1">
+                              <div className="rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                <div className="flex items-center gap-1.5 text-xs text-white/50 font-medium mb-1">
                                   <IconFilm size={12} />{platform.productionLabel}
                                 </div>
-                                <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-line select-text">{idea.filming}</p>
+                                <p className="text-xs text-white/60 leading-relaxed whitespace-pre-line select-text">{idea.filming}</p>
                               </div>
                             </div>
                           )}
 
                           {/* Action buttons */}
-                          <div className="flex items-center gap-2 pt-3 border-t border-zinc-700">
+                          <div className="flex items-center gap-2 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                             <button
                               onClick={() => triggerLike(idea)}
-                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer ${
-                                fb === "liked"
-                                  ? "border-white/80"
-                                  : "border-zinc-600 text-zinc-300 hover:opacity-60"
+                              className={`flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm transition-all cursor-pointer ${
+                                fb === "liked" ? "" : "text-white/50 hover:text-white/70"
                               }`}
-                            style={fb === "liked" ? { backgroundColor: '#ffffff', color: '#09090b' } : undefined}
+                              style={fb === "liked"
+                                ? { backgroundColor: '#ffffff', color: '#09090b', border: "none", touchAction: "manipulation" }
+                                : { border: "1px solid rgba(255,255,255,0.12)", touchAction: "manipulation" }}
                             >
                               <IconThumbUp size={14} /><span>いい感じ</span>
                             </button>
                             <button
                               onClick={() => triggerDislike(idea)}
-                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm border transition-all cursor-pointer border-zinc-600 text-zinc-300 hover:opacity-60"
+                              className="flex flex-1 items-center justify-center gap-1.5 py-2 rounded-xl text-sm text-white/50 hover:text-white/70 transition-colors cursor-pointer"
+                              style={{ border: "1px solid rgba(255,255,255,0.12)", touchAction: "manipulation" }}
                             >
                               <IconThumbDown size={14} /><span>違う</span>
                             </button>
                             <button
                               onClick={() => copyIdea(idea)}
                               title={copied ? "コピー済み" : "コピー"}
-                              className="flex items-center justify-center p-2 rounded-xl border transition-all cursor-pointer border-zinc-600 text-zinc-300 hover:opacity-60"
+                              className="flex items-center justify-center p-2 rounded-xl text-white/50 hover:text-white/70 transition-colors cursor-pointer"
+                              style={{ border: "1px solid rgba(255,255,255,0.12)", touchAction: "manipulation" }}
                             >
                               <IconCopy size={15} />
                             </button>
@@ -579,7 +643,8 @@ export default function MainPage() {
 
             <button
               onClick={() => { setMood(""); setTheme(""); setCondition(""); setAudience(""); setIdeas([]); setExpandedId(null); setRemovedIds(new Set()); }}
-              className="w-full py-3 rounded-2xl text-sm text-zinc-300 border border-zinc-600 hover:opacity-60 transition-all cursor-pointer mt-2"
+              className="w-full py-3 rounded-2xl text-sm text-white/50 hover:opacity-60 transition-all cursor-pointer mt-2"
+              style={{ border: "1px solid rgba(255,255,255,0.12)" }}
             >
               もう一度生成する
             </button>
@@ -587,5 +652,7 @@ export default function MainPage() {
         )}
       </div>
     </div>
+    <BottomNav />
+    </>
   );
 }
