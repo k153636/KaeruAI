@@ -448,11 +448,11 @@ export default function MainPage() {
                         <span className="text-zinc-600 font-bold text-lg leading-none mt-0.5 shrink-0">{i + 1}</span>
                         <div className="flex-1 min-w-0">
 
-                          <h3 className="text-white font-bold text-base mb-2 leading-tight">
+                          <h3 className="text-white font-bold text-base mb-2 leading-tight select-text">
                             {idea.title}
                           </h3>
 
-                          <p className="text-zinc-300 text-sm mb-3 leading-relaxed">
+                          <p className="text-zinc-300 text-sm mb-3 leading-relaxed select-text">
                             {idea.description}
                           </p>
 
@@ -467,19 +467,19 @@ export default function MainPage() {
                             <div className="space-y-2 mb-3">
                               <div className="bg-zinc-800 rounded-xl px-3 py-2">
                                 <span className="text-xs text-white font-semibold">{platform.hookLabel}：</span>
-                                <span className="text-xs text-zinc-900 dark:text-white ml-1">{idea.hook}</span>
+                                <span className="text-xs text-zinc-900 dark:text-white ml-1 select-text">{idea.hook}</span>
                               </div>
                               <div className="bg-zinc-800 rounded-xl px-3 py-2">
                                 <div className="flex items-center gap-1.5 text-xs text-white font-semibold mb-1">
                                   <IconImage size={12} />{platform.visualLabel}
                                 </div>
-                                <p className="text-xs text-zinc-400 leading-relaxed">{idea.thumbnail}</p>
+                                <p className="text-xs text-zinc-400 leading-relaxed select-text">{idea.thumbnail}</p>
                               </div>
                               <div className="bg-zinc-800 rounded-xl px-3 py-2">
                                 <div className="flex items-center gap-1.5 text-xs text-white font-semibold mb-1">
                                   <IconFilm size={12} />{platform.productionLabel}
                                 </div>
-                                <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-line">{idea.filming}</p>
+                                <p className="text-xs text-zinc-400 leading-relaxed whitespace-pre-line select-text">{idea.filming}</p>
                               </div>
                             </div>
                           )}
