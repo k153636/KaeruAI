@@ -270,47 +270,6 @@ export default function MainPage() {
   return (
     <div className="min-h-dvh bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
 
-      {/* 初回警告ポップアップ */}
-      {warningMounted && unansweredCount >= 10 && (
-        <div
-          onClick={dismissWarning}
-          style={{
-            position: "fixed",
-            bottom: "calc(24px + env(safe-area-inset-bottom))",
-            left: "50%",
-            transform: `translateX(-50%) translateY(${warningVisible ? "0px" : "12px"})`,
-            opacity: warningVisible ? 1 : 0,
-            transition: "opacity 0.35s ease, transform 0.35s ease",
-            zIndex: 50,
-            maxWidth: "calc(100vw - 32px)",
-            width: "360px",
-            cursor: "pointer",
-          }}
-        >
-          {/* 吹き出し本体 */}
-          <div style={{
-            background: "rgba(24,24,27,0.97)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "16px",
-            padding: "14px 16px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
-          }}>
-            <p className="text-sm text-zinc-200 leading-relaxed mb-1">
-              プロフィールが少ないため、企画が<span className="text-white font-semibold">汎用的</span>になっています。
-            </p>
-            <p className="text-xs text-zinc-500">精度を上げるには「精度を上げる」から追加してください　·　タップで閉じる</p>
-          </div>
-          {/* 下向き三角 */}
-          <div style={{
-            width: 0,
-            height: 0,
-            borderLeft: "8px solid transparent",
-            borderRight: "8px solid transparent",
-            borderTop: "8px solid rgba(24,24,27,0.97)",
-            marginLeft: "24px",
-          }} />
-        </div>
-      )}
       <div className="max-w-xl mx-auto">
 
         {/* Header */}
@@ -445,6 +404,41 @@ export default function MainPage() {
         {/* Accuracy boost */}
         {unansweredCount > 0 && (
           <FadeUp delay={200} className="mb-8">
+
+            {/* 吹き出し警告 */}
+            {warningMounted && unansweredCount >= 10 && (
+              <div
+                onClick={dismissWarning}
+                className="mb-2 cursor-pointer"
+                style={{
+                  opacity: warningVisible ? 1 : 0,
+                  transform: warningVisible ? "translateY(0)" : "translateY(6px)",
+                  transition: "opacity 0.35s ease, transform 0.35s ease",
+                }}
+              >
+                <div style={{
+                  background: "rgba(24,24,27,0.97)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "14px",
+                  padding: "12px 14px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                }}>
+                  <p className="text-sm text-zinc-200 leading-snug">
+                    プロフィールが少ないため企画が<span className="text-white font-semibold">汎用的</span>になっています
+                  </p>
+                  <p className="text-xs text-zinc-500 mt-1">タップで閉じる</p>
+                </div>
+                {/* 下向き三角（ボタンを指す） */}
+                <div style={{
+                  width: 0, height: 0,
+                  borderLeft: "7px solid transparent",
+                  borderRight: "7px solid transparent",
+                  borderTop: "7px solid rgba(24,24,27,0.97)",
+                  marginLeft: "20px",
+                }} />
+              </div>
+            )}
+
             <button
               onClick={() => router.push("/setup?continue=true")}
               className="w-full py-3 rounded-2xl text-sm font-medium border border-zinc-600 text-zinc-300 hover:opacity-60 transition-opacity cursor-pointer flex items-center justify-center gap-2"
