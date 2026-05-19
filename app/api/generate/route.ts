@@ -120,12 +120,12 @@ function buildUserPrompt(mood: string, theme: string, condition: string, audienc
 
   const ideationGuide = hasRichProfile
     ? `発想の軸：プロフィールにある複数の要素（ジャンル・動機・趣味・視聴者像など）が交差する地点から企画を作ること。交差がなければ書き直すこと。`
-    : `発想の軸：プロフィール情報が少ないため、「${profile.contentNiche}」ジャンルの中で「業界の常識を疑う・プロが言わない本音・意外な失敗談・視聴者が気づいていない盲点」を切り口に企画を発想すること。`;
+    : `発想の軸：プロフィール情報が少ないため、「${profile.contentNiche}」ジャンルの中で「業界の常識を疑う・プロが言わない本音・初心者が陥りやすい誤解・視聴者が気づいていない盲点」を切り口に企画を発想すること。すでに結果や実績があることを前提にした企画は禁止。`;
 
   return `【プラットフォーム】
 ${platform.label}（${platform.contentWord}を作っているクリエイター）
 
-【発信ジャンル】
+【発信ジャンル・テーマ】（最重要：すべての企画はこのジャンルの中から発想すること）
 ${profile.contentNiche}
 
 【このクリエイター像】
