@@ -275,7 +275,7 @@ export default function Home() {
       <div className="bg-zinc-900 py-7">
         <div className="max-w-3xl mx-auto px-6">
           <div className="grid grid-cols-3 gap-4 text-center divide-x divide-zinc-700/60">
-            {[{ num: "9", label: "対応プラットフォーム" }, { num: "2問", label: "から使い始められる" }, { num: "無料", label: "登録不要で今すぐ" }].map(s => (
+            {[{ num: "7", label: "対応プラットフォーム" }, { num: "2問", label: "から使い始められる" }, { num: "無料", label: "登録不要で今すぐ" }].map(s => (
               <div key={s.label} className="px-4">
                 <div className="font-bold text-2xl sm:text-3xl mb-1 text-white">{s.num}</div>
                 <div className="text-xs sm:text-sm text-zinc-400">{s.label}</div>
@@ -510,10 +510,10 @@ export default function Home() {
             {[
               { q: "本当に無料ですか？", a: "はい、現在は完全無料で使えます。1日10回まで企画を生成できます。将来的に有料プランを導入予定ですが、無料プランは引き続き提供します。" },
               { q: "ChatGPTに自分のプロフィールを貼れば同じことができませんか？", a: "形式上は似せられます。ただしCaeruAIはあなたの背景・動機・ターゲットを組み合わせて発想するよう設計されていて、生成後に別のAIが品質を批評して基準を満たさない企画だけを書き直します。好み・嫌いのフィードバックが蓄積されて次回の生成に反映される仕組みもあります。" },
-              { q: "どんなプラットフォームに対応していますか？", a: "YouTube・TikTok・Instagram・Podcast・ブログ・X・配信・Robloxなど9種類に対応しています。それぞれのフォーマットに最適化した企画を生成します。" },
+              { q: "どんなプラットフォームに対応していますか？", a: "YouTube・TikTok・Instagram・Podcast・ブログ・X・配信の7種類に対応しています。それぞれのフォーマットに最適化した企画を生成します。" },
               { q: "生成した企画の著作権はどうなりますか？", a: "生成されたすべての企画はあなたのものです。自由に使用・改変・商用利用できます。" },
               { q: "プロフィールを全部入力しないといけませんか？", a: "いいえ。最初の2問だけで使い始められます。あとの質問は任意で、答えるほど企画の精度が上がる仕組みです。使いながら少しずつ追加できます。" },
-              { q: "YouTuber以外でも使えますか？", a: "はい。YouTube・TikTok・Instagram・Podcast・ブログ・X・配信・Robloxなど、あらゆるコンテンツクリエイターを対象にしています。プラットフォームを選ぶとそれぞれに最適化された企画が届きます。" },
+              { q: "YouTuber以外でも使えますか？", a: "はい。YouTube・TikTok・Instagram・Podcast・ブログ・X・配信など、あらゆるコンテンツクリエイターを対象にしています。プラットフォームを選ぶとそれぞれに最適化された企画が届きます。" },
             ].map((item, i) => (
               <Reveal key={i} delay={i * 40}><FAQ q={item.q} a={item.a} /></Reveal>
             ))}
