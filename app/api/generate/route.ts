@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import Groq from "groq-sdk";
 import { Redis } from "@upstash/redis";
-import type { Profile, Idea, FeedbackStore } from "@/lib/types";
+import type { Profile, Idea, FeedbackStore, YoutubeChannelData, TrendingData } from "@/lib/types";
 import { getPlatform } from "@/lib/platforms";
 
 const redis = Redis.fromEnv();
@@ -39,6 +39,7 @@ const SYSTEM_PROMPT = `あなたは鋭い企画眼を持つコンテンツプロ
 - 「〜ツール紹介」「〜おすすめ5選」という薄い軸だけの企画
 - 「〜の話」「〜をやってみた結果」という弱い締め方のタイトル
 - プロフィールに存在しない属性を主役にした企画
+- プロフィールに明記されていない経歴・資格・年数（「〇〇歴10年」「現役〇〇」等）をタイトルや説明に入れること
 
 【タイトルの質基準】
 ❌ 弱い：「おすすめAIツール5選」「料理を時短してみた」「ChatGPTに質問し続けたら変化した」
@@ -105,7 +106,25 @@ function buildProfileNarrative(profile: Profile): string {
 
 // ── Stage 1 ユーザープロンプト ─────────────────────────────────────────────────
 
-function buildUserPrompt(mood: string, theme: string, condition: string, audience: string, profile: Profile, feedback: FeedbackStore): string {
+function buildYoutubeSection(yt: YoutubeChannelData): string {
+  if (!yt.topVideos.length) return "";
+  const topList = yt.topVideos
+    .map((v) => `  - 「${v.title}」`)
+    .join("\n");
+  return `【過去に反響があったコンテンツスタイル（参考）】
+${topList}
+※ 上記はこのクリエイターの既存コンテンツ。同じテーマの焼き直しではなく、このスタイル・視点を活かしながら新しい切り口で企画を作ること。`;
+}
+
+function buildTrendingSection(trending: TrendingData): string {
+  if (!trending.videos.length) return "";
+  const list = trending.videos.map((v) => `  - 「${v.title}」`).join("\n");
+  return `【直近7日間のトレンド（このジャンルでバズっている動画）】
+${list}
+※ これらのトレンドを「把握した上で」、まだ誰も語っていない角度・意外な視点から企画を作ること。トレンドの焼き直し・類似タイトルは禁止。`;
+}
+
+function buildUserPrompt(mood: string, theme: string, condition: string, audience: string, profile: Profile, feedback: FeedbackStore, youtubeData?: YoutubeChannelData | null, trendingData?: TrendingData | null): string {
   const platform = getPlatform(profile.platform);
   const likedTitles = feedback.liked.slice(0, 8).map((e) => `・${e.title}`).join("\n");
   const dislikedTitles = feedback.disliked.slice(0, 5).map((e) => `・${e.title}`).join("\n");
@@ -122,12 +141,15 @@ function buildUserPrompt(mood: string, theme: string, condition: string, audienc
     ? `発想の軸：プロフィールにある複数の要素（ジャンル・動機・趣味・視聴者像など）が交差する地点から企画を作ること。交差がなければ書き直すこと。`
     : `発想の軸：プロフィール情報が少ないため、「${profile.contentNiche}」ジャンルの中で「業界の常識を疑う・プロが言わない本音・初心者が陥りやすい誤解・視聴者が気づいていない盲点」を切り口に企画を発想すること。すでに結果や実績があることを前提にした企画は禁止。`;
 
+  const youtubeSection = youtubeData ? `\n${buildYoutubeSection(youtubeData)}\n` : "";
+  const trendingSection = trendingData ? `\n${buildTrendingSection(trendingData)}\n` : "";
+
   return `【プラットフォーム】
 ${platform.label}（${platform.contentWord}を作っているクリエイター）
 
 【発信ジャンル・テーマ】（最重要：すべての企画はこのジャンルの中から発想すること）
 ${profile.contentNiche}
-
+${youtubeSection}${trendingSection}
 【このクリエイター像】
 ${profileNarrative || "（詳細プロフィール未設定）"}
 ${feedbackSection}【今の状態・やりたいこと】
@@ -243,13 +265,15 @@ function parseIdeas(text: string): Idea[] {
 
 export async function POST(request: Request) {
   try {
-    const { mood, theme, condition, audience, profile, feedback } = (await request.json()) as {
+    const { mood, theme, condition, audience, profile, feedback, youtubeData, trendingData } = (await request.json()) as {
       mood: string;
       theme?: string;
       condition?: string;
       audience?: string;
       profile: Profile;
       feedback: FeedbackStore;
+      youtubeData?: YoutubeChannelData | null;
+      trendingData?: TrendingData | null;
     };
 
     if (!mood || !profile) {
@@ -282,7 +306,7 @@ export async function POST(request: Request) {
 
     // ── Stage 1: ドラフト生成 ────────────────────────────────────────────────
     console.log("[generate] stage1: drafting");
-    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, safeFeedback);
+    const userPrompt = buildUserPrompt(mood, theme ?? "", condition ?? "", audience ?? "", profile, safeFeedback, youtubeData, trendingData);
 
     let stage1Text = "";
     try {

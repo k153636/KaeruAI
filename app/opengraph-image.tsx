@@ -37,22 +37,23 @@ export default function OGImage() {
         </div>
 
         {/* Main headline */}
-        <p style={{
-          color: "white",
-          fontSize: 52,
-          fontWeight: 800,
-          lineHeight: 1.15,
-          margin: "0 0 24px 0",
-          letterSpacing: "-1px",
-          maxWidth: 820,
-        }}>
-          AIは企画を作れる。<br />
-          でも、<span style={{ borderBottom: "4px solid white" }}>あなたの</span>企画は作れない。
-        </p>
+        <div style={{ display: "flex", flexDirection: "column", marginBottom: 24 }}>
+          <span style={{ color: "white", fontSize: 52, fontWeight: 800, lineHeight: 1.2, letterSpacing: "-1px" }}>
+            あなただけの企画を、
+          </span>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 0 }}>
+            <span style={{ color: "white", fontSize: 52, fontWeight: 800, lineHeight: 1.2, letterSpacing: "-1px", borderBottom: "4px solid white", paddingBottom: 2 }}>
+              CaeruAI
+            </span>
+            <span style={{ color: "white", fontSize: 52, fontWeight: 800, lineHeight: 1.2, letterSpacing: "-1px" }}>
+              が生成する。
+            </span>
+          </div>
+        </div>
 
         {/* Sub */}
         <p style={{ color: "#a1a1aa", fontSize: 24, margin: "0 0 48px 0", fontWeight: 400 }}>
-          プロフィールを読むAI。気分を一言入れるだけで、あなた専用の企画が5つ届く。
+          あなたのジャンル・動機・スタイルを踏まえて、CaeruAIが企画を5つ生成する。
         </p>
 
         {/* Tags */}
