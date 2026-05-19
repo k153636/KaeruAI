@@ -7,6 +7,7 @@ import { loadProfile, saveProfile } from "@/lib/profile";
 import { syncPush } from "@/lib/sync";
 import { PLATFORMS } from "@/lib/platforms";
 import { IconArrowLeft, IconEdit, IconCheck } from "@/components/icons";
+import BottomNav from "@/components/BottomNav";
 
 const SEPARATOR = "|||";
 
@@ -31,6 +32,12 @@ const FIELDS: {
     label: "発信ジャンル・テーマ",
     type: "text",
     placeholder: "例：Roblox開発、料理、プログラミング、ファッション、筋トレ",
+  },
+  {
+    id: "youtubeChannelUrl",
+    label: "YouTubeチャンネルURL",
+    type: "text",
+    placeholder: "例：https://www.youtube.com/@あなたのチャンネル",
   },
   {
     id: "motivation",
@@ -267,36 +274,37 @@ export default function ProfilePage() {
   const editingField = FIELDS.find((f) => f.id === editingId);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 px-4 py-10">
+    <>
+    <div className="min-h-screen bg-zinc-950 px-4 py-10 pb-[calc(env(safe-area-inset-bottom)+72px)] sm:pb-10">
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-zinc-900 dark:text-white font-bold text-xl">プロフィール編集</h1>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/main")}
-              className="flex items-center gap-1.5 text-sm text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer"
-            >
-              <IconArrowLeft size={16} />
-              戻る
-            </button>
-          </div>
+          <h1 className="text-white font-semibold text-xl tracking-tight">プロフィール</h1>
+          <button
+            onClick={() => router.push("/main")}
+            className="hidden sm:flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors cursor-pointer"
+          >
+            <IconArrowLeft size={16} />
+            戻る
+          </button>
         </div>
 
-        <div className="space-y-3">
-          {FIELDS.map((field) => {
+        <div className="rounded-3xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.09)" }}>
+          {FIELDS.map((field, index) => {
             const isEditing = editingId === field.id;
             const raw = profile[field.id] ?? "";
+            const isLast = index === FIELDS.length - 1;
 
             return (
               <div
                 key={field.id}
-                className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-4"
+                className="px-5 py-4"
+                style={!isLast ? { borderBottom: "1px solid rgba(255,255,255,0.07)" } : undefined}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-1">{field.label}</p>
+                    <p className="text-xs text-white/35 mb-1 font-medium">{field.label}</p>
                     {!isEditing && (
-                      <p className="text-sm text-zinc-900 dark:text-white leading-relaxed">
+                      <p className="text-sm text-white/80 leading-relaxed">
                         {displayValue(field, raw)}
                       </p>
                     )}
@@ -304,16 +312,15 @@ export default function ProfilePage() {
                   {!isEditing && (
                     <button
                       onClick={() => startEdit(field)}
-                      className="flex items-center gap-1 text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer shrink-0 mt-1"
+                      className="text-xs text-white/35 hover:text-white/60 transition-colors cursor-pointer shrink-0 mt-1"
                     >
-                      <IconEdit size={13} />
                       変更
                     </button>
                   )}
                 </div>
 
                 {isEditing && editingField && (
-                  <div className="mt-4">
+                  <div className="mt-3">
                     {editingField.type === "text" ? (
                       <textarea
                         value={draft}
@@ -321,7 +328,8 @@ export default function ProfilePage() {
                         rows={3}
                         autoFocus
                         placeholder={editingField.placeholder}
-                        className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors text-sm resize-none"
+                        className="w-full rounded-2xl px-4 py-3 text-white placeholder-white/25 focus:outline-none transition-colors resize-none"
+                        style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 16 }}
                       />
                     ) : (
                       <div>
@@ -349,11 +357,10 @@ export default function ProfilePage() {
                                       : setDraft(draft === opt ? "" : opt)
                                   }
                                   disabled={atLimit}
-                                  className={`px-3 py-1.5 rounded-full text-sm border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-                                    active
-                                      ? "bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900"
-                                      : "bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-white hover:opacity-70"
+                                  className={`px-3 py-1.5 rounded-full text-sm transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                                    active ? "bg-white text-zinc-900" : "text-white/70 hover:text-white"
                                   }`}
+                                  style={!active ? { border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" } : undefined}
                                 >
                                   {label}
                                 </button>
@@ -364,20 +371,20 @@ export default function ProfilePage() {
                                 <button
                                   key={custom}
                                   onClick={() => toggleMulti(custom, editingField.maxSelect)}
-                                  className="px-3 py-1.5 rounded-full text-sm border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
+                                  className="px-3 py-1.5 rounded-full text-sm bg-white text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
                                 >
                                   {custom}
-                                  <span className="text-white/60 dark:text-zinc-900/60 text-xs ml-0.5">×</span>
+                                  <span className="text-zinc-400 text-xs ml-0.5">×</span>
                                 </button>
                               ))
                             }
                             {editingField.type === "select" && draft && !editingField.options?.includes(draft) && (
                               <button
                                 onClick={() => setDraft("")}
-                                className="px-3 py-1.5 rounded-full text-sm border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
+                                className="px-3 py-1.5 rounded-full text-sm bg-white text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
                               >
                                 {draft}
-                                <span className="text-white/60 dark:text-zinc-900/60 text-xs ml-0.5">×</span>
+                                <span className="text-zinc-400 text-xs ml-0.5">×</span>
                               </button>
                             )}
                           </div>
@@ -389,8 +396,9 @@ export default function ProfilePage() {
                                 onChange={(e) => setCustomInput(e.target.value)}
                                 onKeyDown={(e) => { if (e.key === "Enter") { addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect); (e.target as HTMLInputElement).blur(); } }}
                                 onBlur={() => addCustom(editingField.type as "select" | "multiselect", editingField.maxSelect)}
-                                placeholder="その他を入力...（入力後、画面を触れば確定）"
-                                className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-3 py-2 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors text-sm"
+                                placeholder="その他を入力..."
+                                className="w-full rounded-2xl px-3 py-2 text-white placeholder-white/25 focus:outline-none transition-colors"
+                                style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 16 }}
                               />
                             </div>
                           )}
@@ -401,14 +409,15 @@ export default function ProfilePage() {
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={save}
-                        className="flex items-center gap-1.5 px-4 py-2 bg-zinc-900 dark:bg-white hover:opacity-80 text-white dark:text-zinc-900 text-sm font-medium rounded-2xl transition-opacity cursor-pointer"
+                        className="flex items-center gap-1.5 px-4 py-2 bg-white text-zinc-900 text-sm font-medium rounded-2xl hover:opacity-90 transition-opacity cursor-pointer"
                       >
                         <IconCheck size={14} />
                         保存
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className="px-4 py-2 text-zinc-900 dark:text-white text-sm border border-zinc-300 dark:border-zinc-600 hover:opacity-60 rounded-2xl transition-opacity cursor-pointer"
+                        className="px-4 py-2 text-white/50 text-sm hover:text-white/70 rounded-2xl transition-colors cursor-pointer"
+                        style={{ border: "1px solid rgba(255,255,255,0.12)" }}
                       >
                         キャンセル
                       </button>
@@ -421,5 +430,7 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    <BottomNav />
+    </>
   );
 }

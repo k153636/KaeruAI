@@ -6,7 +6,8 @@ import type { HistoryEntry, Idea } from "@/lib/types";
 import { getHistory, deleteHistory } from "@/lib/history";
 import { loadProfile } from "@/lib/profile";
 import { getPlatform } from "@/lib/platforms";
-import { IconCamera, IconArrowLeft } from "@/components/icons";
+import { IconArrowLeft } from "@/components/icons";
+import BottomNav from "@/components/BottomNav";
 
 function IconTrash({ size = 14 }: { size?: number }) {
   return (
@@ -73,100 +74,109 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 px-4 py-10">
+    <>
+    <div className="min-h-screen bg-zinc-950 px-4 py-10 pb-[calc(env(safe-area-inset-bottom)+72px)] sm:pb-10">
       <div className="max-w-xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg">
-            <IconCamera size={22} />
-            <span>履歴</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/main")}
-              className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
-            >
-              <IconArrowLeft size={16} />
-              戻る
-            </button>
-          </div>
+          <h1 className="text-white font-semibold text-xl tracking-tight">履歴</h1>
+          <button
+            onClick={() => router.push("/main")}
+            className="hidden sm:flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 transition-colors cursor-pointer"
+          >
+            <IconArrowLeft size={16} />
+            戻る
+          </button>
         </div>
 
         {entries.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-zinc-400 text-sm">まだ生成した企画がありません</p>
+            <p className="text-white/30 text-sm">まだ生成した企画がありません</p>
             <button
               onClick={() => router.push("/main")}
-              className="mt-4 text-zinc-900 dark:text-white text-sm hover:opacity-60 transition-opacity cursor-pointer"
+              className="mt-4 text-white/50 hover:text-white/80 text-sm transition-colors cursor-pointer"
             >
               企画を生成する →
             </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {entries.map((entry) => {
+          <div className="rounded-3xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.09)" }}>
+            {entries.map((entry, entryIndex) => {
               const isOpen = expandedId === entry.id;
+              const isLastEntry = entryIndex === entries.length - 1;
               return (
-                <div key={entry.id} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl overflow-hidden">
+                <div
+                  key={entry.id}
+                  style={!isLastEntry ? { borderBottom: "1px solid rgba(255,255,255,0.07)" } : undefined}
+                >
+                  {/* Entry header */}
                   <div
-                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                    className="flex items-center justify-between px-5 py-4 cursor-pointer"
                     onClick={() => setExpandedId(isOpen ? null : entry.id)}
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-zinc-900 dark:text-white text-sm font-medium truncate">「{entry.mood}」</p>
-                      <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">{formatDate(entry.createdAt)} · {entry.ideas.length}件の企画</p>
+                      <p className="text-white text-sm font-medium truncate">「{entry.mood}」</p>
+                      <p className="text-white/35 text-xs mt-0.5">
+                        {formatDate(entry.createdAt)} · {entry.ideas.length}件の企画
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2 ml-3">
+                    <div className="flex items-center gap-3 ml-3">
                       <button
                         onClick={(e) => { e.stopPropagation(); handleDelete(entry.id); }}
-                        className="text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer p-1"
+                        className="text-white/30 hover:text-white/60 transition-colors cursor-pointer p-1"
                       >
                         <IconTrash size={14} />
                       </button>
-                      <span className="text-zinc-900 dark:text-white text-xs">{isOpen ? "▲" : "▼"}</span>
+                      <span className="text-white/30 text-xs">{isOpen ? "▲" : "▼"}</span>
                     </div>
                   </div>
 
+                  {/* Expanded ideas */}
                   {isOpen && (
-                    <div className="border-t border-zinc-300 dark:border-zinc-600">
+                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
                       {entry.ideas.map((idea, i) => {
                         const ideaKey = `${entry.id}-${idea.title}`;
                         const isIdeaOpen = expandedIdeaKey === ideaKey;
                         const copied = copiedKey === ideaKey;
+                        const isLastIdea = i === entry.ideas.length - 1;
                         return (
-                          <div key={i} className="border-b border-zinc-200 dark:border-zinc-700 last:border-b-0 px-4 py-3">
+                          <div
+                            key={i}
+                            className="px-5 py-3"
+                            style={!isLastIdea ? { borderBottom: "1px solid rgba(255,255,255,0.05)" } : undefined}
+                          >
                             <div className="flex items-start gap-2">
-                              <span className="text-zinc-500 dark:text-zinc-400 font-bold text-sm shrink-0 mt-0.5">{i + 1}</span>
+                              <span className="text-white/20 font-semibold text-sm shrink-0 mt-0.5">{i + 1}</span>
                               <div className="flex-1 min-w-0">
-                                <p className="text-zinc-900 dark:text-white text-sm font-medium leading-snug mb-1">{idea.title}</p>
-                                <p className="text-zinc-900 dark:text-white text-xs leading-relaxed mb-2">{idea.description}</p>
-                                <div className="flex items-center gap-2">
+                                <p className="text-white text-sm font-medium leading-snug mb-1">{idea.title}</p>
+                                <p className="text-white/60 text-xs leading-relaxed mb-2">{idea.description}</p>
+                                <div className="flex items-center gap-3">
                                   <button
                                     onClick={() => setExpandedIdeaKey(isIdeaOpen ? null : ideaKey)}
-                                    className="text-xs text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer"
+                                    className="text-xs text-white/35 hover:text-white/60 transition-colors cursor-pointer"
                                   >
                                     {isIdeaOpen ? "▲ 閉じる" : "▼ 詳細"}
                                   </button>
                                   <button
                                     onClick={() => copyIdea(idea, entry.id)}
-                                    className="flex items-center gap-1 text-xs ml-auto text-zinc-900 dark:text-white hover:opacity-60 transition-opacity cursor-pointer"
+                                    className="flex items-center gap-1 text-xs ml-auto text-white/35 hover:text-white/60 transition-colors cursor-pointer"
                                   >
                                     <IconCopy size={12} />
                                     {copied ? "コピー済み" : "コピー"}
                                   </button>
                                 </div>
                                 {isIdeaOpen && (
-                                  <div className="space-y-2 mt-2">
-                                    <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                      <p className="text-xs text-zinc-900 dark:text-white font-semibold mb-1">{platform.hookLabel}</p>
-                                      <p className="text-xs text-zinc-900 dark:text-white">{idea.hook}</p>
+                                  <div className="space-y-2 mt-3">
+                                    <div className="rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                      <p className="text-xs text-white/50 font-semibold mb-1">{platform.hookLabel}</p>
+                                      <p className="text-xs text-white/70 leading-relaxed">{idea.hook}</p>
                                     </div>
-                                    <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                      <p className="text-xs text-zinc-900 dark:text-white font-semibold mb-1">{platform.visualLabel}</p>
-                                      <p className="text-xs text-zinc-900 dark:text-white">{idea.thumbnail}</p>
+                                    <div className="rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                      <p className="text-xs text-white/50 font-semibold mb-1">{platform.visualLabel}</p>
+                                      <p className="text-xs text-white/70 leading-relaxed">{idea.thumbnail}</p>
                                     </div>
-                                    <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl px-3 py-2">
-                                      <p className="text-xs text-zinc-900 dark:text-white font-semibold mb-1">{platform.productionLabel}</p>
-                                      <p className="text-xs text-zinc-900 dark:text-white whitespace-pre-line">{idea.filming}</p>
+                                    <div className="rounded-2xl px-3 py-2.5" style={{ background: "rgba(255,255,255,0.05)" }}>
+                                      <p className="text-xs text-white/50 font-semibold mb-1">{platform.productionLabel}</p>
+                                      <p className="text-xs text-white/70 leading-relaxed whitespace-pre-line">{idea.filming}</p>
                                     </div>
                                   </div>
                                 )}
@@ -184,5 +194,7 @@ export default function HistoryPage() {
         )}
       </div>
     </div>
+    <BottomNav />
+    </>
   );
 }
