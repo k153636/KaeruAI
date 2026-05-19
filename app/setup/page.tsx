@@ -37,6 +37,13 @@ const STEPS: Step[] = [
     placeholder: "例：Roblox開発、料理、プログラミング、ファッション、筋トレ",
   },
   {
+    id: "youtubeChannelUrl",
+    question: "YouTubeチャンネルのURLを教えてください",
+    subtitle: "あなたの実績（再生数・人気動画）をAIが読み込み、企画の精度が大幅に上がります",
+    type: "text",
+    placeholder: "例：https://www.youtube.com/@あなたのチャンネル",
+  },
+  {
     id: "motivation",
     question: "なぜコンテンツを作るの？",
     subtitle: "最大2つ選べます",
@@ -241,29 +248,31 @@ function SetupContent() {
   const [answers, setAnswers] = useState<Partial<Record<keyof Profile, string>>>({});
 
   useEffect(() => {
+    const existing = loadProfile();
+    if (existing) {
+      const sep = "|||";
+      const toRaw = (v: string | undefined) => v ? v.split("、").join(sep) : "";
+      setAnswers({
+        platform: existing.platform,
+        contentNiche: toRaw(existing.contentNiche),
+        youtubeChannelUrl: existing.youtubeChannelUrl ?? "",
+        motivation: toRaw(existing.motivation),
+        bestComment: existing.bestComment ?? "",
+        creativeTriger: toRaw(existing.creativeTriger),
+        audienceRelation: existing.audienceRelation ?? "",
+        targetAudience: existing.targetAudience ?? "",
+        contentApproach: existing.contentApproach ?? "",
+        avoid: toRaw(existing.avoid),
+        processingStyle: existing.processingStyle ?? "",
+        creatorIdentity: toRaw(existing.creatorIdentity),
+        successDefinition: existing.successDefinition ?? "",
+        hobby: toRaw(existing.hobby),
+        expertise: toRaw(existing.expertise),
+        dreamGoal: existing.dreamGoal ?? "",
+      });
+    }
+
     if (searchParams.get("continue") === "true") {
-      const existing = loadProfile();
-      if (existing) {
-        const sep = "|||";
-        const toRaw = (v: string | undefined) => v ? v.split("、").join(sep) : "";
-        setAnswers({
-          platform: existing.platform,
-          contentNiche: toRaw(existing.contentNiche),
-          motivation: toRaw(existing.motivation),
-          bestComment: existing.bestComment ?? "",
-          creativeTriger: toRaw(existing.creativeTriger),
-          audienceRelation: existing.audienceRelation ?? "",
-          targetAudience: existing.targetAudience ?? "",
-          contentApproach: existing.contentApproach ?? "",
-          avoid: toRaw(existing.avoid),
-          processingStyle: existing.processingStyle ?? "",
-          creatorIdentity: toRaw(existing.creatorIdentity),
-          successDefinition: existing.successDefinition ?? "",
-          hobby: toRaw(existing.hobby),
-          expertise: toRaw(existing.expertise),
-          dreamGoal: existing.dreamGoal ?? "",
-        });
-      }
       setFromMain(true);
       setPhase("optional");
       const firstUnanswered = STEPS.findIndex(
@@ -312,6 +321,7 @@ function SetupContent() {
   }
 
   function canNext() {
+    if (isOptionalPhase) return true; // optional steps are always skippable
     if (current.type === "multiselect") return value.length > 0;
     if (current.type === "select") return !!value;
     return value.trim().length > 0;
@@ -322,6 +332,7 @@ function SetupContent() {
     return {
       platform: answers.platform ?? "youtube",
       contentNiche: fmt(answers.contentNiche ?? ""),
+      youtubeChannelUrl: answers.youtubeChannelUrl || undefined,
       motivation: answers.motivation ? fmt(answers.motivation) : undefined,
       bestComment: answers.bestComment || undefined,
       creativeTriger: answers.creativeTriger ? fmt(answers.creativeTriger) : undefined,
@@ -345,28 +356,28 @@ function SetupContent() {
   }
 
   function next() {
+    // 毎ステップ即時保存（必須フィールドが揃っている場合のみ）
+    const built = buildProfile();
+    if (built.platform && built.contentNiche) {
+      saveProfile(built);
+    }
+
     if (step + 1 === REQUIRED_STEPS && phase === "required") {
-      saveProfile(buildProfile());
       setPhase("interstitial");
       return;
     }
 
-    if (phase === "optional") {
-      const updated = buildProfile();
-      saveProfile(updated);
-
-      if (fromMain) {
-        const nextUnanswered = STEPS.findIndex(
-          (s, i) => i > step && i >= REQUIRED_STEPS && !answers[s.id]
-        );
-        if (nextUnanswered !== -1) {
-          goStep(nextUnanswered);
-        } else {
-          syncPush();
-          router.push("/main");
-        }
-        return;
+    if (phase === "optional" && fromMain) {
+      const nextUnanswered = STEPS.findIndex(
+        (s, i) => i > step && i >= REQUIRED_STEPS && !answers[s.id]
+      );
+      if (nextUnanswered !== -1) {
+        goStep(nextUnanswered);
+      } else {
+        syncPush();
+        router.push("/main");
       }
+      return;
     }
 
     const nextStep = step + 1;
@@ -400,31 +411,30 @@ function SetupContent() {
   // 中間画面
   if (phase === "interstitial") {
     return (
-      <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
+      <div className="min-h-dvh bg-zinc-950 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
         <div className="w-full max-w-lg">
           <FadeUp delay={0} className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg mb-6">
+            <div className="inline-flex items-center gap-2 text-white font-bold text-lg mb-6">
               <IconCamera size={22} />
               <span>CaeruAI</span>
             </div>
-            <div className="text-4xl mb-4">✦</div>
-            <h2 className="text-zinc-900 dark:text-white font-bold text-2xl mb-3">
-              まず使ってみましょう！
+            <div className="text-4xl mb-4 text-white/20">✦</div>
+            <h2 className="text-white font-semibold text-2xl mb-3 tracking-tight">
+              まず使ってみましょう
             </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed">
-              あと{optionalTotal}問答えると、あなたにしか作れない企画が生まれます。<br />
-              続ける？それともあとで？
+            <p className="text-white/40 text-sm leading-relaxed">
+              あと{optionalTotal}問答えると、企画の精度がさらに上がります。
             </p>
           </FadeUp>
 
-          <FadeUp delay={120} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-5 mb-4">
+          <FadeUp delay={120} className="rounded-3xl p-5 mb-4" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">回答すると精度が上がる項目</span>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400">残り{optionalTotal}問</span>
+              <span className="text-xs text-white/35">回答すると精度が上がる項目</span>
+              <span className="text-xs text-white/35">残り{optionalTotal}問</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {["クリエイター像", "届けたい人", "コンテンツの武器", "作る理由", "NGこと", "距離感", "他5問"].map((tag) => (
-                <span key={tag} className="px-2.5 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full text-xs text-zinc-900 dark:text-white">
+                <span key={tag} className="px-2.5 py-1 rounded-full text-xs text-white/60" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}>
                   {tag}
                 </span>
               ))}
@@ -434,14 +444,16 @@ function SetupContent() {
           <FadeUp delay={200} className="flex flex-col gap-3">
             <button
               onClick={continueOptional}
-              className="w-full py-4 rounded-2xl font-bold text-base bg-zinc-900 dark:bg-white hover:opacity-80 text-white dark:text-zinc-900 flex items-center justify-center gap-2 transition-opacity cursor-pointer"
+              className="w-full py-4 rounded-2xl font-bold text-base hover:opacity-80 flex items-center justify-center gap-2 transition-opacity cursor-pointer"
+              style={{ backgroundColor: "#ffffff", color: "#09090b" }}
             >
               <span>続けて答える</span>
               <IconArrowRight size={18} />
             </button>
             <button
               onClick={exitToMain}
-              className="w-full py-3 rounded-2xl text-sm text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:opacity-60 transition-opacity cursor-pointer"
+              className="w-full py-3 rounded-2xl text-sm text-white/50 hover:opacity-60 transition-opacity cursor-pointer"
+              style={{ border: "1px solid rgba(255,255,255,0.12)" }}
             >
               あとで答える（企画生成へ）
             </button>
@@ -452,7 +464,7 @@ function SetupContent() {
   }
 
   return (
-    <div className="min-h-dvh bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
+    <div className="min-h-dvh bg-zinc-950 flex flex-col items-center justify-center px-4 py-12 pb-[env(safe-area-inset-bottom)]">
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center relative">
           {isOptionalPhase && (
@@ -466,17 +478,17 @@ function SetupContent() {
               </button>
             </div>
           )}
-          <div className="inline-flex items-center gap-2 text-zinc-900 dark:text-white font-bold text-lg mb-2">
+          <div className="inline-flex items-center gap-2 text-white font-bold text-lg mb-2">
             <IconCamera size={22} />
             <span>CaeruAI</span>
           </div>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+          <p className="text-white/40 text-sm">
             {isOptionalPhase ? "答えるほど精度が上がります" : "あなたのことを教えてください"}
           </p>
         </div>
 
         <div className="mb-8">
-          <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 mb-2">
+          <div className="flex justify-between text-xs text-white/35 mb-2">
             <span>
               {isOptionalPhase
                 ? `${optionalAnswered} / ${optionalTotal} 回答済み`
@@ -484,18 +496,18 @@ function SetupContent() {
             </span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="h-1 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+          <div className="h-px rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
             <div
-              className="h-full bg-zinc-900 dark:bg-white rounded-full transition-all duration-500"
+              className="h-full bg-white rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
-        <FadeUp key={step} delay={0} className="bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-600 rounded-3xl p-6 mb-6">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-1">{current.question}</h2>
+        <FadeUp key={step} delay={0} className="rounded-3xl p-6 mb-6" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}>
+          <h2 className="text-xl font-semibold text-white mb-1 tracking-tight">{current.question}</h2>
           <div className="flex items-center justify-between mb-6">
-            <p className="text-zinc-500 dark:text-zinc-400 text-sm">{current.subtitle}</p>
+            <p className="text-white/40 text-sm">{current.subtitle}</p>
             {current.maxSelect && (
               <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 {value ? value.split(SEPARATOR).filter(Boolean).length : 0} / {current.maxSelect}
@@ -510,7 +522,8 @@ function SetupContent() {
               onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && canNext() && next()}
               placeholder={current.placeholder}
               rows={3}
-              className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-4 py-3 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors text-base resize-none"
+              className="w-full rounded-2xl px-4 py-3 text-white placeholder-white/25 focus:outline-none transition-colors text-base resize-none"
+              style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
               autoFocus
             />
           ) : (
@@ -535,11 +548,10 @@ function SetupContent() {
                           : setAnswers((a) => ({ ...a, [current.id]: a[current.id] === opt ? "" : opt }))
                       }
                       disabled={atLimit}
-                      className={`px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
-                        active
-                          ? "bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900"
-                          : "bg-white dark:bg-zinc-800 border-zinc-300 dark:border-zinc-600 text-zinc-900 dark:text-white hover:opacity-70"
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${
+                        active ? "bg-white text-zinc-900" : "text-white/70 hover:text-white"
                       }`}
+                      style={!active ? { border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.05)" } : undefined}
                     >
                       {label}
                     </FadeUp>
@@ -550,20 +562,20 @@ function SetupContent() {
                     <button
                       key={custom}
                       onClick={() => toggleMulti(custom)}
-                      className="px-4 py-2 rounded-full text-sm font-medium border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
+                      className="px-4 py-2 rounded-full text-sm font-medium bg-white text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
                     >
                       {custom}
-                      <span className="text-white/60 dark:text-zinc-900/60 text-xs ml-0.5">×</span>
+                      <span className="text-zinc-400 text-xs ml-0.5">×</span>
                     </button>
                   ))
                 }
                 {current.type === "select" && value && !current.options?.includes(value) && (
                   <button
                     onClick={() => setAnswers((a) => ({ ...a, [current.id]: "" }))}
-                    className="px-4 py-2 rounded-full text-sm font-medium border bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
+                    className="px-4 py-2 rounded-full text-sm font-medium bg-white text-zinc-900 transition-all cursor-pointer flex items-center gap-1"
                   >
                     {value}
-                    <span className="text-white/60 dark:text-zinc-900/60 text-xs ml-0.5">×</span>
+                    <span className="text-zinc-400 text-xs ml-0.5">×</span>
                   </button>
                 )}
               </div>
@@ -576,7 +588,8 @@ function SetupContent() {
                     onKeyDown={(e) => { if (e.key === "Enter") { addCustom(); (e.target as HTMLInputElement).blur(); } }}
                     onBlur={addCustom}
                     placeholder="その他を入力...（入力後、画面を触れば確定）"
-                    className="w-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-2xl px-3 py-2 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400 focus:outline-none focus:border-zinc-600 dark:focus:border-zinc-400 transition-colors text-base"
+                    className="w-full rounded-2xl px-3 py-2 text-white placeholder-white/25 focus:outline-none transition-colors"
+                    style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", fontSize: 16 }}
                   />
                 </FadeUp>
               )}
@@ -597,7 +610,8 @@ function SetupContent() {
                   goStep(step - 1);
                 }
               }}
-              className="flex items-center gap-2 px-6 py-4 rounded-2xl font-medium text-sm text-zinc-900 dark:text-white border border-zinc-900 dark:border-white hover:opacity-60 transition-opacity cursor-pointer"
+              className="flex items-center gap-2 px-6 py-4 rounded-2xl font-medium text-sm text-white/50 hover:opacity-60 transition-opacity cursor-pointer"
+              style={{ border: "1px solid rgba(255,255,255,0.12)" }}
             >
               <IconArrowLeft size={16} />
               戻る
@@ -607,7 +621,8 @@ function SetupContent() {
             <button
               onClick={next}
               disabled={!canNext()}
-              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 dark:bg-white hover:opacity-80 text-white dark:text-zinc-900 flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl font-bold text-base transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-80 flex items-center justify-center gap-2"
+              style={{ backgroundColor: "#ffffff", color: "#09090b" }}
             >
               {step < STEPS.length - 1 ? (
                 <><span>次へ</span><IconArrowRight size={18} /></>
