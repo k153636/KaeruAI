@@ -79,11 +79,25 @@ export default function MainPage() {
   const [detailedVisible, setDetailedVisible] = useState(false);
   const [quickVisible, setQuickVisible] = useState(false);
 
+  const [warningVisible, setWarningVisible] = useState(false);
+  const [warningMounted, setWarningMounted] = useState(false);
+
   // 初回マウント
   useEffect(() => {
     const t = setTimeout(() => setQuickVisible(true), 60);
     return () => clearTimeout(t);
   }, []);
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setWarningMounted(true), 900);
+    const t2 = setTimeout(() => setWarningVisible(true), 950);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  function dismissWarning() {
+    setWarningVisible(false);
+    setTimeout(() => setWarningMounted(false), 350);
+  }
 
   function switchToMode(newMode: "detailed" | "quick") {
     if (newMode === "quick") {
@@ -255,6 +269,48 @@ export default function MainPage() {
 
   return (
     <div className="min-h-dvh bg-zinc-950 px-4 py-10 pb-[env(safe-area-inset-bottom)]">
+
+      {/* 初回警告ポップアップ */}
+      {warningMounted && unansweredCount >= 10 && (
+        <div
+          onClick={dismissWarning}
+          style={{
+            position: "fixed",
+            bottom: "calc(24px + env(safe-area-inset-bottom))",
+            left: "50%",
+            transform: `translateX(-50%) translateY(${warningVisible ? "0px" : "12px"})`,
+            opacity: warningVisible ? 1 : 0,
+            transition: "opacity 0.35s ease, transform 0.35s ease",
+            zIndex: 50,
+            maxWidth: "calc(100vw - 32px)",
+            width: "360px",
+            cursor: "pointer",
+          }}
+        >
+          {/* 吹き出し本体 */}
+          <div style={{
+            background: "rgba(24,24,27,0.97)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: "16px",
+            padding: "14px 16px",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+          }}>
+            <p className="text-sm text-zinc-200 leading-relaxed mb-1">
+              プロフィールが少ないため、企画が<span className="text-white font-semibold">汎用的</span>になっています。
+            </p>
+            <p className="text-xs text-zinc-500">精度を上げるには「精度を上げる」から追加してください　·　タップで閉じる</p>
+          </div>
+          {/* 下向き三角 */}
+          <div style={{
+            width: 0,
+            height: 0,
+            borderLeft: "8px solid transparent",
+            borderRight: "8px solid transparent",
+            borderTop: "8px solid rgba(24,24,27,0.97)",
+            marginLeft: "24px",
+          }} />
+        </div>
+      )}
       <div className="max-w-xl mx-auto">
 
         {/* Header */}
