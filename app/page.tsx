@@ -23,15 +23,35 @@ import { IconCamera, IconSparkle } from "@/components/icons";
 function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const [isPC, setIsPC] = useState(false);
+
   useEffect(() => {
+    const pc = window.matchMedia("(pointer: fine)").matches;
+    setIsPC(pc);
+    if (!pc) return; // モバイル: CSSアニメーションに任せる
+
     const el = ref.current;
     if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.07 });
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0, rootMargin: "0px 0px 80px 0px" }
+    );
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+
   return (
-    <div ref={ref} className={className} style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(28px)", transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms` }}>
+    <div
+      ref={ref}
+      className={`reveal-mobile ${className}`}
+      style={{
+        "--reveal-delay": `${delay}ms`,
+        ...(isPC ? {
+          opacity: visible ? 1 : 0,
+          transition: `opacity 0.45s ease ${delay}ms`,
+        } : {}),
+      } as React.CSSProperties}
+    >
       {children}
     </div>
   );
@@ -174,25 +194,26 @@ function FAQ({ q, a }: { q: string; a: string }) {
 
 export default function Home() {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
   const [navScrolled, setNavScrolled] = useState(false);
 
   useEffect(() => {
+    // プロフィールがあれば即リダイレクト（同期・ブロッキングなし）
     const p = loadProfile();
     if (p) { router.replace("/main"); return; }
 
+    // 認証チェックはバックグラウンドで実行 — ページ表示をブロックしない
     try {
       const supabase = createSupabaseBrowser();
-      supabase.auth.getUser().then(({ data }) => {
-        const user = data?.user ?? null;
-        if (!user) { setReady(true); return; }
-        syncPull().then(() => {
-          router.replace(loadProfile() ? "/main" : "/setup");
-        });
-      }).catch(() => setReady(true));
-    } catch {
-      setReady(true);
-    }
+      Promise.race([
+        supabase.auth.getUser(),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 4000)),
+      ]).then(({ data }: { data: { user: unknown } }) => {
+        if (!data?.user) return;
+        syncPull()
+          .then(() => { router.replace(loadProfile() ? "/main" : "/setup"); })
+          .catch(() => {});
+      }).catch(() => {});
+    } catch {}
   }, [router]);
 
   useEffect(() => {
@@ -200,12 +221,6 @@ export default function Home() {
     window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
-
-  if (!ready) return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950">
-      <div className="w-6 h-6 border-2 border-zinc-700 border-t-transparent rounded-full animate-spin" />
-    </div>
-  );
 
   async function signInWithGoogle() {
     try {
@@ -233,7 +248,7 @@ export default function Home() {
         <div className="flex items-center gap-4">
           <button
             onClick={signInWithGoogle}
-            className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-zinc-800 border border-zinc-600 rounded-lg text-white hover:bg-zinc-700 transition-colors cursor-pointer"
+            className="flex items-center gap-2 px-3 py-2.5 text-xs font-semibold bg-zinc-800 border border-zinc-600 rounded-lg text-white hover:bg-zinc-700 transition-colors cursor-pointer"
             style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.4)" }}
           >
             <IconGoogle />
@@ -251,16 +266,16 @@ export default function Home() {
             ChatGPTで試したが、どこかで見た企画しか出なかった人へ
           </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight mb-7 text-white">
-            AIは企画を<br />作れる。<br />
-            でも、<span className="relative inline-block">
-              あなたの
+            あなただけの企画を、<br />
+            <span className="relative inline-block">
+              CaeruAI
               <span className="absolute left-0 right-0 -bottom-1 h-[3px] bg-white rounded-full" />
             </span><br />
-            企画は作れない。
+            が生成する。
           </h1>
           <p className="text-zinc-400 text-lg sm:text-xl leading-relaxed mb-10 max-w-xl mx-auto">
-            CaeruAIはプロフィールを読む。あなたが何者で、なぜ作り、誰に届けたいか。<br className="hidden sm:block" />
-            その3つが重なる場所に、あなたにしか作れないコンテンツがある。
+            CaeruAIはあなたのジャンル・動機・スタイルを踏まえて企画を生成する。<br className="hidden sm:block" />
+            誰でも使えるテンプレートじゃなく、あなたのチャンネルに合ったコンテンツを。
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <LightBtn label="無料で企画を生成する" onClick={() => router.push("/setup")} />
@@ -274,7 +289,7 @@ export default function Home() {
       {/* ══ STATS — zinc-900 ═════════════════════════════════════════════════ */}
       <div className="bg-zinc-900 py-7">
         <div className="max-w-3xl mx-auto px-6">
-          <div className="grid grid-cols-3 gap-4 text-center divide-x divide-zinc-700/60">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center divide-x divide-zinc-700/60">
             {[{ num: "7", label: "対応プラットフォーム" }, { num: "2問", label: "から使い始められる" }, { num: "無料", label: "登録不要で今すぐ" }].map(s => (
               <div key={s.label} className="px-4">
                 <div className="font-bold text-2xl sm:text-3xl mb-1 text-white">{s.num}</div>
