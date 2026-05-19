@@ -289,10 +289,13 @@ export default function ProfilePage() {
         </div>
 
         <div className="rounded-3xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.09)" }}>
-          {FIELDS.map((field, index) => {
+          {FIELDS.filter((field) => {
+            if (field.id === "youtubeChannelUrl" && profile.platform !== "youtube") return false;
+            return true;
+          }).map((field, index, arr) => {
             const isEditing = editingId === field.id;
             const raw = profile[field.id] ?? "";
-            const isLast = index === FIELDS.length - 1;
+            const isLast = index === arr.length - 1;
 
             return (
               <div
